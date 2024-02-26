@@ -17,15 +17,18 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-module jviz.core {
-  exports io.github.ericmedvet.jviz.core;
-  exports io.github.ericmedvet.jviz.core.plot;
-  exports io.github.ericmedvet.jviz.core.plot.image;
-  exports io.github.ericmedvet.jviz.core.plot.video;
+package io.github.ericmedvet.jviz.core.plot.image;
 
-  requires java.logging;
-  requires org.apache.commons.csv;
-  requires io.github.ericmedvet.jsdynsym.core;
-  requires java.desktop;
-  requires jcodec;
+import io.github.ericmedvet.jsdynsym.core.DoubleRange;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
+
+public record Axis(DoubleRange range, List<Double> ticks, List<String> labels) {
+  double xIn(double x, Rectangle2D r) {
+    return r.getX() + r.getWidth() * range.normalize(x);
+  }
+
+  double yIn(double y, Rectangle2D r) {
+    return r.getY() + r.getHeight() * (1 - range.normalize(y));
+  }
 }

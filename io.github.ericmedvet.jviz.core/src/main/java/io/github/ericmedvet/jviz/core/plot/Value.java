@@ -17,15 +17,18 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-module jviz.core {
-  exports io.github.ericmedvet.jviz.core;
-  exports io.github.ericmedvet.jviz.core.plot;
-  exports io.github.ericmedvet.jviz.core.plot.image;
-  exports io.github.ericmedvet.jviz.core.plot.video;
+package io.github.ericmedvet.jviz.core.plot;
 
-  requires java.logging;
-  requires org.apache.commons.csv;
-  requires io.github.ericmedvet.jsdynsym.core;
-  requires java.desktop;
-  requires jcodec;
+public interface Value {
+  double v();
+
+  static Value of(double v) {
+    record HardValue(double v) implements Value {
+      @Override
+      public String toString() {
+        return Double.toString(v);
+      }
+    }
+    return new HardValue(v);
+  }
 }

@@ -17,15 +17,22 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-module jviz.core {
-  exports io.github.ericmedvet.jviz.core;
-  exports io.github.ericmedvet.jviz.core.plot;
-  exports io.github.ericmedvet.jviz.core.plot.image;
-  exports io.github.ericmedvet.jviz.core.plot.video;
+package io.github.ericmedvet.jviz.core.plot;
 
-  requires java.logging;
-  requires org.apache.commons.csv;
-  requires io.github.ericmedvet.jsdynsym.core;
-  requires java.desktop;
-  requires jcodec;
-}
+import io.github.ericmedvet.jsdynsym.core.DoubleRange;
+import io.github.ericmedvet.jsdynsym.grid.Grid;
+import java.util.List;
+
+/**
+ * @author "Eric Medvet" on 2023/12/10 for jgea
+ */
+public record XYDataSeriesPlot(
+    String title,
+    String xTitleName,
+    String yTitleName,
+    String xName,
+    String yName,
+    DoubleRange xRange,
+    DoubleRange yRange,
+    Grid<TitledData<List<XYDataSeries>>> dataGrid)
+    implements XYPlot<List<XYDataSeries>> {}

@@ -17,15 +17,25 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-module jviz.core {
-  exports io.github.ericmedvet.jviz.core;
-  exports io.github.ericmedvet.jviz.core.plot;
-  exports io.github.ericmedvet.jviz.core.plot.image;
-  exports io.github.ericmedvet.jviz.core.plot.video;
+package io.github.ericmedvet.jviz.core.plot.image;
 
-  requires java.logging;
-  requires org.apache.commons.csv;
-  requires io.github.ericmedvet.jsdynsym.core;
-  requires java.desktop;
-  requires jcodec;
+import io.github.ericmedvet.jsdynsym.grid.Grid;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+
+public interface PlotDrawer {
+
+  double computeLegendH(Graphics2D g);
+
+  double computeNoteH(Graphics2D g, Grid.Key k);
+
+  Grid<Axis> computeXAxes(Graphics2D g, Layout l);
+
+  Grid<Axis> computeYAxes(Graphics2D g, Layout l);
+
+  void drawLegend(Graphics2D g, Rectangle2D r);
+
+  void drawPlot(Graphics2D g, Rectangle2D r, Grid.Key k, Axis xA, Axis yA);
+
+  void drawNote(Graphics2D g, Rectangle2D r, Grid.Key k);
 }

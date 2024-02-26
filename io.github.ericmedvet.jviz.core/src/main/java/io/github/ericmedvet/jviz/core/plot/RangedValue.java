@@ -17,15 +17,27 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-module jviz.core {
-  exports io.github.ericmedvet.jviz.core;
-  exports io.github.ericmedvet.jviz.core.plot;
-  exports io.github.ericmedvet.jviz.core.plot.image;
-  exports io.github.ericmedvet.jviz.core.plot.video;
+package io.github.ericmedvet.jviz.core.plot;
 
-  requires java.logging;
-  requires org.apache.commons.csv;
-  requires io.github.ericmedvet.jsdynsym.core;
-  requires java.desktop;
-  requires jcodec;
+import io.github.ericmedvet.jsdynsym.core.DoubleRange;
+
+public interface RangedValue extends Value {
+  DoubleRange range();
+
+  static RangedValue of(double v, double min, double max) {
+    record HardRangedValue(double v, DoubleRange range) implements RangedValue {
+      @Override
+      public String toString() {
+        return "%f[%f;%f]".formatted(v, this.range.min(), this.range.max());
+      }
+    }
+    return new HardRangedValue(v, new DoubleRange(min, max));
+  }
+
+  static DoubleRange range(Value v) {
+    if (v instanceof RangedValue rv) {
+      return rv.range();
+    }
+    return new DoubleRange(v.v(), v.v());
+  }
 }
