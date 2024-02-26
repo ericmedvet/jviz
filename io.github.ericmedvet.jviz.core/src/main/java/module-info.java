@@ -17,7 +17,7 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-module jviz.core {
+module io.github.ericmedvet.jviz.core {
   exports io.github.ericmedvet.jviz.core;
   exports io.github.ericmedvet.jviz.core.plot;
   exports io.github.ericmedvet.jviz.core.plot.image;
