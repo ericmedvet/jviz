@@ -19,6 +19,7 @@
  */
 module io.github.ericmedvet.jviz.core {
   exports io.github.ericmedvet.jviz.core;
+  exports io.github.ericmedvet.jviz.core.drawer;
   exports io.github.ericmedvet.jviz.core.plot;
   exports io.github.ericmedvet.jviz.core.plot.image;
   exports io.github.ericmedvet.jviz.core.plot.video;
