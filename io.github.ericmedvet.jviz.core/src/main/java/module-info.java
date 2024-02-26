@@ -22,6 +22,7 @@ module jviz.core {
   exports io.github.ericmedvet.jviz.core.plot;
   exports io.github.ericmedvet.jviz.core.plot.image;
   exports io.github.ericmedvet.jviz.core.plot.video;
+  exports io.github.ericmedvet.jviz.core.util;
 
   requires java.logging;
   requires org.apache.commons.csv;

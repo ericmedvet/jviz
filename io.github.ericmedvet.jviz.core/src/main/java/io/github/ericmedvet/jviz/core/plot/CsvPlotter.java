@@ -21,9 +21,9 @@
 package io.github.ericmedvet.jviz.core.plot;
 
 import io.github.ericmedvet.jsdynsym.grid.Grid;
-import io.github.ericmedvet.jviz.core.HashMapTable;
-import io.github.ericmedvet.jviz.core.Misc;
-import io.github.ericmedvet.jviz.core.Table;
+import io.github.ericmedvet.jviz.core.util.HashMapTable;
+import io.github.ericmedvet.jviz.core.util.Misc;
+import io.github.ericmedvet.jviz.core.util.Table;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;

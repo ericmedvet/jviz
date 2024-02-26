@@ -17,7 +17,7 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package io.github.ericmedvet.jviz.core;
+package io.github.ericmedvet.jviz.core.util;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -21,7 +21,7 @@ package io.github.ericmedvet.jviz.core.plot;
 
 import io.github.ericmedvet.jsdynsym.core.DoubleRange;
 import io.github.ericmedvet.jsdynsym.grid.Grid;
-import io.github.ericmedvet.jviz.core.Misc;
+import io.github.ericmedvet.jviz.core.util.Misc;
 import java.util.List;
 
 /**

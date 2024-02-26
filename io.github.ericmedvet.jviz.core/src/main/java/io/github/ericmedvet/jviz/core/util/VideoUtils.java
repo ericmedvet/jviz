@@ -18,7 +18,7 @@
  * =========================LICENSE_END==================================
  */
 
-package io.github.ericmedvet.jviz.core;
+package io.github.ericmedvet.jviz.core.util;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
