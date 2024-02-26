@@ -20,8 +20,6 @@
 package io.github.ericmedvet.jviz.core.plot.video;
 
 import io.github.ericmedvet.jsdynsym.grid.Grid;
-import io.github.ericmedvet.jviz.core.util.Misc;
-import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.Plotter;
@@ -29,6 +27,8 @@ import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.image.ImagePlotter;
+import io.github.ericmedvet.jviz.core.util.Misc;
+import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
