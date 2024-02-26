@@ -27,7 +27,7 @@ module io.github.ericmedvet.jviz.core {
 
   requires java.logging;
   requires org.apache.commons.csv;
-  requires io.github.ericmedvet.jsdynsym.core;
+  requires io.github.ericmedvet.jnb.datastructure;
   requires java.desktop;
   requires jcodec;
 }

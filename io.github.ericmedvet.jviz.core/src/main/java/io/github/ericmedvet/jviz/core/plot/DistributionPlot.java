@@ -19,8 +19,8 @@
  */
 package io.github.ericmedvet.jviz.core.plot;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
-import io.github.ericmedvet.jsdynsym.grid.Grid;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.util.Misc;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public record DistributionPlot(
     String xName,
     String yName,
     DoubleRange yRange,
-    Grid<XYPlot.TitledData<List<Data>>> dataGrid)
+    Grid<TitledData<List<Data>>> dataGrid)
     implements XYPlot<List<DistributionPlot.Data>> {
 
   @Override

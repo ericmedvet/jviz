@@ -19,7 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.plot.image;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;

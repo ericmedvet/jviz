@@ -19,7 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.plot;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

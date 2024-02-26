@@ -19,7 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.plot;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 
 public interface RangedValue extends Value {
   DoubleRange range();

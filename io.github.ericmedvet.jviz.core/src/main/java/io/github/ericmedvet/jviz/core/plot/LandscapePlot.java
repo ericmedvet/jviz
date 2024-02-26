@@ -19,8 +19,8 @@
  */
 package io.github.ericmedvet.jviz.core.plot;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
-import io.github.ericmedvet.jsdynsym.grid.Grid;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.Grid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

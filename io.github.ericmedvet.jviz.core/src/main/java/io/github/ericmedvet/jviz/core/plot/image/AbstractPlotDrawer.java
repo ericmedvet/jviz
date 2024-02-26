@@ -19,8 +19,8 @@
  */
 package io.github.ericmedvet.jviz.core.plot.image;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
-import io.github.ericmedvet.jsdynsym.grid.Grid;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;

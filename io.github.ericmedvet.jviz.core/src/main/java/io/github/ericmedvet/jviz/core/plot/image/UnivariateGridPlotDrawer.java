@@ -19,8 +19,8 @@
  */
 package io.github.ericmedvet.jviz.core.plot.image;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
-import io.github.ericmedvet.jsdynsym.grid.Grid;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.plot.RangedGrid;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import java.awt.Color;

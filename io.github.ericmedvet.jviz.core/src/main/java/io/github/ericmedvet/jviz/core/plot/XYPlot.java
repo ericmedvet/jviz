@@ -19,8 +19,8 @@
  */
 package io.github.ericmedvet.jviz.core.plot;
 
-import io.github.ericmedvet.jsdynsym.core.DoubleRange;
-import io.github.ericmedvet.jsdynsym.grid.Grid;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.Grid;
 
 /**
  * @author "Eric Medvet" on 2023/12/01 for jgea
