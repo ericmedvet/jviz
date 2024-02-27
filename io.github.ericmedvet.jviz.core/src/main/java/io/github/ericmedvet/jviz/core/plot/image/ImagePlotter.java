@@ -29,10 +29,7 @@ import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -51,8 +48,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /**
  * @author "Eric Medvet" on 2023/12/01 for jgea
@@ -108,29 +103,6 @@ public class ImagePlotter implements Plotter<BufferedImage> {
   protected static DoubleRange enlarge(DoubleRange range, double r) {
     return new DoubleRange(
         range.min() - range.extent() * (r - 1d) / 2d, range.max() + range.extent() * (r - 1d) / 2d);
-  }
-
-  public static void showImage(BufferedImage image) {
-    EventQueue.invokeLater(() -> {
-      JFrame frame = new JFrame("Image");
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.add(new JPanel() {
-        protected void paintComponent(Graphics g) {
-          super.paintComponent(g);
-          Dimension d = getSize();
-          Graphics2D g2d = (Graphics2D) g.create();
-          g2d.drawImage(image, (d.width - image.getWidth()) / 2, (d.height - image.getHeight()) / 2, this);
-          g2d.dispose();
-        }
-
-        public Dimension getPreferredSize() {
-          return new Dimension(image.getWidth(), image.getHeight());
-        }
-      });
-      frame.pack();
-      frame.setLocationRelativeTo(null);
-      frame.setVisible(true);
-    });
   }
 
   protected Configuration c() {

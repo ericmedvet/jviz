@@ -19,6 +19,11 @@
  */
 package io.github.ericmedvet.jviz.core.util;
 
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +34,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class Misc {
 
@@ -88,5 +95,28 @@ public class Misc {
     List<K> collection = ks.stream().sorted(comparator).toList();
     int i = (int) Math.max(Math.min(((double) collection.size()) * p, collection.size() - 1), 0);
     return collection.get(i);
+  }
+
+  public static void showImage(BufferedImage image) {
+    EventQueue.invokeLater(() -> {
+      JFrame frame = new JFrame("Image");
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      frame.add(new JPanel() {
+        protected void paintComponent(Graphics g) {
+          super.paintComponent(g);
+          Dimension d = getSize();
+          Graphics2D g2d = (Graphics2D) g.create();
+          g2d.drawImage(image, (d.width - image.getWidth()) / 2, (d.height - image.getHeight()) / 2, this);
+          g2d.dispose();
+        }
+
+        public Dimension getPreferredSize() {
+          return new Dimension(image.getWidth(), image.getHeight());
+        }
+      });
+      frame.pack();
+      frame.setLocationRelativeTo(null);
+      frame.setVisible(true);
+    });
   }
 }
