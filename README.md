@@ -12,6 +12,6 @@ Add (at least) this to your `pom.xml`:
 <dependency>
     <groupId>io.github.ericmedvet</groupId>
     <artifactId>jviz.core</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
 </dependency>
 ```
