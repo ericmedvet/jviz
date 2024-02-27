@@ -37,7 +37,8 @@ public interface TimedSequenceDrawer<E> extends Drawer<SortedMap<Double, E>> {
 
   @Override
   default void draw(Graphics2D g, SortedMap<Double, E> map) {
-    map.forEach((t, e) -> drawSingle(g, t, e));
+    double t = map.lastKey();
+    drawSingle(g, t, map.get(t));
     drawAll(g, map);
   }
 

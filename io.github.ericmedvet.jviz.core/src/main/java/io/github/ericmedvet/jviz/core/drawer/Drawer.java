@@ -19,6 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
@@ -28,13 +29,22 @@ import java.awt.image.BufferedImage;
  * @author "Eric Medvet" on 2024/02/23 for jgea
  */
 public interface Drawer<E> {
+
+  Color bgColor = Color.WHITE;
+
   void draw(Graphics2D g, E e);
+
+  default void clean(Graphics2D g) {
+    g.setColor(bgColor);
+    g.fill(new Rectangle2D.Double(0, 0, g.getClipBounds().width, g.getClipBounds().height));
+  }
 
   default BufferedImage draw(int w, int h, E e) {
     BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
     Graphics2D g = image.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g.setClip(new Rectangle2D.Double(0, 0, image.getWidth(), image.getHeight()));
+    clean(g);
     draw(g, e);
     g.dispose();
     return image;
