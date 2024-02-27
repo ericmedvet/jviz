@@ -20,23 +20,28 @@
 package io.github.ericmedvet.jviz.core.drawer;
 
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
-/**
- * @author "Eric Medvet" on 2024/02/23 for jgea
- */
-public interface Drawer<E> {
-  void draw(Graphics2D g, E e);
+public interface TimedSequenceDrawer<E> extends Drawer<SortedMap<Double, E>> {
 
-  default BufferedImage draw(int w, int h, E e) {
-    BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
-    Graphics2D g = image.createGraphics();
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setClip(new Rectangle2D.Double(0, 0, image.getWidth(), image.getHeight()));
-    draw(g, e);
-    g.dispose();
-    return image;
+  void drawSingle(Graphics2D g, double t, E e);
+
+  default Drawer<Map.Entry<Double, E>> single() {
+    return (g, entry) -> drawSingle(g, entry.getKey(), entry.getValue());
+  }
+
+  default void drawAll(Graphics2D g, SortedMap<Double, E> map) {}
+
+  @Override
+  default void draw(Graphics2D g, SortedMap<Double, E> map) {
+    map.forEach((t, e) -> drawSingle(g, t, e));
+    drawAll(g, map);
+  }
+
+  default List<BufferedImage> drawAll(int w, int h, SortedMap<Double, E> map) {
+    return map.entrySet().stream().map(e -> single().draw(w, h, e)).toList();
   }
 }
