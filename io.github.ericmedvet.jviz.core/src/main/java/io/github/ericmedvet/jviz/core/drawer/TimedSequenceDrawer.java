@@ -19,8 +19,11 @@
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
+import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -44,5 +47,25 @@ public interface TimedSequenceDrawer<E> extends Drawer<SortedMap<Double, E>> {
 
   default List<BufferedImage> drawAll(int w, int h, SortedMap<Double, E> map) {
     return map.entrySet().stream().map(e -> single().draw(w, h, e)).toList();
+  }
+
+  default void saveVideo(
+      int w, int h, File file, double frameRate, VideoUtils.EncoderFacility encoder, SortedMap<Double, E> map)
+      throws IOException {
+    VideoUtils.encodeAndSave(drawAll(w, h, map), frameRate, file, encoder);
+  }
+
+  default void saveVideo(int w, int h, File file, double frameRate, SortedMap<Double, E> map) throws IOException {
+    saveVideo(w, h, file, frameRate, VideoUtils.EncoderFacility.JCODEC, map);
+  }
+
+  default void saveVideo(int w, int h, File file, VideoUtils.EncoderFacility encoder, SortedMap<Double, E> map)
+      throws IOException {
+    double frameRate = (double) map.size() / (map.lastKey() - map.firstKey());
+    saveVideo(w, h, file, frameRate, encoder, map);
+  }
+
+  default void saveVideo(int w, int h, File file, SortedMap<Double, E> map) throws IOException {
+    saveVideo(w, h, file, VideoUtils.EncoderFacility.JCODEC, map);
   }
 }

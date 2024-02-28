@@ -24,6 +24,9 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 /**
  * @author "Eric Medvet" on 2024/02/23 for jgea
@@ -48,5 +51,14 @@ public interface Drawer<E> {
     draw(g, e);
     g.dispose();
     return image;
+  }
+
+  default void saveImage(int w, int h, String formatName, File file, E e) throws IOException {
+    ImageIO.write(draw(w, h, e), formatName, file);
+  }
+
+  default void saveImage(int w, int h, File file, E e) throws IOException {
+    String[] tokens = file.getName().split("\\.");
+    saveImage(w, h, tokens[tokens.length - 1], file, e);
   }
 }

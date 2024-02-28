@@ -27,6 +27,7 @@ import io.github.ericmedvet.jviz.core.plot.Plotter;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import io.github.ericmedvet.jviz.core.util.GraphicsUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -277,7 +278,7 @@ public class ImagePlotter implements Plotter<BufferedImage> {
       double strokeSizeRate) {
     markRectangle(g, r);
     // fill box
-    g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (color.getAlpha() * alpha)));
+    g.setColor(GraphicsUtils.alphaed(color, alpha));
     g.fill(new Rectangle2D.Double(r.getX(), innerBottom, r.getWidth(), innerTop - innerBottom));
     // draw
     g.setColor(color);
@@ -409,7 +410,7 @@ public class ImagePlotter implements Plotter<BufferedImage> {
             case SQUARE -> new Rectangle2D.Double(p.getX() - l, p.getY() - l, size, size);
             default -> throw new IllegalArgumentException();
           };
-      g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (color.getAlpha() * alpha)));
+      g.setColor(GraphicsUtils.alphaed(color, alpha));
       g.fill(s);
       g.setColor(color);
       g.draw(s);
