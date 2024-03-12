@@ -19,6 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
+import io.github.ericmedvet.jviz.core.util.Misc;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -60,5 +61,9 @@ public interface Drawer<E> {
   default void saveImage(int w, int h, File file, E e) throws IOException {
     String[] tokens = file.getName().split("\\.");
     saveImage(w, h, tokens[tokens.length - 1], file, e);
+  }
+
+  default void showImage(int w, int h, E e) {
+    Misc.showImage(draw(w, h, e));
   }
 }
