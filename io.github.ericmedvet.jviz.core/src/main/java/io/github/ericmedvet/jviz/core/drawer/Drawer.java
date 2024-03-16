@@ -20,6 +20,7 @@
 package io.github.ericmedvet.jviz.core.drawer;
 
 import io.github.ericmedvet.jviz.core.util.Misc;
+import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -27,6 +28,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import javax.imageio.ImageIO;
 
 /**
@@ -65,5 +67,10 @@ public interface Drawer<E> {
 
   default void showImage(int w, int h, E e) {
     Misc.showImage(draw(w, h, e));
+  }
+
+  default void saveVideo(int w, int h, File file, double frameRate, VideoUtils.EncoderFacility encoder, List<E> es)
+      throws IOException {
+    VideoUtils.encodeAndSave(es.stream().map(e -> draw(w, h, e)).toList(), frameRate, file, encoder);
   }
 }
