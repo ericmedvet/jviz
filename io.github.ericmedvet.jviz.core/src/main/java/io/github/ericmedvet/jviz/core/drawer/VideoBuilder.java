@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.function.Function;
 
 public interface VideoBuilder<E> {
-  byte[] build(int w, int h, E e) throws IOException;
+  byte[] build(int w, int h, double frameRate, E e) throws IOException;
 
-  default void save(int w, int h, File file, E e) throws IOException {
-    byte[] data = build(w, h, e);
+  default void save(int w, int h, double frameRate, File file, E e) throws IOException {
+    byte[] data = build(w, h, frameRate, e);
     try (OutputStream os = new FileOutputStream(file);
         InputStream is = new ByteArrayInputStream(data)) {
       byte[] buffer = new byte[1024];
@@ -44,11 +44,8 @@ public interface VideoBuilder<E> {
   }
 
   static <F, E> VideoBuilder<F> from(
-      ImageBuilder<E> imageBuilder,
-      Function<F, List<E>> splitter,
-      double frameRate,
-      VideoUtils.EncoderFacility encoder) {
-    return (w, h, f) -> {
+      ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, VideoUtils.EncoderFacility encoder) {
+    return (w, h, frameRate, f) -> {
       List<BufferedImage> images = splitter.apply(f).stream()
           .map(e -> imageBuilder.build(w, h, e))
           .toList();
