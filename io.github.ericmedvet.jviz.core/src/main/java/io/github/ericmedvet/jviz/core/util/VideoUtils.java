@@ -36,10 +36,7 @@
 package io.github.ericmedvet.jviz.core.util;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -93,6 +90,19 @@ public class VideoUtils {
     }
   }
 
+  public static byte[] encode(List<BufferedImage> images, double frameRate, EncoderFacility encoder)
+      throws IOException {
+    File tmpFile = File.createTempFile("video", ".mp4");
+    encodeAndSave(images, frameRate, tmpFile, encoder);
+    try (InputStream is = new FileInputStream(tmpFile)) {
+      return is.readAllBytes();
+    }
+  }
+
+  public static void encodeAndSave(List<BufferedImage> images, double frameRate, File file) throws IOException {
+    encodeAndSave(images, frameRate, file, DEFAULT_ENCODER);
+  }
+
   public static void encodeAndSave(List<BufferedImage> images, double frameRate, File file, EncoderFacility encoder)
       throws IOException {
     switch (encoder) {
@@ -100,10 +110,6 @@ public class VideoUtils {
       case FFMPEG_LARGE -> encodeAndSaveWithFFMpeg(images, frameRate, file, 18);
       case FFMPEG_SMALL -> encodeAndSaveWithFFMpeg(images, frameRate, file, 30);
     }
-  }
-
-  public static void encodeAndSave(List<BufferedImage> images, double frameRate, File file) throws IOException {
-    encodeAndSave(images, frameRate, file, DEFAULT_ENCODER);
   }
 
   private static void encodeAndSaveWithFFMpeg(
