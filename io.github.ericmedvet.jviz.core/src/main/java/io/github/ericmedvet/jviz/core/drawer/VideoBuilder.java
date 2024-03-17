@@ -23,33 +23,48 @@ import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public interface VideoBuilder<E> {
-  byte[] build(int w, int h, double frameRate, E e) throws IOException;
 
-  default void save(int w, int h, double frameRate, File file, E e) throws IOException {
-    byte[] data = build(w, h, frameRate, e);
-    try (OutputStream os = new FileOutputStream(file);
-        InputStream is = new ByteArrayInputStream(data)) {
-      byte[] buffer = new byte[1024];
-      while (true) {
-        int read = is.read(buffer, 0, buffer.length);
-        if (read == -1) {
-          break;
-        }
-        os.write(buffer, 0, read);
-      }
+  record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
+
+  record Video(List<BufferedImage> images, double frameRate) {
+    @Override
+    public String toString() {
+      return "(%dx%d)x%d@%.1ffps"
+          .formatted(images.get(0).getWidth(), images.get(0).getHeight(), images.size(), frameRate);
     }
   }
 
-  static <F, E> VideoBuilder<F> from(
-      ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, VideoUtils.EncoderFacility encoder) {
-    return (w, h, frameRate, f) -> {
+  Video build(VideoInfo videoInfo, E e) throws IOException;
+
+  default void save(VideoInfo videoInfo, File file, E e) throws IOException {
+    Logger.getLogger(getClass().getSimpleName()).fine("Building video");
+    Video video = build(videoInfo, e);
+    Logger.getLogger(getClass().getSimpleName()).fine("Video built: %s".formatted(video));
+    VideoUtils.encodeAndSave(video.images, video.frameRate, file, videoInfo.encoder);
+    Logger.getLogger(getClass().getSimpleName()).fine("Video saved on %s".formatted(file));
+  }
+
+  static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, double frameRate) {
+    return (videoInfo, f) -> {
       List<BufferedImage> images = splitter.apply(f).stream()
-          .map(e -> imageBuilder.build(w, h, e))
+          .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
           .toList();
-      return VideoUtils.encode(images, frameRate, encoder);
+      return new Video(images, frameRate);
+    };
+  }
+
+  static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, SortedMap<Double, E>> splitter) {
+    return (videoInfo, f) -> {
+      SortedMap<Double, E> map = splitter.apply(f);
+      List<BufferedImage> images = map.values().stream()
+          .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
+          .toList();
+      return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey());
     };
   }
 }

@@ -26,18 +26,21 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public interface ImageBuilder<E> {
-  BufferedImage build(int w, int h, E e);
 
-  default void save(int w, int h, String formatName, File file, E e) throws IOException {
-    ImageIO.write(build(w, h, e), formatName, file);
+  record ImageInfo(int w, int h) {}
+
+  BufferedImage build(ImageInfo imageInfo, E e);
+
+  default void save(ImageInfo imageInfo, String formatName, File file, E e) throws IOException {
+    ImageIO.write(build(imageInfo, e), formatName, file);
   }
 
-  default void save(int w, int h, File file, E e) throws IOException {
+  default void save(ImageInfo imageInfo, File file, E e) throws IOException {
     String[] tokens = file.getName().split("\\.");
-    save(w, h, tokens[tokens.length - 1], file, e);
+    save(imageInfo, tokens[tokens.length - 1], file, e);
   }
 
-  default void show(int w, int h, E e) {
-    Misc.showImage(build(w, h, e));
+  default void show(ImageInfo imageInfo, E e) {
+    Misc.showImage(build(imageInfo, e));
   }
 }

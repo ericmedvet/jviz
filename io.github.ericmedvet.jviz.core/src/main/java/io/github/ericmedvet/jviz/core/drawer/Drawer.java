@@ -34,14 +34,22 @@ public interface Drawer<E> extends ImageBuilder<E> {
 
   void draw(Graphics2D g, E e);
 
+  default Drawer<E> andThen(Drawer<E> other) {
+    Drawer<E> thisDrawer = this;
+    return (g, e) -> {
+      thisDrawer.draw(g, e);
+      other.draw(g, e);
+    };
+  }
+
   static void clean(Graphics2D g) {
     g.setColor(BG_COLOR);
     g.fill(new Rectangle2D.Double(0, 0, g.getClipBounds().width, g.getClipBounds().height));
   }
 
   @Override
-  default BufferedImage build(int w, int h, E e) {
-    BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+  default BufferedImage build(ImageInfo imageInfo, E e) {
+    BufferedImage image = new BufferedImage(imageInfo.w(), imageInfo.h(), BufferedImage.TYPE_3BYTE_BGR);
     Graphics2D g = image.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g.setClip(new Rectangle2D.Double(0, 0, image.getWidth(), image.getHeight()));
