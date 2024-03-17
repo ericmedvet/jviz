@@ -36,12 +36,12 @@ import javax.imageio.ImageIO;
  */
 public interface Drawer<E> {
 
-  Color bgColor = Color.WHITE;
+  Color BG_COLOR = Color.WHITE;
 
   void draw(Graphics2D g, E e);
 
-  default void clean(Graphics2D g) {
-    g.setColor(bgColor);
+  static void clean(Graphics2D g) {
+    g.setColor(BG_COLOR);
     g.fill(new Rectangle2D.Double(0, 0, g.getClipBounds().width, g.getClipBounds().height));
   }
 
