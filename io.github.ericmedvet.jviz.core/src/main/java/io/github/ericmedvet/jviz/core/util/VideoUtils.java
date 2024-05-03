@@ -116,6 +116,7 @@ public class VideoUtils {
       List<BufferedImage> images, double frameRate, File file, int compression) throws IOException {
     // save all files
     String workingDirName = file.getAbsoluteFile().getParentFile().getPath();
+    String outFileName = file.getName();
     String imagesDirName = workingDirName + File.separator + "imgs." + System.currentTimeMillis();
     Files.createDirectories(Path.of(imagesDirName));
     List<Path> toDeletePaths = new ArrayList<>();
@@ -129,7 +130,7 @@ public class VideoUtils {
     // invoke ffmpeg
     String command = String.format(
         "ffmpeg -y -r %d -i %s/frame%%06d.jpg -vcodec libx264 -crf %d -pix_fmt yuv420p %s",
-        (int) Math.round(frameRate), imagesDirName, compression, file.getPath());
+        (int) Math.round(frameRate), imagesDirName, compression, outFileName);
     L.fine(String.format("Running: %s", command));
     ProcessBuilder pb = new ProcessBuilder(command.split(" "));
     pb.directory(new File(workingDirName));
