@@ -23,13 +23,24 @@ import io.github.ericmedvet.jviz.core.util.Misc;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Function;
 import javax.imageio.ImageIO;
 
-public interface ImageBuilder<E> {
+public interface ImageBuilder<E> extends Function<E, BufferedImage> {
 
-  record ImageInfo(int w, int h) {}
+  int DEFAULT_W = 300;
+  int DEFAULT_H = 200;
 
   BufferedImage build(ImageInfo imageInfo, E e);
+
+  @Override
+  default BufferedImage apply(E e) {
+    return build(imageInfo(e), e);
+  }
+
+  default ImageInfo imageInfo(E e) {
+    return new ImageInfo(DEFAULT_W, DEFAULT_H);
+  }
 
   default void save(ImageInfo imageInfo, String formatName, File file, E e) throws IOException {
     ImageIO.write(build(imageInfo, e), formatName, file);
@@ -43,4 +54,6 @@ public interface ImageBuilder<E> {
   default void show(ImageInfo imageInfo, E e) {
     Misc.showImage(build(imageInfo, e));
   }
+
+  record ImageInfo(int w, int h) {}
 }
