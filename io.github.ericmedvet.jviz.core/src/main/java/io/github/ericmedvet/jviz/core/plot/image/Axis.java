@@ -24,11 +24,11 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 public record Axis(DoubleRange range, List<Double> ticks, List<String> labels) {
-  double xIn(double x, Rectangle2D r) {
+  public double xIn(double x, Rectangle2D r) {
     return r.getX() + r.getWidth() * range.normalize(x);
   }
 
-  double yIn(double y, Rectangle2D r) {
+  public double yIn(double y, Rectangle2D r) {
     return r.getY() + r.getHeight() * (1 - range.normalize(y));
   }
 }

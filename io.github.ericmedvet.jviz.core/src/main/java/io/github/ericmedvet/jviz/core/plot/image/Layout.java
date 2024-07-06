@@ -40,7 +40,7 @@ public record Layout(
     double noteH,
     Configuration.Layout configuration,
     XYPlot<?> plot) {
-  Rectangle2D colTitle(int plotX, int plotY) {
+  public Rectangle2D colTitle(int plotX, int plotY) {
     return new Rectangle2D.Double(
         commonYAxesW + (double) plotX * plotOuterW() + yAxisW,
         mainTitleH + commonColTitleH + (double) plotY * plotOuterH() + configuration.colTitleMarginHRate() * h,
@@ -48,7 +48,7 @@ public record Layout(
         colTitleH - 2d * configuration.colTitleMarginHRate() * h);
   }
 
-  Rectangle2D commonColTitle(int plotX) {
+  public Rectangle2D commonColTitle(int plotX) {
     return new Rectangle2D.Double(
         commonYAxesW + (double) plotX * plotOuterW() + yAxisW,
         mainTitleH + configuration.colTitleMarginHRate() * h,
@@ -56,7 +56,7 @@ public record Layout(
         commonColTitleH - 2d * configuration.colTitleMarginHRate() * h);
   }
 
-  Rectangle2D commonRowTitle(int plotY) {
+  public Rectangle2D commonRowTitle(int plotY) {
     return new Rectangle2D.Double(
         w - commonRowTitleW + configuration.rowTitleMarginWRate() * w,
         mainTitleH + commonColTitleH + (double) plotY * plotOuterH() + colTitleH + noteH,
@@ -64,7 +64,7 @@ public record Layout(
         plotInnerH());
   }
 
-  Rectangle2D commonXAxis(int plotX) {
+  public Rectangle2D commonXAxis(int plotX) {
     return new Rectangle2D.Double(
         innerPlot(plotX, 0).getX(),
         h - legendH - commonXAxesH + configuration.xAxisMarginHRate() * h,
@@ -72,7 +72,7 @@ public record Layout(
         commonXAxesH - 2d * configuration.xAxisMarginHRate() * h);
   }
 
-  Rectangle2D commonYAxis(int plotY) {
+  public Rectangle2D commonYAxis(int plotY) {
     return new Rectangle2D.Double(
         configuration.yAxisMarginWRate() * w,
         innerPlot(0, plotY).getY(),
@@ -80,7 +80,7 @@ public record Layout(
         innerPlot(0, plotY).getHeight());
   }
 
-  Rectangle2D innerPlot(int plotX, int plotY) {
+  public Rectangle2D innerPlot(int plotX, int plotY) {
     return new Rectangle2D.Double(
         commonYAxesW + (double) plotX * plotOuterW() + yAxisW + configuration.plotMarginWRate() * w,
         mainTitleH
@@ -93,7 +93,7 @@ public record Layout(
         plotInnerH() - 2d * configuration.plotMarginHRate() * h);
   }
 
-  Rectangle2D legend() {
+  public Rectangle2D legend() {
     return new Rectangle2D.Double(
         configuration.legendMarginWRate() * w,
         h - legendH + configuration.legendMarginHRate() * h,
@@ -101,7 +101,7 @@ public record Layout(
         legendH - 2d * configuration.legendMarginHRate() * h);
   }
 
-  Rectangle2D mainTitle() {
+  public Rectangle2D mainTitle() {
     return new Rectangle2D.Double(
         0,
         configuration.mainTitleMarginHRate() * h,
@@ -109,7 +109,7 @@ public record Layout(
         mainTitleH - 2d * configuration.mainTitleMarginHRate() * h);
   }
 
-  Rectangle2D note(int plotX, int plotY) {
+  public Rectangle2D note(int plotX, int plotY) {
     return new Rectangle2D.Double(
         innerPlot(plotX, plotY).getX(),
         mainTitleH
@@ -121,23 +121,23 @@ public record Layout(
         noteH - 2d * configuration.noteMarginHRate() * h);
   }
 
-  double plotInnerH() {
+  public double plotInnerH() {
     return plotOuterH() - xAxisH - colTitleH - noteH;
   }
 
-  double plotInnerW() {
+  public double plotInnerW() {
     return plotOuterW() - yAxisW - rowTitleW;
   }
 
-  double plotOuterH() {
+  public double plotOuterH() {
     return (h - mainTitleH - commonColTitleH - legendH - commonXAxesH) / (double) plotRows;
   }
 
-  double plotOuterW() {
+  public double plotOuterW() {
     return (w - commonYAxesW - commonRowTitleW) / (double) plotCols;
   }
 
-  Layout refit(double newXAxisH, double newYAxisW) {
+  public Layout refit(double newXAxisH, double newYAxisW) {
     return new Layout(
         w,
         h,
@@ -158,7 +158,7 @@ public record Layout(
         plot);
   }
 
-  Rectangle2D rowTitle(int plotX, int plotY) {
+  public Rectangle2D rowTitle(int plotX, int plotY) {
     return new Rectangle2D.Double(
         commonYAxesW
             + yAxisW
@@ -170,7 +170,7 @@ public record Layout(
         plotInnerH());
   }
 
-  Rectangle2D xAxis(int plotX, int plotY) {
+  public Rectangle2D xAxis(int plotX, int plotY) {
     return new Rectangle2D.Double(
         innerPlot(plotX, plotY).getX(),
         mainTitleH
@@ -183,7 +183,7 @@ public record Layout(
         xAxisH - 2d * configuration.xAxisMarginHRate() * h);
   }
 
-  Rectangle2D yAxis(int plotX, int plotY) {
+  public Rectangle2D yAxis(int plotX, int plotY) {
     return new Rectangle2D.Double(
         commonYAxesW + (double) plotX * plotOuterW() + configuration.yAxisMarginWRate() * w,
         innerPlot(plotX, plotY).getY(),
