@@ -28,6 +28,8 @@ import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.LinesPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.PointsPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
+import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.Value;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
@@ -89,8 +91,8 @@ public class Main {
         "My plot",
         "x title",
         "y title",
-        "x",
-        "f(x)",
+        "x1",
+        "x2",
         DoubleRange.UNBOUNDED,
         DoubleRange.UNBOUNDED,
         DoubleRange.UNBOUNDED,
@@ -105,9 +107,30 @@ public class Main {
                     List.of(
                         sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
                         sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
-                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100))))));
+                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 50))))));
     new LandscapePlotDrawer(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT, Colors.DEFAULT.dataColors())
         .show(lsp);
+    // grid plot
+    UnivariateGridPlot ugp = new UnivariateGridPlot(
+        "My plot",
+        "x title",
+        "y title",
+        "x1",
+        "x2",
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            4,
+            2,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                Grid.create(
+                    10,
+                    10,
+                    (igx, igy) -> Math.exp(1 + Math.sin(igx / (1 + gX) + igy / (1 + gY)))))));
+    new UnivariateGridPlotDrawer(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT).show(ugp);
   }
 
   private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {
