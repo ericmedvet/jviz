@@ -21,11 +21,11 @@ package io.github.ericmedvet.jviz.core;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
-import io.github.ericmedvet.jviz.core.drawer.ImageBuilder;
 import io.github.ericmedvet.jviz.core.plot.BoxPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.LinesPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.PointsPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.Value;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
@@ -34,8 +34,7 @@ import io.github.ericmedvet.jviz.core.plot.image.Configuration;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
-import io.github.ericmedvet.jviz.core.plot.image.ImagePlotter;
-import io.github.ericmedvet.jviz.core.util.Misc;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import java.util.List;
 import java.util.Random;
 import java.util.random.RandomGenerator;
@@ -64,7 +63,8 @@ public class Main {
                     sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
                     sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)))));
     new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT, Colors.DEFAULT.dataColors()).show(lp);
-    Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
+    new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT, Colors.DEFAULT.dataColors()).show(lp);
+    // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
     // box plot
     DistributionPlot bp = new DistributionPlot(
         "My plot",

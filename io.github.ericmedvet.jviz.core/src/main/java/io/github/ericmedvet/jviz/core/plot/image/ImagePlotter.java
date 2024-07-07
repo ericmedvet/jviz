@@ -27,6 +27,7 @@ import io.github.ericmedvet.jviz.core.plot.Plotter;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer;
 import io.github.ericmedvet.jviz.core.util.GraphicsUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -87,13 +88,6 @@ public class ImagePlotter implements Plotter<BufferedImage> {
     T,
     C,
     B
-  }
-
-  protected enum Marker {
-    CIRCLE,
-    PLUS,
-    SQUARE,
-    TIMES
   }
 
   @FunctionalInterface
@@ -400,10 +394,16 @@ public class ImagePlotter implements Plotter<BufferedImage> {
   }
 
   protected void drawMarker(
-      Graphics2D g, Point2D p, double size, Marker marker, Color color, double alpha, double strokeSize) {
+      Graphics2D g,
+      Point2D p,
+      double size,
+      XYPlotDrawer.Marker marker,
+      Color color,
+      double alpha,
+      double strokeSize) {
     double l = size / 2d;
     g.setStroke(new BasicStroke((float) strokeSize));
-    if (marker.equals(Marker.CIRCLE) || marker.equals(Marker.SQUARE)) {
+    if (marker.equals(XYPlotDrawer.Marker.CIRCLE) || marker.equals(XYPlotDrawer.Marker.SQUARE)) {
       Shape s =
           switch (marker) {
             case CIRCLE -> new Ellipse2D.Double(p.getX() - l, p.getY() - l, size, size);
@@ -414,11 +414,11 @@ public class ImagePlotter implements Plotter<BufferedImage> {
       g.fill(s);
       g.setColor(color);
       g.draw(s);
-    } else if (marker.equals(Marker.PLUS)) {
+    } else if (marker.equals(XYPlotDrawer.Marker.PLUS)) {
       g.setColor(color);
       g.draw(new Line2D.Double(p.getX(), p.getY() - l, p.getX(), p.getY() + l));
       g.draw(new Line2D.Double(p.getX() - l, p.getY(), p.getX() + l, p.getY()));
-    } else if (marker.equals(Marker.TIMES)) {
+    } else if (marker.equals(XYPlotDrawer.Marker.TIMES)) {
       g.setColor(color);
       g.draw(new Line2D.Double(p.getX() - l, p.getY() - l, p.getX() + l, p.getY() + l));
       g.draw(new Line2D.Double(p.getX() - l, p.getY() + l, p.getX() + l, p.getY() - l));

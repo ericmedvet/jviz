@@ -19,6 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.plot.image;
 
+import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer;
 import java.awt.Color;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +140,7 @@ public record Configuration(
       double markerSizeRate,
       double alpha,
       double markerLegendImageSizeRate,
-      ImagePlotter.Marker marker,
+      XYPlotDrawer.Marker marker,
       int legendSteps,
       double colorBarLegendImageWRate,
       double colorBarLegendImageHRate,
@@ -220,7 +221,7 @@ public record Configuration(
       double markerSizeRate,
       double alpha,
       double legendImageSizeRate,
-      ImagePlotter.Marker marker,
+      XYPlotDrawer.Marker marker,
       List<Color> colors,
       double xExtensionRate,
       double yExtensionRate) {
@@ -229,7 +230,7 @@ public record Configuration(
         0.005,
         0.35,
         0.02,
-        ImagePlotter.Marker.CIRCLE,
+        XYPlotDrawer.Marker.CIRCLE,
         Colors.DEFAULT.dataColors(),
         LinesPlot.DEFAULT.xExtensionRate,
         LinesPlot.DEFAULT.yExtensionRate);

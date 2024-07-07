@@ -23,6 +23,7 @@ import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.AnchorH;
 import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.AnchorV;
+import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.Marker;
 import io.github.ericmedvet.jviz.core.plot.image.Axis;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Text.Use;
@@ -32,7 +33,9 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -113,6 +116,38 @@ public class PlotUtils {
         r.getMaxY(),
         r.getCenterX() + r.getWidth() * whiskersWRate / 2d,
         r.getMaxY()));
+  }
+
+  public static void drawMarker(
+      Graphics2D g,
+      Point2D p,
+      double size,
+      XYPlotDrawer.Marker marker,
+      Color color,
+      double alpha,
+      double strokeSize) {
+    double l = size / 2d;
+    g.setStroke(new BasicStroke((float) strokeSize));
+    if (marker.equals(XYPlotDrawer.Marker.CIRCLE) || marker.equals(XYPlotDrawer.Marker.SQUARE)) {
+      Shape s =
+          switch (marker) {
+            case CIRCLE -> new Ellipse2D.Double(p.getX() - l, p.getY() - l, size, size);
+            case SQUARE -> new Rectangle2D.Double(p.getX() - l, p.getY() - l, size, size);
+            default -> throw new IllegalArgumentException();
+          };
+      g.setColor(GraphicsUtils.alphaed(color, alpha));
+      g.fill(s);
+      g.setColor(color);
+      g.draw(s);
+    } else if (marker.equals(XYPlotDrawer.Marker.PLUS)) {
+      g.setColor(color);
+      g.draw(new Line2D.Double(p.getX(), p.getY() - l, p.getX(), p.getY() + l));
+      g.draw(new Line2D.Double(p.getX() - l, p.getY(), p.getX() + l, p.getY()));
+    } else if (marker.equals(Marker.TIMES)) {
+      g.setColor(color);
+      g.draw(new Line2D.Double(p.getX() - l, p.getY() - l, p.getX() + l, p.getY() + l));
+      g.draw(new Line2D.Double(p.getX() - l, p.getY() + l, p.getX() + l, p.getY() - l));
+    }
   }
 
   public static void drawYAxis(Graphics2D g, Configuration c, Rectangle2D r, String name, Axis a) {
