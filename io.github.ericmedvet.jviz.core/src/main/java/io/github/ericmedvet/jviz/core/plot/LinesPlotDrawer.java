@@ -39,7 +39,7 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
 
   private final Configuration.LinesPlot c;
 
-  public LinesPlotDrawer(Configuration configuration, List<Color> colors, LinesPlot c) {
+  public LinesPlotDrawer(Configuration configuration, LinesPlot c, List<Color> colors) {
     super(configuration, c.xExtensionRate(), c.yExtensionRate(), colors);
     this.c = c;
   }

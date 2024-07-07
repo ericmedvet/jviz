@@ -28,8 +28,8 @@ import javax.imageio.ImageIO;
 
 public interface ImageBuilder<E> extends Function<E, BufferedImage> {
 
-  int DEFAULT_W = 300;
-  int DEFAULT_H = 200;
+  int DEFAULT_W = 600;
+  int DEFAULT_H = 400;
 
   BufferedImage build(ImageInfo imageInfo, E e);
 
@@ -46,13 +46,25 @@ public interface ImageBuilder<E> extends Function<E, BufferedImage> {
     ImageIO.write(build(imageInfo, e), formatName, file);
   }
 
+  default void save(String formatName, File file, E e) throws IOException {
+    save(imageInfo(e), formatName, file, e);
+  }
+
   default void save(ImageInfo imageInfo, File file, E e) throws IOException {
     String[] tokens = file.getName().split("\\.");
     save(imageInfo, tokens[tokens.length - 1], file, e);
   }
 
+  default void save(File file, E e) throws IOException {
+    save(imageInfo(e), file, e);
+  }
+
   default void show(ImageInfo imageInfo, E e) {
     Misc.showImage(build(imageInfo, e));
+  }
+
+  default void show(E e) {
+    show(imageInfo(e), e);
   }
 
   record ImageInfo(int w, int h) {}

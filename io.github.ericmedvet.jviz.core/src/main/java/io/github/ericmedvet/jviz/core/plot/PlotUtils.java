@@ -27,11 +27,13 @@ import io.github.ericmedvet.jviz.core.plot.image.Axis;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Text.Use;
 import io.github.ericmedvet.jviz.core.plot.image.Layout;
+import io.github.ericmedvet.jviz.core.util.GraphicsUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -76,6 +78,41 @@ public class PlotUtils {
 
   public static Point2D center(Rectangle2D r) {
     return new Point2D.Double(r.getCenterX(), r.getCenterY());
+  }
+
+  public static void drawBoxAndWhiskers(
+      Graphics2D g,
+      Configuration c,
+      GMetrics gm,
+      Rectangle2D r,
+      Color color,
+      double innerBottom,
+      double center,
+      double innerTop,
+      double alpha,
+      double whiskersWRate,
+      double strokeSizeRate) {
+    markRectangle(g, c, r);
+    // fill box
+    g.setColor(GraphicsUtils.alphaed(color, alpha));
+    g.fill(new Rectangle2D.Double(r.getX(), innerBottom, r.getWidth(), innerTop - innerBottom));
+    // draw
+    g.setColor(color);
+    g.setStroke(new BasicStroke((float) (strokeSizeRate * gm.refL)));
+    g.draw(new Rectangle2D.Double(r.getX(), innerBottom, r.getWidth(), innerTop - innerBottom));
+    g.draw(new Line2D.Double(r.getX(), center, r.getMaxX(), center));
+    g.draw(new Line2D.Double(r.getCenterX(), innerBottom, r.getCenterX(), r.getY()));
+    g.draw(new Line2D.Double(r.getCenterX(), innerTop, r.getCenterX(), r.getMaxY()));
+    g.draw(new Line2D.Double(
+        r.getCenterX() - r.getWidth() * whiskersWRate / 2d,
+        r.getY(),
+        r.getCenterX() + r.getWidth() * whiskersWRate / 2d,
+        r.getY()));
+    g.draw(new Line2D.Double(
+        r.getCenterX() - r.getWidth() * whiskersWRate / 2d,
+        r.getMaxY(),
+        r.getCenterX() + r.getWidth() * whiskersWRate / 2d,
+        r.getMaxY()));
   }
 
   public static void drawYAxis(Graphics2D g, Configuration c, Rectangle2D r, String name, Axis a) {

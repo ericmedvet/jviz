@@ -31,8 +31,8 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
 public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
-  int DEFAULT_AXIS_W = 200;
-  int DEFAULT_AXIS_H = 200;
+  int DEFAULT_AXIS_W = 300;
+  int DEFAULT_AXIS_H = 300;
 
   Configuration configuration();
 
