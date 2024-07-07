@@ -61,16 +61,20 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
   public double computeLegendH(Graphics2D g, DistributionPlot p) {
     GMetrics gm = new GMetrics(g);
     // prepare colors
-    SortedMap<String, Color> dataColors = PlotUtils.computeSeriesDataColors(
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    return PlotUtils.computeItemsLegendSize(
+            g, configuration(), dataColors, c.legendImageWRate() * gm.w(), c.legendImageHRate() * gm.h())
+        .getY();
+  }
+
+  private SortedMap<String, Color> getComputeSeriesDataColors(DistributionPlot p) {
+    return PlotUtils.computeSeriesDataColors(
         p.dataGrid().values().stream()
             .map(XYPlot.TitledData::data)
             .flatMap(List::stream)
             .map(Data::name)
             .toList(),
         colors);
-    return PlotUtils.computeItemsLegendSize(
-            g, configuration(), dataColors, c.legendImageWRate() * gm.w(), c.legendImageHRate() * gm.h())
-        .getY();
   }
 
   @Override
@@ -82,13 +86,7 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
   public void drawLegend(Graphics2D g, Rectangle2D r, DistributionPlot p) {
     GMetrics gm = new GMetrics(g);
     // prepare colors
-    SortedMap<String, Color> dataColors = PlotUtils.computeSeriesDataColors(
-        p.dataGrid().values().stream()
-            .map(XYPlot.TitledData::data)
-            .flatMap(List::stream)
-            .map(Data::name)
-            .toList(),
-        colors);
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     PlotUtils.drawItemsLegend(
         g,
         configuration(),
@@ -114,13 +112,7 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
   @Override
   public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, DistributionPlot p) {
     // prepare colors
-    SortedMap<String, Color> dataColors = PlotUtils.computeSeriesDataColors(
-        p.dataGrid().values().stream()
-            .map(XYPlot.TitledData::data)
-            .flatMap(List::stream)
-            .map(Data::name)
-            .toList(),
-        colors);
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     g.setColor(configuration().colors().gridColor());
     g.setStroke(new BasicStroke((float) (configuration().general().gridStrokeSizeRate() * gm.refL())));
     xA.ticks()

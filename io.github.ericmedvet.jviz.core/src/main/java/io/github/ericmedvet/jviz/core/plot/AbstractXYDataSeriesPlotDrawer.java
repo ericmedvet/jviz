@@ -54,13 +54,7 @@ public abstract class AbstractXYDataSeriesPlotDrawer
   @Override
   public void drawLegend(Graphics2D g, Rectangle2D r, XYDataSeriesPlot p) {
     // prepare colors
-    SortedMap<String, Color> dataColors = PlotUtils.computeSeriesDataColors(
-        p.dataGrid().values().stream()
-            .map(XYPlot.TitledData::data)
-            .flatMap(List::stream)
-            .map(XYDataSeries::name)
-            .toList(),
-        colors);
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     PlotUtils.drawItemsLegend(
         g,
         configuration(),
@@ -69,6 +63,16 @@ public abstract class AbstractXYDataSeriesPlotDrawer
         computeLegendImageSize(g).getX(),
         computeLegendImageSize(g).getY(),
         this::drawLegendImage);
+  }
+
+  private SortedMap<String, Color> getComputeSeriesDataColors(XYDataSeriesPlot p) {
+    return PlotUtils.computeSeriesDataColors(
+        p.dataGrid().values().stream()
+            .map(XYPlot.TitledData::data)
+            .flatMap(List::stream)
+            .map(XYDataSeries::name)
+            .toList(),
+        colors);
   }
 
   @Override
@@ -84,13 +88,7 @@ public abstract class AbstractXYDataSeriesPlotDrawer
             xA.xIn(xA.range().min(), r), yA.yIn(y, r),
             xA.xIn(xA.range().max(), r), yA.yIn(y, r))));
     // prepare colors
-    SortedMap<String, Color> dataColors = PlotUtils.computeSeriesDataColors(
-        p.dataGrid().values().stream()
-            .map(XYPlot.TitledData::data)
-            .flatMap(List::stream)
-            .map(XYDataSeries::name)
-            .toList(),
-        colors);
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     // draw data
     p.dataGrid().get(k).data().forEach(ds -> drawData(g, gm, r, xA, yA, ds, dataColors.get(ds.name())));
   }
@@ -103,13 +101,7 @@ public abstract class AbstractXYDataSeriesPlotDrawer
   @Override
   public double computeLegendH(Graphics2D g, XYDataSeriesPlot p) {
     // prepare colors
-    SortedMap<String, Color> dataColors = PlotUtils.computeSeriesDataColors(
-        p.dataGrid().values().stream()
-            .map(XYPlot.TitledData::data)
-            .flatMap(List::stream)
-            .map(XYDataSeries::name)
-            .toList(),
-        colors);
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     Point2D legendImageSize = computeLegendImageSize(g);
     return PlotUtils.computeItemsLegendSize(
             g, configuration(), dataColors, legendImageSize.getX(), legendImageSize.getY())
