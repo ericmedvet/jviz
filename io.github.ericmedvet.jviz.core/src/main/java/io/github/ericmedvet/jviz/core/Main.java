@@ -24,6 +24,8 @@ import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.plot.BoxPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
+import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
+import io.github.ericmedvet.jviz.core.plot.LandscapePlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.LinesPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.PointsPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.Value;
@@ -82,6 +84,30 @@ public class Main {
                 List.of(gaussian(1d, 1d, 100), gaussian(1.5, 2, 100), gaussian(0.5, 0.2, 200)))));
     BoxPlotDrawer bpd = new BoxPlotDrawer(Configuration.DEFAULT, BoxPlot.DEFAULT, Colors.DEFAULT.dataColors());
     bpd.show(bp);
+    // landscape plot
+    LandscapePlot lsp = new LandscapePlot(
+        "My plot",
+        "x title",
+        "y title",
+        "x",
+        "f(x)",
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            4,
+            2,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                new LandscapePlot.Data(
+                    (x1, x2) -> Math.sin((1 + gX) * x1) * Math.log(1 + gY + Math.abs(x2)),
+                    List.of(
+                        sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
+                        sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
+                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100))))));
+    new LandscapePlotDrawer(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT, Colors.DEFAULT.dataColors())
+        .show(lsp);
   }
 
   private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {

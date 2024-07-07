@@ -25,6 +25,7 @@ import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.AnchorH;
 import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.AnchorV;
 import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.Marker;
 import io.github.ericmedvet.jviz.core.plot.image.Axis;
+import io.github.ericmedvet.jviz.core.plot.image.ColorRange;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Text.Use;
 import io.github.ericmedvet.jviz.core.plot.image.Layout;
@@ -46,6 +47,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 public class PlotUtils {
@@ -116,6 +118,69 @@ public class PlotUtils {
         r.getMaxY(),
         r.getCenterX() + r.getWidth() * whiskersWRate / 2d,
         r.getMaxY()));
+  }
+
+  public static void drawColorBar(
+      Graphics2D g,
+      Configuration c,
+      GMetrics gm,
+      Rectangle2D r,
+      DoubleRange outerRange,
+      DoubleRange innerRange,
+      ColorRange colorRange,
+      double h,
+      int steps,
+      Configuration.Text.Use use,
+      Color labelColor,
+      AnchorV labelsAnchor) {
+    Shape clip = g.getClip();
+    markRectangle(g, c, r);
+    // background
+    double barY = labelsAnchor.equals(AnchorV.B) ? r.getY() : (r.getMaxY() - h);
+    double labelsY = labelsAnchor.equals(AnchorV.B) ? (r.getMaxY() - computeStringH(g, c, use)) : r.getY();
+    Rectangle2D barR = new Rectangle2D.Double(r.getX(), barY, r.getWidth(), h);
+    g.setColor(c.colors().plotBgColor());
+    g.fill(barR);
+    // color bar
+    g.setClip(barR);
+    DoubleRange rRange = new DoubleRange(r.getX(), r.getMaxX());
+    double step = outerRange.extent() / (double) steps;
+    DoubleStream.iterate(outerRange.min(), v -> v < outerRange.max(), v -> v + step)
+        .filter(v -> v + step > innerRange.min())
+        .filter(v -> v < innerRange.max())
+        .forEach(v -> {
+          g.setColor(colorRange.interpolate(outerRange.normalize(v)));
+          double rMin = rRange.denormalize(outerRange.normalize(innerRange.clip(v)));
+          double rMax = rRange.denormalize(outerRange.normalize(innerRange.clip(v + step)));
+          g.fill(new Rectangle2D.Double(rMin, barY, rMax - rMin, h));
+        });
+    // border
+    g.setClip(clip);
+    g.setStroke(new BasicStroke((float) (c.general().borderStrokeSizeRate() * gm.refL)));
+    g.setColor(c.colors().plotBorderColor());
+    g.draw(barR);
+    // labels
+    String format = computeTicksFormat(c, List.of(innerRange.min(), innerRange.max()));
+    drawString(
+        g,
+        c,
+        new Point2D.Double(rRange.denormalize(outerRange.normalize(innerRange.min())), labelsY),
+        format.formatted(innerRange.min()),
+        AnchorH.C,
+        AnchorV.B,
+        use,
+        Configuration.Text.Direction.H,
+        labelColor);
+    drawString(
+        g,
+        c,
+        new Point2D.Double(rRange.denormalize(outerRange.normalize(innerRange.max())), labelsY),
+        format.formatted(innerRange.max()),
+        AnchorH.C,
+        AnchorV.B,
+        use,
+        Configuration.Text.Direction.H,
+        labelColor);
   }
 
   public static void drawMarker(
