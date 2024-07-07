@@ -20,10 +20,11 @@
 package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
-import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -33,15 +34,41 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.SortedMap;
 
-public abstract class AbstractXYDataSeriesPlotDrawer extends AbstractPlotDrawer<XYDataSeriesPlot, List<XYDataSeries>> {
+public abstract class AbstractXYDataSeriesPlotDrawer
+    extends AbstractXYPlotDrawer<XYDataSeriesPlot, List<XYDataSeries>> {
 
-  protected final SortedMap<String, Color> dataColors;
+  private final List<Color> colors;
 
   public AbstractXYDataSeriesPlotDrawer(
-      ImagePlotter ip, XYDataSeriesPlot plot, List<Color> colors, double xExtensionRate, double yExtensionRate) {
-    super(ip, plot, xExtensionRate, yExtensionRate);
-    dataColors = ip.computeSeriesDataColors(
-        plot.dataGrid().values().stream()
+      Configuration configuration, double xExtensionRate, double yExtensionRate, List<Color> colors) {
+    super(configuration, xExtensionRate, yExtensionRate);
+    this.colors = colors;
+  }
+
+  protected abstract Point2D computeLegendImageSize(Graphics2D g);
+
+  protected abstract void drawData(
+      Graphics2D g, GMetrics gm, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color);
+
+  protected abstract void drawLegendImage(Graphics2D g, Rectangle2D r, Color color);
+
+  @Override
+  public void drawLegend(Graphics2D g, Rectangle2D r, XYDataSeriesPlot p) {
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    PlotUtils.drawItemsLegend(
+        g,
+        configuration(),
+        r,
+        dataColors,
+        computeLegendImageSize(g).getX(),
+        computeLegendImageSize(g).getY(),
+        this::drawLegendImage);
+  }
+
+  private SortedMap<String, Color> getComputeSeriesDataColors(XYDataSeriesPlot p) {
+    return PlotUtils.computeSeriesDataColors(
+        p.dataGrid().values().stream()
             .map(XYPlot.TitledData::data)
             .flatMap(List::stream)
             .map(XYDataSeries::name)
@@ -49,39 +76,10 @@ public abstract class AbstractXYDataSeriesPlotDrawer extends AbstractPlotDrawer<
         colors);
   }
 
-  protected abstract Point2D computeLegendImageSize();
-
-  protected abstract void drawData(Graphics2D g, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color);
-
-  protected abstract void drawLegendImage(Graphics2D g, Rectangle2D r, Color color);
-
   @Override
-  public double computeLegendH(Graphics2D g) {
-    Point2D legendImageSize = computeLegendImageSize();
-    return ip.computeItemsLegendSize(g, dataColors, legendImageSize.getX(), legendImageSize.getY())
-        .getY();
-  }
-
-  @Override
-  public double computeNoteH(Graphics2D g, Grid.Key k) {
-    return 0;
-  }
-
-  @Override
-  public void drawLegend(Graphics2D g, Rectangle2D r) {
-    ip.drawItemsLegend(
-        g,
-        r,
-        dataColors,
-        computeLegendImageSize().getX(),
-        computeLegendImageSize().getY(),
-        this::drawLegendImage);
-  }
-
-  @Override
-  public void drawPlot(Graphics2D g, Rectangle2D r, Grid.Key k, Axis xA, Axis yA) {
-    g.setColor(ip.c().colors().gridColor());
-    g.setStroke(new BasicStroke((float) (ip.c().general().gridStrokeSizeRate() * ip.refL())));
+  public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, XYDataSeriesPlot p) {
+    g.setColor(configuration().colors().gridColor());
+    g.setStroke(new BasicStroke((float) (configuration().general().gridStrokeSizeRate() * gm.refL())));
     xA.ticks()
         .forEach(x -> g.draw(new Line2D.Double(
             xA.xIn(x, r), yA.yIn(yA.range().min(), r),
@@ -90,15 +88,34 @@ public abstract class AbstractXYDataSeriesPlotDrawer extends AbstractPlotDrawer<
         .forEach(y -> g.draw(new Line2D.Double(
             xA.xIn(xA.range().min(), r), yA.yIn(y, r),
             xA.xIn(xA.range().max(), r), yA.yIn(y, r))));
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     // draw data
-    plot.dataGrid().get(k).data().forEach(ds -> drawData(g, r, xA, yA, ds, dataColors.get(ds.name())));
+    p.dataGrid().get(k).data().forEach(ds -> drawData(g, gm, r, xA, yA, ds, dataColors.get(ds.name())));
   }
 
   @Override
-  public void drawNote(Graphics2D g, Rectangle2D r, Grid.Key k) {}
+  public void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, XYDataSeriesPlot p) {
+    // do nothing
+  }
 
   @Override
-  protected DoubleRange computeRange(List<XYDataSeries> data, boolean isXAxis) {
+  public double computeLegendH(Graphics2D g, XYDataSeriesPlot p) {
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    Point2D legendImageSize = computeLegendImageSize(g);
+    return PlotUtils.computeItemsLegendSize(
+            g, configuration(), dataColors, legendImageSize.getX(), legendImageSize.getY())
+        .getY();
+  }
+
+  @Override
+  public double computeNoteH(Graphics2D g, Key k, XYDataSeriesPlot xyDataSeriesPlot) {
+    return 0;
+  }
+
+  @Override
+  protected DoubleRange computeRange(List<XYDataSeries> data, boolean isXAxis, XYDataSeriesPlot p) {
     return data.stream()
         .map(d -> isXAxis ? d.xRange() : d.yRange())
         .reduce(DoubleRange::largest)

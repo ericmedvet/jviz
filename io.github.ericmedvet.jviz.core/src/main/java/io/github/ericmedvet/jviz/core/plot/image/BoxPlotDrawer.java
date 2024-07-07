@@ -20,43 +20,36 @@
 package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
-import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
+import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
+import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.stream.IntStream;
 
-/**
- * @author "Eric Medvet" on 2024/01/04 for jgea
- */
-public class BoxPlotDrawer extends AbstractPlotDrawer<DistributionPlot, List<DistributionPlot.Data>> {
+public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<Data>> {
 
   private final Configuration.BoxPlot c;
-  protected final SortedMap<String, Color> dataColors;
+  private final List<Color> colors;
 
-  public BoxPlotDrawer(ImagePlotter ip, DistributionPlot plot, Configuration.BoxPlot c) {
-    super(ip, plot, 1, c.yExtensionRate());
+  public BoxPlotDrawer(Configuration configuration, BoxPlot c, List<Color> colors) {
+    super(configuration, 1, c.yExtensionRate());
     this.c = c;
-    dataColors = ip.computeSeriesDataColors(
-        plot.dataGrid().values().stream()
-            .map(XYPlot.TitledData::data)
-            .flatMap(List::stream)
-            .map(DistributionPlot.Data::name)
-            .toList(),
-        c.colors());
+    this.colors = colors;
   }
 
   @Override
-  protected DoubleRange computeRange(List<DistributionPlot.Data> data, boolean isXAxis) {
+  protected DoubleRange computeRange(List<Data> data, boolean isXAxis, DistributionPlot p) {
     if (isXAxis) {
-      return plot.xRange();
+      return p.xRange();
     }
     return data.stream()
         .map(DistributionPlot.Data::range)
@@ -65,26 +58,46 @@ public class BoxPlotDrawer extends AbstractPlotDrawer<DistributionPlot, List<Dis
   }
 
   @Override
-  public double computeLegendH(Graphics2D g) {
-    return ip.computeItemsLegendSize(g, dataColors, c.legendImageWRate() * ip.w(), c.legendImageHRate() * ip.h())
+  public double computeLegendH(Graphics2D g, DistributionPlot p) {
+    GMetrics gm = new GMetrics(g);
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    return PlotUtils.computeItemsLegendSize(
+            g, configuration(), dataColors, c.legendImageWRate() * gm.w(), c.legendImageHRate() * gm.h())
         .getY();
   }
 
+  private SortedMap<String, Color> getComputeSeriesDataColors(DistributionPlot p) {
+    return PlotUtils.computeSeriesDataColors(
+        p.dataGrid().values().stream()
+            .map(XYPlot.TitledData::data)
+            .flatMap(List::stream)
+            .map(Data::name)
+            .toList(),
+        colors);
+  }
+
   @Override
-  public double computeNoteH(Graphics2D g, Grid.Key k) {
+  public double computeNoteH(Graphics2D g, Key k, DistributionPlot p) {
     return 0;
   }
 
   @Override
-  public void drawLegend(Graphics2D g, Rectangle2D r) {
-    ip.drawItemsLegend(
+  public void drawLegend(Graphics2D g, Rectangle2D r, DistributionPlot p) {
+    GMetrics gm = new GMetrics(g);
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    PlotUtils.drawItemsLegend(
         g,
+        configuration(),
         r,
         dataColors,
-        c.legendImageWRate() * ip.w(),
-        c.legendImageHRate() * ip.h(),
-        (gg, ir, color) -> ip.drawBoxAndWhiskers(
+        c.legendImageWRate() * gm.w(),
+        c.legendImageHRate() * gm.h(),
+        (gg, ir, color) -> PlotUtils.drawBoxAndWhiskers(
             gg,
+            configuration(),
+            gm,
             new Rectangle2D.Double(
                 ir.getX() + ir.getWidth() * 0.2, ir.getY(), ir.getWidth() * 0.6, ir.getHeight()),
             color,
@@ -97,9 +110,11 @@ public class BoxPlotDrawer extends AbstractPlotDrawer<DistributionPlot, List<Dis
   }
 
   @Override
-  public void drawPlot(Graphics2D g, Rectangle2D r, Grid.Key k, Axis xA, Axis yA) {
-    g.setColor(ip.c().colors().gridColor());
-    g.setStroke(new BasicStroke((float) (ip.c().general().gridStrokeSizeRate() * ip.refL())));
+  public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, DistributionPlot p) {
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    g.setColor(configuration().colors().gridColor());
+    g.setStroke(new BasicStroke((float) (configuration().general().gridStrokeSizeRate() * gm.refL())));
     xA.ticks()
         .forEach(x -> g.draw(new Line2D.Double(
             xA.xIn(x, r), yA.yIn(yA.range().min(), r),
@@ -112,10 +127,10 @@ public class BoxPlotDrawer extends AbstractPlotDrawer<DistributionPlot, List<Dis
     List<String> names = dataColors.keySet().stream().toList();
     double w = r.getWidth() / ((double) names.size()) * c.boxWRate();
     IntStream.range(0, names.size())
-        .filter(i -> plot.dataGrid().get(k).data().stream()
+        .filter(i -> p.dataGrid().get(k).data().stream()
             .map(DistributionPlot.Data::name)
             .anyMatch(n -> names.get(i).equals(n)))
-        .forEach(x -> plot.dataGrid().get(k).data().stream()
+        .forEach(x -> p.dataGrid().get(k).data().stream()
             .filter(d -> d.name().equals(names.get(x)))
             .findFirst()
             .ifPresent(d -> {
@@ -140,8 +155,10 @@ public class BoxPlotDrawer extends AbstractPlotDrawer<DistributionPlot, List<Dis
                   },
                   r);
               Rectangle2D bR = new Rectangle2D.Double(xA.xIn(x, r) - w / 2d, bottomY, w, topY - bottomY);
-              ip.drawBoxAndWhiskers(
+              PlotUtils.drawBoxAndWhiskers(
                   g,
+                  configuration(),
+                  gm,
                   bR,
                   dataColors.get(names.get(x)),
                   innerBottomY,
@@ -154,22 +171,7 @@ public class BoxPlotDrawer extends AbstractPlotDrawer<DistributionPlot, List<Dis
   }
 
   @Override
-  public void drawNote(Graphics2D g, Rectangle2D r, Grid.Key k) {
-    // intentionally empty
-  }
-
-  @Override
-  protected Axis computeAxis(
-      Graphics2D g, double size, List<DistributionPlot.Data> data, DoubleRange range, boolean isXAxis) {
-    if (!isXAxis) {
-      return super.computeAxis(g, size, data, range, isXAxis);
-    }
-    return new Axis(
-        plot.xRange(),
-        IntStream.range(0, dataColors.size())
-            .mapToDouble(i -> i)
-            .boxed()
-            .toList(),
-        Collections.nCopies(dataColors.size(), ""));
+  public void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, DistributionPlot p) {
+    // do nothing
   }
 }

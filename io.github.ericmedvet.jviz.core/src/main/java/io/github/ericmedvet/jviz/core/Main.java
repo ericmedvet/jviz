@@ -21,24 +21,27 @@ package io.github.ericmedvet.jviz.core;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
-import io.github.ericmedvet.jviz.core.plot.BoxPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
-import io.github.ericmedvet.jviz.core.plot.LandscapePlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.LinesPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.PointsPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
-import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.Value;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot.TitledData;
+import io.github.ericmedvet.jviz.core.plot.image.BoxPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
+import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.random.RandomGenerator;
@@ -131,6 +134,15 @@ public class Main {
                     10,
                     (igx, igy) -> Math.exp(1 + Math.sin(igx / (1 + gX) + igy / (1 + gY)))))));
     new UnivariateGridPlotDrawer(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT).show(ugp);
+    try {
+      new UnivariatePlotVideoBuilder(
+              io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
+              Configuration.DEFAULT,
+              Configuration.UnivariateGridPlot.DEFAULT)
+          .save(new File("../gv.mp4"), ugp);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {

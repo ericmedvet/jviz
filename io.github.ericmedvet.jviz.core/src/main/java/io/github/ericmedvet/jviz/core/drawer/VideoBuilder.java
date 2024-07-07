@@ -77,6 +77,10 @@ public interface VideoBuilder<E> extends Function<E, Video> {
     Logger.getLogger(getClass().getSimpleName()).fine("Video saved on %s".formatted(file));
   }
 
+  default void save(File file, E e) throws IOException {
+    save(videoInfo(e), file, e);
+  }
+
   record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
 
   record Video(List<BufferedImage> images, double frameRate) {

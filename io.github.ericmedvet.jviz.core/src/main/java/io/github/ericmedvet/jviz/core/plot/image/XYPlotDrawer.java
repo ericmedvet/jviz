@@ -17,14 +17,12 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package io.github.ericmedvet.jviz.core.plot;
+package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.drawer.Drawer;
-import io.github.ericmedvet.jviz.core.plot.PlotUtils.GMetrics;
-import io.github.ericmedvet.jviz.core.plot.image.Axis;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration;
-import io.github.ericmedvet.jviz.core.plot.image.Layout;
+import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Shape;

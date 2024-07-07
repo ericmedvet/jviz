@@ -20,45 +20,35 @@
 package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
+import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
 
   private final Configuration.PointsPlot c;
 
-  public PointsPlotDrawer(ImagePlotter ip, XYDataSeriesPlot plot, Configuration.PointsPlot c) {
-    super(ip, plot, c.colors(), c.xExtensionRate(), c.yExtensionRate());
+  public PointsPlotDrawer(Configuration configuration, PointsPlot c, List<Color> colors) {
+    super(configuration, c.xExtensionRate(), c.yExtensionRate(), colors);
     this.c = c;
   }
 
   @Override
-  protected Point2D computeLegendImageSize() {
-    return new Point2D.Double(c.legendImageSizeRate() * ip.refL(), c.legendImageSizeRate() * ip.refL());
+  protected Point2D computeLegendImageSize(Graphics2D g) {
+    GMetrics gm = new GMetrics(g);
+    return new Point2D.Double(c.legendImageSizeRate() * gm.refL(), c.legendImageSizeRate() * gm.refL());
   }
 
   @Override
-  protected void drawLegendImage(Graphics2D g, Rectangle2D r, Color color) {
-    double l = c.markerSizeRate() * ip.refL();
-    ip.drawMarker(
-        g,
-        new Point2D.Double(r.getCenterX(), r.getCenterY()),
-        l,
-        c.marker(),
-        color,
-        c.alpha(),
-        c.strokeSizeRate() * ip.refL());
-  }
-
-  @Override
-  protected void drawData(Graphics2D g, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color) {
-    double l = c.markerSizeRate() * ip.refL();
-    double strokeSize = c.strokeSizeRate() * ip.refL();
+  protected void drawData(Graphics2D g, GMetrics gm, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color) {
+    double l = c.markerSizeRate() * gm.refL();
+    double strokeSize = c.strokeSizeRate() * gm.refL();
     ds.points()
-        .forEach(p -> ip.drawMarker(
+        .forEach(p -> PlotUtils.drawMarker(
             g,
             new Point2D.Double(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)),
             l,
@@ -66,5 +56,19 @@ public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
             color,
             c.alpha(),
             strokeSize));
+  }
+
+  @Override
+  protected void drawLegendImage(Graphics2D g, Rectangle2D r, Color color) {
+    GMetrics gm = new GMetrics(g);
+    double l = c.markerSizeRate() * gm.refL();
+    PlotUtils.drawMarker(
+        g,
+        new Point2D.Double(r.getCenterX(), r.getCenterY()),
+        l,
+        c.marker(),
+        color,
+        c.alpha(),
+        c.strokeSizeRate() * gm.refL());
   }
 }

@@ -19,7 +19,6 @@
  */
 package io.github.ericmedvet.jviz.core.plot.image;
 
-import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer;
 import java.awt.Color;
 import java.util.List;
 import java.util.Map;

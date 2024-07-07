@@ -17,14 +17,11 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package io.github.ericmedvet.jviz.core.plot;
+package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
-import io.github.ericmedvet.jviz.core.plot.image.AbstractPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.image.Axis;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration;
-import io.github.ericmedvet.jviz.core.plot.image.Layout;
+import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -35,7 +32,7 @@ import java.util.stream.Stream;
 
 public abstract class AbstractXYPlotDrawer<P extends XYPlot<D>, D> implements XYPlotDrawer<P, D> {
 
-  private static final Logger L = Logger.getLogger(AbstractPlotDrawer.class.getName());
+  private static final Logger L = Logger.getLogger(AbstractXYPlotDrawer.class.getName());
 
   private final Configuration configuration;
   private final double xExtensionRate;

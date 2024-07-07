@@ -21,92 +21,102 @@ package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.RangedGrid;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
+import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.DoubleFunction;
-import java.util.stream.IntStream;
 
-public class UnivariateGridPlotDrawer extends AbstractPlotDrawer<UnivariateGridPlot, Grid<Double>> {
+public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGridPlot, Grid<Double>> {
 
   private final Configuration.UnivariateGridPlot c;
 
-  protected final Grid<DoubleRange> valueRanges;
-  protected final DoubleRange valueRange;
-
-  public UnivariateGridPlotDrawer(ImagePlotter ip, UnivariateGridPlot plot, Configuration.UnivariateGridPlot c) {
-    super(ip, plot, 1, 1);
+  public UnivariateGridPlotDrawer(Configuration configuration, Configuration.UnivariateGridPlot c) {
+    super(configuration, 1, 1);
     this.c = c;
-    valueRanges = plot.dataGrid().map(td -> computeValueRange(td.data()));
-    if (plot.valueRange().equals(DoubleRange.UNBOUNDED)) {
+  }
+
+  private static DoubleRange computeValueRange(UnivariateGridPlot p) {
+    DoubleRange valueRange;
+    Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
+    if (p.valueRange().equals(DoubleRange.UNBOUNDED)) {
       valueRange = DoubleRange.largest(valueRanges.values().stream().toList());
     } else {
-      valueRange = plot.valueRange();
+      valueRange = p.valueRange();
     }
+    return valueRange;
+  }
+
+  private static DoubleRange computeValueRange(Grid<Double> grid) {
+    double[] values = grid.values().stream()
+        .filter(Objects::nonNull)
+        .filter(Double::isFinite)
+        .mapToDouble(v -> v)
+        .toArray();
+    return new DoubleRange(
+        Arrays.stream(values).min().orElse(0),
+        Arrays.stream(values).max().orElse(1));
   }
 
   @Override
-  public double computeLegendH(Graphics2D g) {
-    return c.legendImageHRate() * ip.h()
-        + ip.computeStringH(g, "0", Configuration.Text.Use.LEGEND_LABEL)
-        + ip.c().layout().legendInnerMarginHRate() * ip.h();
+  protected DoubleRange computeRange(Grid<Double> data, boolean isXAxis, UnivariateGridPlot p) {
+    if (data instanceof RangedGrid<Double> rg) {
+      return isXAxis ? rg.xRange() : rg.yRange();
+    }
+    return isXAxis ? new DoubleRange(0, data.w()) : new DoubleRange(0, data.h());
   }
 
   @Override
-  public double computeNoteH(Graphics2D g, Grid.Key k) {
+  public double computeLegendH(Graphics2D g, UnivariateGridPlot p) {
+    GMetrics gm = new GMetrics(g);
+    return c.legendImageHRate() * gm.h()
+        + PlotUtils.computeStringH(g, configuration(), Configuration.Text.Use.LEGEND_LABEL)
+        + configuration().layout().legendInnerMarginHRate() * gm.h();
+  }
+
+  @Override
+  public double computeNoteH(Graphics2D g, Key k, UnivariateGridPlot univariateGridPlot) {
+    GMetrics gm = new GMetrics(g);
     return c.showRanges()
-        ? (c.legendImageHRate() * ip.h()
-            + ip.computeStringH(g, "0", Configuration.Text.Use.TICK_LABEL)
-            + ip.c().layout().legendInnerMarginHRate() * ip.h())
+        ? (c.legendImageHRate() * gm.h()
+            + PlotUtils.computeStringH(g, configuration(), Configuration.Text.Use.TICK_LABEL)
+            + configuration().layout().legendInnerMarginHRate() * gm.h())
         : 0;
   }
 
   @Override
-  public void drawNote(Graphics2D g, Rectangle2D r, Grid.Key k) {
-    if (!c.showRanges()) {
-      return;
-    }
-    ip.drawColorBar(
+  public void drawLegend(Graphics2D g, Rectangle2D r, UnivariateGridPlot p) {
+    GMetrics gm = new GMetrics(g);
+    DoubleRange valueRange = computeValueRange(p);
+    PlotUtils.drawColorBar(
         g,
-        new Rectangle2D.Double(r.getX(), r.getY(), r.getWidth(), r.getHeight()),
-        valueRange,
-        valueRanges.get(k),
-        c.colorRange(),
-        c.legendImageHRate() * ip.h(),
-        c.legendSteps(),
-        Configuration.Text.Use.TICK_LABEL,
-        ip.c().colors().tickLabelColor(),
-        ImagePlotter.AnchorV.T);
-  }
-
-  @Override
-  public void drawLegend(Graphics2D g, Rectangle2D r) {
-    ip.drawColorBar(
-        g,
+        configuration(),
+        gm,
         new Rectangle2D.Double(
-            r.getCenterX() - c.legendImageWRate() * ip.w() / 2d,
+            r.getCenterX() - c.legendImageWRate() * gm.w() / 2d,
             r.getY(),
-            c.legendImageWRate() * ip.w(),
+            c.legendImageWRate() * gm.w(),
             r.getHeight()),
         valueRange,
         valueRange,
         c.colorRange(),
-        c.legendImageHRate() * ip.h(),
+        c.legendImageHRate() * gm.h(),
         c.legendSteps(),
         Configuration.Text.Use.LEGEND_LABEL,
-        ip.c().colors().legendLabelColor(),
-        ImagePlotter.AnchorV.B);
+        configuration().colors().legendLabelColor(),
+        AnchorV.B);
   }
 
   @Override
-  public void drawPlot(Graphics2D g, Rectangle2D r, Grid.Key k, Axis xA, Axis yA) {
-    Grid<Double> data = plot.dataGrid().get(k).data();
-    DoubleFunction<Color> colorF = v -> c.colorRange().interpolate(valueRange.normalize(v));
+  public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, UnivariateGridPlot p) {
+    Grid<Double> data = p.dataGrid().get(k).data();
+    DoubleFunction<Color> colorF =
+        v -> c.colorRange().interpolate(computeValueRange(p).normalize(v));
     double cellW = r.getWidth() / (double) data.w() * c.cellSideRate();
     double cellH = r.getHeight() / (double) data.h() * c.cellSideRate();
     double cellMarginW = r.getWidth() / (double) data.w() * (1 - c.cellSideRate()) / 2d;
@@ -140,63 +150,25 @@ public class UnivariateGridPlotDrawer extends AbstractPlotDrawer<UnivariateGridP
     }
   }
 
-  private static DoubleRange computeValueRange(Grid<Double> grid) {
-    double[] values = grid.values().stream()
-        .filter(Objects::nonNull)
-        .filter(Double::isFinite)
-        .mapToDouble(v -> v)
-        .toArray();
-    return new DoubleRange(
-        Arrays.stream(values).min().orElse(0),
-        Arrays.stream(values).max().orElse(1));
-  }
-
   @Override
-  protected DoubleRange computeRange(Grid<Double> data, boolean isXAxis) {
-    if (data instanceof RangedGrid<Double> rg) {
-      return isXAxis ? rg.xRange() : rg.yRange();
+  public void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, UnivariateGridPlot p) {
+    if (!c.showRanges()) {
+      return;
     }
-    return isXAxis ? new DoubleRange(0, data.w()) : new DoubleRange(0, data.h());
-  }
-
-  @Override
-  protected Axis computeAxis(Graphics2D g, double size, Grid<Double> data, DoubleRange range, boolean isXAxis) {
-    int l = isXAxis ? data.w() : data.h();
-    double labelLineL = ip.computeStringH(g, "1", Configuration.Text.Use.TICK_LABEL);
-    if (data instanceof RangedGrid<Double> rg) {
-      List<Double> ticks;
-      int step = 1;
-      while (true) {
-        int finalStep = step;
-        ticks = IntStream.iterate(0, i -> i <= l + 1, i -> i + finalStep)
-            .mapToDouble(
-                i -> isXAxis ? rg.xRange(i).min() : rg.yRange(i).min())
-            .boxed()
-            .toList();
-        if (ticks.size() * labelLineL < size) {
-          break;
-        }
-        step = step + 1;
-      }
-      String format = ip.computeTicksFormat(ticks);
-      return new Axis(range, ticks, ticks.stream().map(format::formatted).toList());
-    }
-    List<Double> ticks;
-    int step = 1;
-    while (true) {
-      int finalStep = step;
-      ticks = IntStream.iterate(0, i -> i < l, i -> i + finalStep)
-          .mapToDouble(i -> i + 0.5d)
-          .boxed()
-          .toList();
-      if (ticks.size() * labelLineL < size) {
-        break;
-      }
-      step = step + 1;
-    }
-    return new Axis(
-        range,
-        ticks,
-        ticks.stream().map(t -> "%.0f".formatted(t + 0.5d)).toList());
+    DoubleRange valueRange = computeValueRange(p);
+    Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
+    PlotUtils.drawColorBar(
+        g,
+        configuration(),
+        gm,
+        new Rectangle2D.Double(r.getX(), r.getY(), r.getWidth(), r.getHeight()),
+        valueRange,
+        valueRanges.get(k),
+        c.colorRange(),
+        c.legendImageHRate() * gm.h(),
+        c.legendSteps(),
+        Configuration.Text.Use.TICK_LABEL,
+        configuration().colors().tickLabelColor(),
+        AnchorV.T);
   }
 }

@@ -21,7 +21,8 @@ package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jviz.core.plot.RangedValue;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
+import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import io.github.ericmedvet.jviz.core.util.GraphicsUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -38,17 +39,25 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
 
   private final Configuration.LinesPlot c;
 
-  public LinesPlotDrawer(ImagePlotter ip, XYDataSeriesPlot plot, Configuration.LinesPlot c) {
-    super(ip, plot, c.colors(), c.xExtensionRate(), c.yExtensionRate());
+  public LinesPlotDrawer(Configuration configuration, LinesPlot c, List<Color> colors) {
+    super(configuration, c.xExtensionRate(), c.yExtensionRate(), colors);
     this.c = c;
   }
 
-  @Override
-  protected Point2D computeLegendImageSize() {
-    return new Point2D.Double(c.legendImageWRate() * ip.w(), +c.legendImageHRate() * ip.h());
+  private static <T> List<T> reverse(List<T> ts) {
+    return IntStream.range(0, ts.size())
+        .mapToObj(i -> ts.get(ts.size() - 1 - i))
+        .toList();
   }
 
-  protected void drawData(Graphics2D g, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color) {
+  @Override
+  protected Point2D computeLegendImageSize(Graphics2D g) {
+    GMetrics gm = new GMetrics(g);
+    return new Point2D.Double(c.legendImageWRate() * gm.w(), +c.legendImageHRate() * gm.h());
+  }
+
+  @Override
+  protected void drawData(Graphics2D g, GMetrics gm, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color) {
     ds = XYDataSeries.of(
         ds.name(),
         ds.points().stream()
@@ -75,7 +84,7 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
     }
     // draw line
     g.setColor(color);
-    g.setStroke(new BasicStroke((float) (c.strokeSizeRate() * ip.refL())));
+    g.setStroke(new BasicStroke((float) (c.strokeSizeRate() * gm.refL())));
     Path2D path = new Path2D.Double();
     path.moveTo(
         xA.xIn(ds.points().get(0).x().v(), r),
@@ -86,6 +95,7 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
 
   @Override
   protected void drawLegendImage(Graphics2D g, Rectangle2D r, Color color) {
+    GMetrics gm = new GMetrics(g);
     g.setColor(GraphicsUtils.alphaed(color, c.alpha()));
     g.fill(new Rectangle2D.Double(
         r.getX() + r.getWidth() * 0.1,
@@ -93,14 +103,8 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
         r.getWidth() * 0.8,
         r.getHeight() * 0.5));
     g.setColor(color);
-    g.setStroke(new BasicStroke((float) (c.strokeSizeRate() * ip.refL())));
+    g.setStroke(new BasicStroke((float) (c.strokeSizeRate() * gm.refL())));
     g.draw(new Line2D.Double(
         r.getX() + r.getWidth() * 0.1, r.getCenterY(), r.getMaxX() - r.getWidth() * 0.1, r.getCenterY()));
-  }
-
-  private static <T> List<T> reverse(List<T> ts) {
-    return IntStream.range(0, ts.size())
-        .mapToObj(i -> ts.get(ts.size() - 1 - i))
-        .toList();
   }
 }

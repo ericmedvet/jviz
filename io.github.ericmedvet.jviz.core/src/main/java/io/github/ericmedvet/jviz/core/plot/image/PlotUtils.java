@@ -17,18 +17,15 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package io.github.ericmedvet.jviz.core.plot;
+package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
-import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.AnchorH;
-import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.AnchorV;
-import io.github.ericmedvet.jviz.core.plot.XYPlotDrawer.Marker;
-import io.github.ericmedvet.jviz.core.plot.image.Axis;
-import io.github.ericmedvet.jviz.core.plot.image.ColorRange;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration;
+import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Text.Use;
-import io.github.ericmedvet.jviz.core.plot.image.Layout;
+import io.github.ericmedvet.jviz.core.plot.image.XYPlotDrawer.AnchorH;
+import io.github.ericmedvet.jviz.core.plot.image.XYPlotDrawer.AnchorV;
+import io.github.ericmedvet.jviz.core.plot.image.XYPlotDrawer.Marker;
 import io.github.ericmedvet.jviz.core.util.GraphicsUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;

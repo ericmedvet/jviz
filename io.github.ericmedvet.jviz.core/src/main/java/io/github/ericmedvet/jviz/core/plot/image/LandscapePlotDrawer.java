@@ -21,8 +21,11 @@ package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
+import io.github.ericmedvet.jviz.core.plot.LandscapePlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
+import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
@@ -31,106 +34,140 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.function.DoubleBinaryOperator;
 
-/**
- * @author "Eric Medvet" on 2023/12/29 for jgea
- */
-public class LandscapePlotDrawer extends AbstractPlotDrawer<LandscapePlot, LandscapePlot.Data> {
+public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, LandscapePlot.Data> {
 
-  protected final Grid<DoubleRange> valueRanges;
-  protected final DoubleRange valueRange;
-  protected final SortedMap<String, Color> dataColors;
   private final Configuration.LandscapePlot c;
+  private final List<Color> colors;
 
-  public LandscapePlotDrawer(ImagePlotter ip, LandscapePlot plot, Configuration.LandscapePlot c) {
-    super(ip, plot, c.xExtensionRate(), c.yExtensionRate());
+  public LandscapePlotDrawer(Configuration configuration, Configuration.LandscapePlot c, List<Color> colors) {
+    super(configuration, c.xExtensionRate(), c.yExtensionRate());
     this.c = c;
-    valueRanges = plot.dataGrid()
-        .map((k, td) -> computeValueRange(
-            k,
-            ip.w() / plot.dataGrid().w() * c.fDensity(),
-            ip.h() / plot.dataGrid().h() * c.fDensity()));
-    if (plot.valueRange().equals(DoubleRange.UNBOUNDED)) {
-      valueRange = DoubleRange.largest(valueRanges.values().stream().toList());
-    } else {
-      valueRange = plot.valueRange();
-    }
-    dataColors = ip.computeSeriesDataColors(
-        plot.dataGrid().values().stream()
-            .map(td -> td.data().xyDataSeries())
-            .flatMap(List::stream)
-            .map(XYDataSeries::name)
-            .toList(),
-        c.colors());
+    this.colors = colors;
   }
 
   @Override
-  public double computeLegendH(Graphics2D g) {
-    double itemsLegendH = ip.computeItemsLegendSize(
+  protected DoubleRange computeRange(Data data, boolean isXAxis, LandscapePlot p) {
+    return data.xyDataSeries().stream()
+        .map(d -> isXAxis ? d.xRange() : d.yRange())
+        .reduce(DoubleRange::largest)
+        .orElseThrow();
+  }
+
+  @Override
+  public double computeLegendH(Graphics2D g, LandscapePlot p) {
+    GMetrics gm = new GMetrics(g);
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    double itemsLegendH = PlotUtils.computeItemsLegendSize(
             g,
+            configuration(),
             dataColors,
-            ip.c().layout().legendInnerMarginWRate() * ip.w(),
-            ip.c().layout().legendInnerMarginHRate() * ip.h())
+            configuration().layout().legendInnerMarginWRate() * gm.w(),
+            configuration().layout().legendInnerMarginHRate() * gm.h())
         .getY();
-    double colorBarLegendH = c.colorBarLegendImageHRate() * ip.h()
-        + ip.computeStringH(g, "0", Configuration.Text.Use.LEGEND_LABEL)
-        + ip.c().layout().legendInnerMarginHRate() * ip.h();
-    return itemsLegendH + ip.c().layout().legendInnerMarginHRate() * ip.h() + colorBarLegendH;
+    double colorBarLegendH = c.colorBarLegendImageHRate() * gm.h()
+        + PlotUtils.computeStringH(g, configuration(), Configuration.Text.Use.LEGEND_LABEL)
+        + configuration().layout().legendInnerMarginHRate() * gm.h();
+    return itemsLegendH + configuration().layout().legendInnerMarginHRate() * gm.h() + colorBarLegendH;
   }
 
   @Override
-  public double computeNoteH(Graphics2D g, Grid.Key k) {
+  public double computeNoteH(Graphics2D g, Key k, LandscapePlot p) {
+    GMetrics gm = new GMetrics(g);
     return c.showRanges()
-        ? (c.colorBarLegendImageHRate() * ip.h()
-            + ip.computeStringH(g, "0", Configuration.Text.Use.TICK_LABEL)
-            + ip.c().layout().legendInnerMarginHRate() * ip.h())
+        ? (c.colorBarLegendImageHRate() * gm.h()
+            + PlotUtils.computeStringH(g, configuration(), Configuration.Text.Use.TICK_LABEL)
+            + configuration().layout().legendInnerMarginHRate() * gm.h())
         : 0;
   }
 
   @Override
-  public void drawLegend(Graphics2D g, Rectangle2D r) {
-    double l = c.markerSizeRate() * ip.refL();
-    double itemsLegendH = ip.computeItemsLegendSize(
+  public void drawLegend(Graphics2D g, Rectangle2D r, LandscapePlot p) {
+    // prepare colors
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
+    GMetrics gm = new GMetrics(g);
+    double l = c.markerSizeRate() * gm.refL();
+    double itemsLegendH = PlotUtils.computeItemsLegendSize(
             g,
+            configuration(),
             dataColors,
-            ip.c().layout().legendInnerMarginWRate() * ip.w(),
-            ip.c().layout().legendInnerMarginHRate() * ip.h())
+            configuration().layout().legendInnerMarginWRate() * gm.w(),
+            configuration().layout().legendInnerMarginHRate() * gm.h())
         .getY();
     Point2D legendImageSize = new Point2D.Double(
-        c.markerLegendImageSizeRate() * ip.refL(), c.markerLegendImageSizeRate() * ip.refL());
-    ip.drawItemsLegend(g, r, dataColors, legendImageSize.getX(), legendImageSize.getY(), (g1, ir, color) -> {
-      ip.drawMarker(
-          g1,
-          new Point2D.Double(ir.getCenterX(), ir.getCenterY()),
-          l,
-          c.marker(),
-          color,
-          c.alpha(),
-          c.dataStrokeSizeRate() * ip.refL());
-    });
+        c.markerLegendImageSizeRate() * gm.refL(), c.markerLegendImageSizeRate() * gm.refL());
+    PlotUtils.drawItemsLegend(
+        g, configuration(), r, dataColors, legendImageSize.getX(), legendImageSize.getY(), (g1, ir, color) -> {
+          PlotUtils.drawMarker(
+              g1,
+              new Point2D.Double(ir.getCenterX(), ir.getCenterY()),
+              l,
+              c.marker(),
+              color,
+              c.alpha(),
+              c.dataStrokeSizeRate() * gm.refL());
+        });
     r = new Rectangle2D.Double(
         r.getX(),
-        r.getY() + ip.c().layout().legendInnerMarginHRate() * ip.h() + itemsLegendH,
+        r.getY() + configuration().layout().legendInnerMarginHRate() * gm.h() + itemsLegendH,
         r.getWidth(),
-        r.getHeight() - ip.c().layout().legendInnerMarginHRate() * ip.h() - itemsLegendH);
-    ip.drawColorBar(
+        r.getHeight() - configuration().layout().legendInnerMarginHRate() * gm.h() - itemsLegendH);
+    DoubleRange valueRange = computeValueRange(p, gm);
+    PlotUtils.drawColorBar(
         g,
+        configuration(),
+        gm,
         new Rectangle2D.Double(
-            r.getCenterX() - c.colorBarLegendImageWRate() * ip.w() / 2d,
+            r.getCenterX() - c.colorBarLegendImageWRate() * gm.w() / 2d,
             r.getY(),
-            c.colorBarLegendImageWRate() * ip.w(),
+            c.colorBarLegendImageWRate() * gm.w(),
             r.getHeight()),
         valueRange,
         valueRange,
         c.colorRange(),
-        c.colorBarLegendImageHRate() * ip.h(),
+        c.colorBarLegendImageHRate() * gm.h(),
         c.legendSteps(),
         Configuration.Text.Use.LEGEND_LABEL,
-        ip.c().colors().legendLabelColor(),
-        ImagePlotter.AnchorV.B);
+        configuration().colors().legendLabelColor(),
+        AnchorV.B);
+  }
+
+  private SortedMap<String, Color> getComputeSeriesDataColors(LandscapePlot p) {
+    return PlotUtils.computeSeriesDataColors(
+        p.dataGrid().values().stream()
+            .map(td -> td.data().xyDataSeries())
+            .flatMap(List::stream)
+            .map(XYDataSeries::name)
+            .toList(),
+        colors);
+  }
+
+  private DoubleRange computeValueRange(LandscapePlot p, GMetrics gm) {
+    DoubleRange valueRange;
+    if (p.valueRange().equals(DoubleRange.UNBOUNDED)) {
+      Grid<DoubleRange> valueRanges = computeValueRanges(p, gm);
+      valueRange = DoubleRange.largest(valueRanges.values().stream().toList());
+    } else {
+      valueRange = p.valueRange();
+    }
+    return valueRange;
+  }
+
+  private Grid<DoubleRange> computeValueRanges(LandscapePlot p, GMetrics gm) {
+    return p.dataGrid()
+        .map((k, td) -> computeValueRange(
+            k,
+            gm.w() / p.dataGrid().w() * c.fDensity(),
+            gm.h() / p.dataGrid().h() * c.fDensity(),
+            p));
   }
 
   @Override
-  public void drawPlot(Graphics2D g, Rectangle2D r, Grid.Key k, Axis xA, Axis yA) {
+  public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, LandscapePlot p) {
+    Grid<DoubleRange> xRanges = computeRanges(true, c.xExtensionRate(), p);
+    Grid<DoubleRange> yRanges = computeRanges(false, c.xExtensionRate(), p);
+    DoubleRange valueRange = computeValueRange(p, gm);
+    SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     // draw function
     double w = r.getWidth() * c.fDensity();
     double h = r.getHeight() * c.fDensity();
@@ -138,19 +175,20 @@ public class LandscapePlotDrawer extends AbstractPlotDrawer<LandscapePlot, Lands
     xRanges.get(k)
         .points((int) w)
         .forEach(x -> yRanges.get(k).points((int) h).forEach(y -> {
-          double v = plot.dataGrid().get(k).data().f().applyAsDouble(x, y);
+          double v = p.dataGrid().get(k).data().f().applyAsDouble(x, y);
           g.setColor(c.colorRange().interpolate(valueRange.normalize(v)));
           g.fill(new Rectangle2D.Double(xA.xIn(x, r), yA.yIn(y, r) - cellS, cellS, cellS));
         }));
     // draw points
-    double strokeSize = c.dataStrokeSizeRate() * ip.refL();
-    double l = c.markerSizeRate() * ip.refL();
-    plot.dataGrid().get(k).data().xyDataSeries().forEach(ds -> {
+    double strokeSize = c.dataStrokeSizeRate() * gm.refL();
+    double l = c.markerSizeRate() * gm.refL();
+    p.dataGrid().get(k).data().xyDataSeries().forEach(ds -> {
       Color color = dataColors.get(ds.name());
       ds.points()
-          .forEach(p -> ip.drawMarker(
+          .forEach(point -> PlotUtils.drawMarker(
               g,
-              new Point2D.Double(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)),
+              new Point2D.Double(
+                  xA.xIn(point.x().v(), r), yA.yIn(point.y().v(), r)),
               l,
               c.marker(),
               color,
@@ -160,35 +198,33 @@ public class LandscapePlotDrawer extends AbstractPlotDrawer<LandscapePlot, Lands
   }
 
   @Override
-  public void drawNote(Graphics2D g, Rectangle2D r, Grid.Key k) {
+  public void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, LandscapePlot p) {
     if (!c.showRanges()) {
       return;
     }
-    ip.drawColorBar(
+    DoubleRange valueRange = computeValueRange(p, gm);
+    Grid<DoubleRange> valueRanges = computeValueRanges(p, gm);
+    PlotUtils.drawColorBar(
         g,
+        configuration(),
+        gm,
         new Rectangle2D.Double(r.getX(), r.getY(), r.getWidth(), r.getHeight()),
         valueRange,
         valueRanges.get(k),
         c.colorRange(),
-        c.colorBarLegendImageHRate() * ip.h(),
+        c.colorBarLegendImageHRate() * gm.h(),
         c.legendSteps(),
         Configuration.Text.Use.TICK_LABEL,
-        ip.c().colors().tickLabelColor(),
-        ImagePlotter.AnchorV.T);
+        configuration().colors().tickLabelColor(),
+        AnchorV.T);
   }
 
-  @Override
-  protected DoubleRange computeRange(LandscapePlot.Data data, boolean isXAxis) {
-    return data.xyDataSeries().stream()
-        .map(d -> isXAxis ? d.xRange() : d.yRange())
-        .reduce(DoubleRange::largest)
-        .orElseThrow();
-  }
-
-  private DoubleRange computeValueRange(Grid.Key k, double w, double h) {
+  private DoubleRange computeValueRange(Grid.Key k, double w, double h, LandscapePlot p) {
+    Grid<DoubleRange> xRanges = computeRanges(true, c.xExtensionRate(), p);
+    Grid<DoubleRange> yRanges = computeRanges(false, c.xExtensionRate(), p);
     DoubleRange xRange = xRanges.get(k);
     DoubleRange yRange = yRanges.get(k);
-    DoubleBinaryOperator f = plot.dataGrid().get(k).data().f();
+    DoubleBinaryOperator f = p.dataGrid().get(k).data().f();
     List<Double> vs = xRange.points((int) w)
         .mapToObj(x -> yRange.points((int) h)
             .map(y -> f.applyAsDouble(x, y))

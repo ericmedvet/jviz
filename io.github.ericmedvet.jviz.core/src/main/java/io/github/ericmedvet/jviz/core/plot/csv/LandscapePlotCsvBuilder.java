@@ -17,25 +17,23 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package io.github.ericmedvet.jviz.core.plot.image;
+package io.github.ericmedvet.jviz.core.plot.csv;
 
-import io.github.ericmedvet.jnb.datastructure.Grid;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
+import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
+import io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode;
+import java.util.function.Function;
 
-public interface PlotDrawer {
+public class LandscapePlotCsvBuilder extends AbstractCsvBuilder implements Function<LandscapePlot, byte[]> {
 
-  double computeLegendH(Graphics2D g);
+  private final XYDataSeriesPlotCsvBuilder innerBuilder;
 
-  double computeNoteH(Graphics2D g, Grid.Key k);
+  public LandscapePlotCsvBuilder(Configuration c, Mode mode) {
+    super(c, mode);
+    this.innerBuilder = new XYDataSeriesPlotCsvBuilder(c, mode);
+  }
 
-  Grid<Axis> computeXAxes(Graphics2D g, Layout l);
-
-  Grid<Axis> computeYAxes(Graphics2D g, Layout l);
-
-  void drawLegend(Graphics2D g, Rectangle2D r);
-
-  void drawPlot(Graphics2D g, Rectangle2D r, Grid.Key k, Axis xA, Axis yA);
-
-  void drawNote(Graphics2D g, Rectangle2D r, Grid.Key k);
+  @Override
+  public byte[] apply(LandscapePlot p) {
+    return innerBuilder.apply(p.toXYDataSeriesPlot());
+  }
 }
