@@ -26,24 +26,22 @@ import io.github.ericmedvet.jnb.datastructure.Table;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import org.apache.commons.csv.CSVPrinter;
 
-public class UnivariateGridPlotCsvBuilder extends AbstractCsvBuilder implements Function<UnivariateGridPlot, byte[]> {
+public class UnivariateGridPlotCsvBuilder extends AbstractCsvBuilder<UnivariateGridPlot> {
 
   public UnivariateGridPlotCsvBuilder(Configuration c, Mode mode) {
     super(c, mode);
   }
 
   @Override
-  public byte[] apply(UnivariateGridPlot p) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try (CSVPrinter csvPrinter = new CSVPrinter(new PrintStream(baos), c.getCSVFormat())) {
+  public String apply(UnivariateGridPlot p) {
+    StringWriter sw = new StringWriter();
+    try (CSVPrinter csvPrinter = new CSVPrinter(sw, c.getCSVFormat())) {
       if (mode.equals(Mode.NORMAL)) {
         csvPrinter.printRecord(processRecord(List.of(p.xTitleName(), p.yTitleName(), "x", "y", "v")));
         for (XYPlot.TitledData<Grid<Double>> td : p.dataGrid().values()) {
@@ -75,6 +73,6 @@ public class UnivariateGridPlotCsvBuilder extends AbstractCsvBuilder implements 
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return baos.toByteArray();
+    return sw.toString();
   }
 }

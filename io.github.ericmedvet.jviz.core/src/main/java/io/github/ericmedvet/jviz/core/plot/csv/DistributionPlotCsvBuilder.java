@@ -24,23 +24,21 @@ import io.github.ericmedvet.jnb.datastructure.Table;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.List;
-import java.util.function.Function;
 import org.apache.commons.csv.CSVPrinter;
 
-public class DistributionPlotCsvBuilder extends AbstractCsvBuilder implements Function<DistributionPlot, byte[]> {
+public class DistributionPlotCsvBuilder extends AbstractCsvBuilder<DistributionPlot> {
 
   public DistributionPlotCsvBuilder(Configuration c, Mode mode) {
     super(c, mode);
   }
 
   @Override
-  public byte[] apply(DistributionPlot p) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try (CSVPrinter csvPrinter = new CSVPrinter(new PrintStream(baos), c.getCSVFormat())) {
+  public String apply(DistributionPlot p) {
+    StringWriter sw = new StringWriter();
+    try (CSVPrinter csvPrinter = new CSVPrinter(sw, c.getCSVFormat())) {
       if (mode.equals(Mode.NORMAL)) {
         csvPrinter.printRecord(processRecord(List.of(
             p.xTitleName(),
@@ -89,7 +87,7 @@ public class DistributionPlotCsvBuilder extends AbstractCsvBuilder implements Fu
           csvPrinter.printRecord(processRecord(t.rowValues(i)));
         }
       }
-      return baos.toByteArray();
+      return sw.toString();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

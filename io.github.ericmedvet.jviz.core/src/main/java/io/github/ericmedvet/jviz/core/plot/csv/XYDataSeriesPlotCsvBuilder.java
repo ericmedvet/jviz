@@ -26,24 +26,22 @@ import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import org.apache.commons.csv.CSVPrinter;
 
-public class XYDataSeriesPlotCsvBuilder extends AbstractCsvBuilder implements Function<XYDataSeriesPlot, byte[]> {
+public class XYDataSeriesPlotCsvBuilder extends AbstractCsvBuilder<XYDataSeriesPlot> {
 
   public XYDataSeriesPlotCsvBuilder(Configuration c, Mode mode) {
     super(c, mode);
   }
 
   @Override
-  public byte[] apply(XYDataSeriesPlot p) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try (CSVPrinter csvPrinter = new CSVPrinter(new PrintStream(baos), c.getCSVFormat())) {
+  public String apply(XYDataSeriesPlot p) {
+    StringWriter sw = new StringWriter();
+    try (CSVPrinter csvPrinter = new CSVPrinter(sw, c.getCSVFormat())) {
       if (mode.equals(Mode.NORMAL)) {
         csvPrinter.printRecord(processRecord(List.of(
             p.xTitleName(),
@@ -104,7 +102,7 @@ public class XYDataSeriesPlotCsvBuilder extends AbstractCsvBuilder implements Fu
               Stream.concat(Stream.of(x), t.rowValues(x).stream()).toList()));
         }
       }
-      return baos.toByteArray();
+      return sw.toString();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -21,9 +21,8 @@ package io.github.ericmedvet.jviz.core.plot.csv;
 
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode;
-import java.util.function.Function;
 
-public class LandscapePlotCsvBuilder extends AbstractCsvBuilder implements Function<LandscapePlot, byte[]> {
+public class LandscapePlotCsvBuilder extends AbstractCsvBuilder<LandscapePlot> {
 
   private final XYDataSeriesPlotCsvBuilder innerBuilder;
 
@@ -33,7 +32,7 @@ public class LandscapePlotCsvBuilder extends AbstractCsvBuilder implements Funct
   }
 
   @Override
-  public byte[] apply(LandscapePlot p) {
+  public String apply(LandscapePlot p) {
     return innerBuilder.apply(p.toXYDataSeriesPlot());
   }
 }

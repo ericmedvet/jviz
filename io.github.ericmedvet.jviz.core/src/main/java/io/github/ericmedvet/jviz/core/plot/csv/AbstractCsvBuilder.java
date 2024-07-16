@@ -21,8 +21,9 @@ package io.github.ericmedvet.jviz.core.plot.csv;
 
 import io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode;
 import java.util.List;
+import java.util.function.Function;
 
-public abstract class AbstractCsvBuilder {
+public abstract class AbstractCsvBuilder<P> implements Function<P, String> {
   protected final Configuration c;
   protected final Mode mode;
 
