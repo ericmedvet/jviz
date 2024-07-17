@@ -21,6 +21,7 @@ package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.drawer.Drawer;
+import io.github.ericmedvet.jviz.core.drawer.ImageBuilder;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
@@ -29,6 +30,7 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
 public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
+
   int DEFAULT_AXIS_W = 300;
   int DEFAULT_AXIS_H = 300;
 
@@ -167,8 +169,13 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
 
   @Override
   default ImageInfo imageInfo(P p) {
-    return new ImageInfo(
-        DEFAULT_AXIS_W * p.dataGrid().w(), DEFAULT_AXIS_H * p.dataGrid().h());
+    int axisW = ImageBuilder.DEFAULT_W / p.dataGrid().w();
+    int axisH = ImageBuilder.DEFAULT_H / p.dataGrid().h();
+    if (axisW < DEFAULT_AXIS_W || axisH < DEFAULT_AXIS_H) {
+      axisW = DEFAULT_AXIS_W;
+      axisH = DEFAULT_AXIS_H;
+    }
+    return new ImageInfo(axisW * p.dataGrid().w(), axisH * p.dataGrid().h());
   }
 
   double computeLegendH(Graphics2D g, P p);
