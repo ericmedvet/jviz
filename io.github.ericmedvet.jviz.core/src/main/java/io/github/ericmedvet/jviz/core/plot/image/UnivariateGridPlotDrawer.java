@@ -36,6 +36,10 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
 
   private final Configuration.UnivariateGridPlot c;
 
+  public UnivariateGridPlotDrawer() {
+    this(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT);
+  }
+
   public UnivariateGridPlotDrawer(Configuration configuration, Configuration.UnivariateGridPlot c) {
     super(configuration, 1, 1);
     this.c = c;

@@ -25,6 +25,7 @@ import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -38,6 +39,10 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
 
   private final Configuration.LandscapePlot c;
   private final List<Color> colors;
+
+  public LandscapePlotDrawer() {
+    this(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT, Colors.DEFAULT.dataColors());
+  }
 
   public LandscapePlotDrawer(Configuration configuration, Configuration.LandscapePlot c, List<Color> colors) {
     super(configuration, c.xExtensionRate(), c.yExtensionRate());

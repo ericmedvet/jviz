@@ -25,6 +25,7 @@ import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -39,6 +40,10 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
 
   private final Configuration.BoxPlot c;
   private final List<Color> colors;
+
+  public BoxPlotDrawer() {
+    this(Configuration.DEFAULT, BoxPlot.DEFAULT, Colors.DEFAULT.dataColors());
+  }
 
   public BoxPlotDrawer(Configuration configuration, BoxPlot c, List<Color> colors) {
     super(configuration, 1, c.yExtensionRate());

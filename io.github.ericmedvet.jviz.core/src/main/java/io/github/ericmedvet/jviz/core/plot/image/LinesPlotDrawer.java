@@ -21,6 +21,7 @@ package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jviz.core.plot.RangedValue;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import io.github.ericmedvet.jviz.core.util.GraphicsUtils;
@@ -38,6 +39,10 @@ import java.util.stream.IntStream;
 public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
 
   private final Configuration.LinesPlot c;
+
+  public LinesPlotDrawer() {
+    this(Configuration.DEFAULT, LinesPlot.DEFAULT, Colors.DEFAULT.dataColors());
+  }
 
   public LinesPlotDrawer(Configuration configuration, LinesPlot c, List<Color> colors) {
     super(configuration, c.xExtensionRate(), c.yExtensionRate(), colors);

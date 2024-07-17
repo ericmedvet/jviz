@@ -20,6 +20,7 @@
 package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
@@ -31,6 +32,10 @@ import java.util.List;
 public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
 
   private final Configuration.PointsPlot c;
+
+  public PointsPlotDrawer() {
+    this(Configuration.DEFAULT, PointsPlot.DEFAULT, Colors.DEFAULT.dataColors());
+  }
 
   public PointsPlotDrawer(Configuration configuration, PointsPlot c, List<Color> colors) {
     super(configuration, c.xExtensionRate(), c.yExtensionRate(), colors);
