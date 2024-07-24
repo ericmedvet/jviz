@@ -35,29 +35,57 @@ public interface VideoBuilder<E> extends Function<E, Video> {
   int DEFAULT_H = 200;
   VideoUtils.EncoderFacility DEFAULT_ENCODER = EncoderFacility.JCODEC;
 
+  record Video(List<BufferedImage> images, double frameRate) {
+    @Override
+    public String toString() {
+      return "(%dx%d)x%d@%.1ffps"
+          .formatted(images.get(0).getWidth(), images.get(0).getHeight(), images.size(), frameRate);
+    }
+  }
+
+  record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
+
+  Video build(VideoInfo videoInfo, E e) throws IOException;
+
   static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, double frameRate) {
-    return (videoInfo, f) -> {
-      List<BufferedImage> images = splitter.apply(f).stream()
-          .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
-          .toList();
-      return new Video(images, frameRate);
+    return new VideoBuilder<F>() {
+      @Override
+      public Video build(VideoInfo videoInfo, F f) throws IOException {
+        List<BufferedImage> images = splitter.apply(f).stream()
+            .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
+            .toList();
+        return new Video(images, frameRate);
+      }
+
+      @Override
+      public VideoInfo videoInfo(F f) {
+        VideoInfo vi = VideoBuilder.super.videoInfo(f);
+        ImageBuilder.ImageInfo ii =
+            imageBuilder.imageInfo(splitter.apply(f).get(0));
+        return new VideoInfo(ii.w(), ii.h(), vi.encoder());
+      }
     };
   }
 
   static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, SortedMap<Double, E>> splitter) {
-    return (videoInfo, f) -> {
-      SortedMap<Double, E> map = splitter.apply(f);
-      List<BufferedImage> images = map.values().stream()
-          .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
-          .toList();
-      return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey());
+    return new VideoBuilder<F>() {
+      @Override
+      public Video build(VideoInfo videoInfo, F f) throws IOException {
+        SortedMap<Double, E> map = splitter.apply(f);
+        List<BufferedImage> images = map.values().stream()
+            .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
+            .toList();
+        return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey());
+      }
+
+      @Override
+      public VideoInfo videoInfo(F f) {
+        VideoInfo vi = VideoBuilder.super.videoInfo(f);
+        SortedMap<Double, E> map = splitter.apply(f);
+        ImageBuilder.ImageInfo ii = imageBuilder.imageInfo(map.get(map.firstKey()));
+        return new VideoInfo(ii.w(), ii.h(), vi.encoder());
+      }
     };
-  }
-
-  Video build(VideoInfo videoInfo, E e) throws IOException;
-
-  default VideoInfo videoInfo(E e) {
-    return new VideoInfo(DEFAULT_W, DEFAULT_H, DEFAULT_ENCODER);
   }
 
   @Override
@@ -81,13 +109,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
     save(videoInfo(e), file, e);
   }
 
-  record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
-
-  record Video(List<BufferedImage> images, double frameRate) {
-    @Override
-    public String toString() {
-      return "(%dx%d)x%d@%.1ffps"
-          .formatted(images.get(0).getWidth(), images.get(0).getHeight(), images.size(), frameRate);
-    }
+  default VideoInfo videoInfo(E e) {
+    return new VideoInfo(DEFAULT_W, DEFAULT_H, DEFAULT_ENCODER);
   }
 }
