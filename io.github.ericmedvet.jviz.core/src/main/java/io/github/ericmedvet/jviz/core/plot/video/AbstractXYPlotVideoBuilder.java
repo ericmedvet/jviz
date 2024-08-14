@@ -27,7 +27,6 @@ import io.github.ericmedvet.jviz.core.drawer.VideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -42,7 +41,7 @@ public abstract class AbstractXYPlotVideoBuilder<P extends XYPlot<D>, D> impleme
   }
 
   @Override
-  public Video build(VideoInfo videoInfo, P p) throws IOException {
+  public Video build(VideoInfo videoInfo, P p) {
     return new Video(
         split(p, c.splitType()).stream()
             .map(sp -> imageBuilder.build(new ImageInfo(videoInfo.w(), videoInfo.h()), sp))

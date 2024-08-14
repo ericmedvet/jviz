@@ -24,10 +24,11 @@ import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 public interface VideoBuilder<E> extends Function<E, Video> {
 
@@ -36,12 +37,12 @@ public interface VideoBuilder<E> extends Function<E, Video> {
 
   record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
 
-  Video build(VideoInfo videoInfo, E e) throws IOException;
+  Video build(VideoInfo videoInfo, E e);
 
   static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, double frameRate) {
     return new VideoBuilder<>() {
       @Override
-      public Video build(VideoInfo videoInfo, F f) throws IOException {
+      public Video build(VideoInfo videoInfo, F f) {
         List<BufferedImage> images = splitter.apply(f).stream()
             .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
@@ -61,7 +62,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
   static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, SortedMap<Double, E>> splitter) {
     return new VideoBuilder<F>() {
       @Override
-      public Video build(VideoInfo videoInfo, F f) throws IOException {
+      public Video build(VideoInfo videoInfo, F f) {
         SortedMap<Double, E> map = splitter.apply(f);
         List<BufferedImage> images = map.values().stream()
             .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
@@ -81,22 +82,22 @@ public interface VideoBuilder<E> extends Function<E, Video> {
 
   @Override
   default Video apply(E e) {
+    return build(videoInfo(e), e);
+  }
+
+  default void save(VideoInfo videoInfo, File file, E e) {
     try {
-      return build(videoInfo(e), e);
+      Files.write(
+          file.toPath(),
+          build(videoInfo, e).data(videoInfo.encoder),
+          StandardOpenOption.CREATE,
+          StandardOpenOption.WRITE);
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
   }
 
-  default void save(VideoInfo videoInfo, File file, E e) throws IOException {
-    Logger.getLogger(getClass().getSimpleName()).fine("Building video");
-    Video video = build(videoInfo, e);
-    Logger.getLogger(getClass().getSimpleName()).fine("Video built: %s".formatted(video));
-    VideoUtils.encodeAndSave(video.images(), video.frameRate(), file, videoInfo.encoder);
-    Logger.getLogger(getClass().getSimpleName()).fine("Video saved on %s".formatted(file));
-  }
-
-  default void save(File file, E e) throws IOException {
+  default void save(File file, E e) {
     save(videoInfo(e), file, e);
   }
 

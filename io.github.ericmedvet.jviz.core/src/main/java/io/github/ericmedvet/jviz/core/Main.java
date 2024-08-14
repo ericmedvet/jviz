@@ -21,33 +21,47 @@ package io.github.ericmedvet.jviz.core;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
-import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
+import io.github.ericmedvet.jviz.core.plot.*;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
-import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
-import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
-import io.github.ericmedvet.jviz.core.plot.Value;
-import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot.TitledData;
-import io.github.ericmedvet.jviz.core.plot.image.BoxPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration;
+import io.github.ericmedvet.jviz.core.plot.image.*;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
-import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 
 public class Main {
+
+  private static DistributionPlot.Data gaussian(double mu, double sigma, int n) {
+    RandomGenerator r = new Random();
+    return new Data(
+        "N(%.1f,%.1f)".formatted(mu, sigma),
+        IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)).toList()
+    );
+  }
+
+  private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {
+    return new XYDataSeries() {
+      @Override
+      public String name() {
+        return "sin(%.1f*x)".formatted(f);
+      }
+
+      @Override
+      public List<Point> points() {
+        return xRange.points(n)
+            .mapToObj(x -> new Point(Value.of(x), Value.of(Math.sin(f * x))))
+            .toList();
+      }
+    };
+  }
 
   public static void main(String[] args) {
     // lines plot
@@ -68,7 +82,11 @@ public class Main {
                 List.of(
                     sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
                     sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
-                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)))));
+                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)
+                )
+            )
+        )
+    );
     new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT, Colors.DEFAULT.dataColors()).show(lp);
     new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT, Colors.DEFAULT.dataColors()).show(lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
@@ -86,7 +104,10 @@ public class Main {
             (gX, gY) -> new TitledData<>(
                 "gx=%d".formatted(gX),
                 "gy=%d".formatted(gY),
-                List.of(gaussian(1d, 1d, 100), gaussian(1.5, 2, 100), gaussian(0.5, 0.2, 200)))));
+                List.of(gaussian(1d, 1d, 100), gaussian(1.5, 2, 100), gaussian(0.5, 0.2, 200))
+            )
+        )
+    );
     BoxPlotDrawer bpd = new BoxPlotDrawer(Configuration.DEFAULT, BoxPlot.DEFAULT, Colors.DEFAULT.dataColors());
     bpd.show(bp);
     // landscape plot
@@ -110,7 +131,12 @@ public class Main {
                     List.of(
                         sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
                         sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
-                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 50))))));
+                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 50)
+                    )
+                )
+            )
+        )
+    );
     new LandscapePlotDrawer(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT, Colors.DEFAULT.dataColors())
         .show(lsp);
     // grid plot
@@ -132,39 +158,17 @@ public class Main {
                 Grid.create(
                     10,
                     10,
-                    (igx, igy) -> Math.exp(1 + Math.sin(igx / (1 + gX) + igy / (1 + gY)))))));
+                    (igx, igy) -> Math.exp(1 + Math.sin(igx / (1 + gX) + igy / (1 + gY)))
+                )
+            )
+        )
+    );
     new UnivariateGridPlotDrawer(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT).show(ugp);
-    try {
-      new UnivariatePlotVideoBuilder(
-              io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
-              Configuration.DEFAULT,
-              Configuration.UnivariateGridPlot.DEFAULT)
-          .save(new File("../gv.mp4"), ugp);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {
-    return new XYDataSeries() {
-      @Override
-      public String name() {
-        return "sin(%.1f*x)".formatted(f);
-      }
-
-      @Override
-      public List<Point> points() {
-        return xRange.points(n)
-            .mapToObj(x -> new Point(Value.of(x), Value.of(Math.sin(f * x))))
-            .toList();
-      }
-    };
-  }
-
-  private static DistributionPlot.Data gaussian(double mu, double sigma, int n) {
-    RandomGenerator r = new Random();
-    return new Data(
-        "N(%.1f,%.1f)".formatted(mu, sigma),
-        IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)).toList());
+    new UnivariatePlotVideoBuilder(
+        io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
+        Configuration.DEFAULT,
+        Configuration.UnivariateGridPlot.DEFAULT
+    )
+        .save(new File("../gv.mp4"), ugp);
   }
 }
