@@ -20,7 +20,6 @@
 package io.github.ericmedvet.jviz.core.drawer;
 
 import io.github.ericmedvet.jviz.core.util.VideoUtils;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;

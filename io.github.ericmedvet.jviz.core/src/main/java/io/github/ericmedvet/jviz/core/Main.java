@@ -30,7 +30,6 @@ import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
-
 import java.io.File;
 import java.util.List;
 import java.util.Random;

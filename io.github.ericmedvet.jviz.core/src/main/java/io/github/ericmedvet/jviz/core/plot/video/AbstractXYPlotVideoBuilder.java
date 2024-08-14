@@ -26,7 +26,6 @@ import io.github.ericmedvet.jviz.core.drawer.Video;
 import io.github.ericmedvet.jviz.core.drawer.VideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
-
 import java.util.List;
 import java.util.stream.IntStream;
 
