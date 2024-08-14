@@ -19,11 +19,11 @@
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
-import io.github.ericmedvet.jviz.core.drawer.VideoBuilder.Video;
 import io.github.ericmedvet.jviz.core.util.VideoUtils;
-import io.github.ericmedvet.jviz.core.util.VideoUtils.EncoderFacility;
+
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.function.Function;
@@ -33,22 +33,13 @@ public interface VideoBuilder<E> extends Function<E, Video> {
 
   int DEFAULT_W = 300;
   int DEFAULT_H = 200;
-  VideoUtils.EncoderFacility DEFAULT_ENCODER = EncoderFacility.JCODEC;
-
-  record Video(List<BufferedImage> images, double frameRate) {
-    @Override
-    public String toString() {
-      return "(%dx%d)x%d@%.1ffps"
-          .formatted(images.get(0).getWidth(), images.get(0).getHeight(), images.size(), frameRate);
-    }
-  }
 
   record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
 
   Video build(VideoInfo videoInfo, E e) throws IOException;
 
   static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, double frameRate) {
-    return new VideoBuilder<F>() {
+    return new VideoBuilder<>() {
       @Override
       public Video build(VideoInfo videoInfo, F f) throws IOException {
         List<BufferedImage> images = splitter.apply(f).stream()
@@ -101,7 +92,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
     Logger.getLogger(getClass().getSimpleName()).fine("Building video");
     Video video = build(videoInfo, e);
     Logger.getLogger(getClass().getSimpleName()).fine("Video built: %s".formatted(video));
-    VideoUtils.encodeAndSave(video.images, video.frameRate, file, videoInfo.encoder);
+    VideoUtils.encodeAndSave(video.images(), video.frameRate(), file, videoInfo.encoder);
     Logger.getLogger(getClass().getSimpleName()).fine("Video saved on %s".formatted(file));
   }
 
@@ -110,6 +101,6 @@ public interface VideoBuilder<E> extends Function<E, Video> {
   }
 
   default VideoInfo videoInfo(E e) {
-    return new VideoInfo(DEFAULT_W, DEFAULT_H, DEFAULT_ENCODER);
+    return new VideoInfo(DEFAULT_W, DEFAULT_H, VideoUtils.defaultEncoder());
   }
 }

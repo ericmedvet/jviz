@@ -35,15 +35,6 @@
 
 package io.github.ericmedvet.jviz.core.util;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import org.jcodec.api.SequenceEncoder;
 import org.jcodec.common.Format;
 import org.jcodec.common.io.NIOUtils;
@@ -52,18 +43,35 @@ import org.jcodec.common.model.ColorSpace;
 import org.jcodec.common.model.Picture;
 import org.jcodec.common.model.Rational;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class VideoUtils {
 
   private static final int alphaR = 0xff;
   private static final int alphaG = 0xff;
   private static final int alphaB = 0xff;
 
-  private static final EncoderFacility DEFAULT_ENCODER = EncoderFacility.JCODEC;
+  private static final EncoderFacility FALL_BACK_ENCODER = EncoderFacility.JCODEC;
+  private static final EncoderFacility PREFERRED_ENCODER = EncoderFacility.FFMPEG_SMALL;
   private static final Logger L = Logger.getLogger(VideoUtils.class.getName());
+
+  private static EncoderFacility defaultEncoder;
 
   private VideoUtils() {}
 
   public enum EncoderFacility {
+    DEFAULT,
     JCODEC,
     FFMPEG_LARGE,
     FFMPEG_SMALL
@@ -90,22 +98,41 @@ public class VideoUtils {
     }
   }
 
+  public static EncoderFacility defaultEncoder() {
+    if (defaultEncoder == null) {
+      if (PREFERRED_ENCODER.equals(EncoderFacility.FFMPEG_LARGE)
+          || PREFERRED_ENCODER.equals(EncoderFacility.FFMPEG_SMALL)) {
+        // check if ffmpeg is present
+        String command = "ffmpeg -version";
+        ProcessBuilder pb = new ProcessBuilder(command.split(" "));
+        try {
+          Process process = pb.start();
+          if (process.waitFor() < 0) {
+            throw new IOException("Unexpected exit val");
+          }
+          defaultEncoder = PREFERRED_ENCODER;
+        } catch (IOException | InterruptedException e) {
+          // ignore, use fallback
+          defaultEncoder = FALL_BACK_ENCODER;
+        }
+      } else {
+        defaultEncoder = FALL_BACK_ENCODER;
+      }
+    }
+    return defaultEncoder;
+  }
+
   public static byte[] encode(List<BufferedImage> images, double frameRate, EncoderFacility encoder)
       throws IOException {
     File tmpFile = File.createTempFile("video", ".mp4");
     encodeAndSave(images, frameRate, tmpFile, encoder);
-    try (InputStream is = new FileInputStream(tmpFile)) {
-      return is.readAllBytes();
-    }
-  }
-
-  public static void encodeAndSave(List<BufferedImage> images, double frameRate, File file) throws IOException {
-    encodeAndSave(images, frameRate, file, DEFAULT_ENCODER);
+    return Files.readAllBytes(tmpFile.toPath());
   }
 
   public static void encodeAndSave(List<BufferedImage> images, double frameRate, File file, EncoderFacility encoder)
       throws IOException {
     switch (encoder) {
+      case DEFAULT -> encodeAndSave(images, frameRate, file, defaultEncoder());
       case JCODEC -> encodeAndSaveWithJCodec(images, frameRate, file);
       case FFMPEG_LARGE -> encodeAndSaveWithFFMpeg(images, frameRate, file, 18);
       case FFMPEG_SMALL -> encodeAndSaveWithFFMpeg(images, frameRate, file, 30);
@@ -179,5 +206,9 @@ public class VideoUtils {
     }
     encoder.finish();
     NIOUtils.closeQuietly(channel);
+  }
+
+  public static void encodeAndSave(List<BufferedImage> images, double frameRate, File file) throws IOException {
+    encodeAndSave(images, frameRate, file, defaultEncoder());
   }
 }
