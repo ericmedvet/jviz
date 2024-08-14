@@ -43,8 +43,7 @@ public class Main {
     RandomGenerator r = new Random();
     return new Data(
         "N(%.1f,%.1f)".formatted(mu, sigma),
-        IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)).toList()
-    );
+        IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)).toList());
   }
 
   private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {
@@ -82,11 +81,7 @@ public class Main {
                 List.of(
                     sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
                     sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
-                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)
-                )
-            )
-        )
-    );
+                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)))));
     new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT, Colors.DEFAULT.dataColors()).show(lp);
     new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT, Colors.DEFAULT.dataColors()).show(lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
@@ -104,10 +99,7 @@ public class Main {
             (gX, gY) -> new TitledData<>(
                 "gx=%d".formatted(gX),
                 "gy=%d".formatted(gY),
-                List.of(gaussian(1d, 1d, 100), gaussian(1.5, 2, 100), gaussian(0.5, 0.2, 200))
-            )
-        )
-    );
+                List.of(gaussian(1d, 1d, 100), gaussian(1.5, 2, 100), gaussian(0.5, 0.2, 200)))));
     BoxPlotDrawer bpd = new BoxPlotDrawer(Configuration.DEFAULT, BoxPlot.DEFAULT, Colors.DEFAULT.dataColors());
     bpd.show(bp);
     // landscape plot
@@ -131,12 +123,7 @@ public class Main {
                     List.of(
                         sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
                         sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
-                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 50)
-                    )
-                )
-            )
-        )
-    );
+                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 50))))));
     new LandscapePlotDrawer(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT, Colors.DEFAULT.dataColors())
         .show(lsp);
     // grid plot
@@ -158,17 +145,12 @@ public class Main {
                 Grid.create(
                     10,
                     10,
-                    (igx, igy) -> Math.exp(1 + Math.sin(igx / (1 + gX) + igy / (1 + gY)))
-                )
-            )
-        )
-    );
+                    (igx, igy) -> Math.exp(1 + Math.sin(igx / (1 + gX) + igy / (1 + gY)))))));
     new UnivariateGridPlotDrawer(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT).show(ugp);
     new UnivariatePlotVideoBuilder(
-        io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
-        Configuration.DEFAULT,
-        Configuration.UnivariateGridPlot.DEFAULT
-    )
+            io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
+            Configuration.DEFAULT,
+            Configuration.UnivariateGridPlot.DEFAULT)
         .save(new File("../gv.mp4"), ugp);
   }
 }
