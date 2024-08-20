@@ -28,8 +28,8 @@ import javax.imageio.ImageIO;
 
 public interface ImageBuilder<E> extends Function<E, BufferedImage> {
 
-  int DEFAULT_W = 600;
-  int DEFAULT_H = 400;
+  int DEFAULT_W = 1000;
+  int DEFAULT_H = 800;
 
   BufferedImage build(ImageInfo imageInfo, E e);
 
