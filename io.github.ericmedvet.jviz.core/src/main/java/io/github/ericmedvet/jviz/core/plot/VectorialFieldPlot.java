@@ -17,17 +17,19 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package io.github.ericmedvet.jviz.core.plot.video;
+package io.github.ericmedvet.jviz.core.plot;
 
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
-import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.Grid;
+import java.util.List;
 
-public class PointsPlotVideoBuilder extends AbstractXYDataSeriesPlotVideoBuilder {
-
-  public PointsPlotVideoBuilder(
-      Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      PointsPlot ppConfiguration) {
-    super(c, new PointsPlotDrawer(iConfiguration, ppConfiguration));
-  }
-}
+public record VectorialFieldPlot(
+    String title,
+    String xTitleName,
+    String yTitleName,
+    String xName,
+    String yName,
+    DoubleRange xRange,
+    DoubleRange yRange,
+    Grid<TitledData<List<VectorialFieldDataSeries>>> dataGrid)
+    implements XYPlot<List<VectorialFieldDataSeries>> {}

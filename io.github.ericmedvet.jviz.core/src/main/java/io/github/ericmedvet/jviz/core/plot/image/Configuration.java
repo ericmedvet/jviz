@@ -114,6 +114,7 @@ public record Configuration(
       double gridStrokeSizeRate,
       double borderStrokeSizeRate,
       double maxNOfDecimalDigits) {
+
     public static final General DEFAULT = new General(1.25, 0.9, 0.0005, 0.001, 5);
   }
 
@@ -124,6 +125,7 @@ public record Configuration(
       double legendImageHRate,
       boolean showRanges,
       ColorRange colorRange) {
+
     public static final UnivariateGridPlot DEFAULT = new UnivariateGridPlot(
         0.9,
         20,
@@ -148,6 +150,7 @@ public record Configuration(
       ColorRange colorRange,
       double xExtensionRate,
       double yExtensionRate) {
+
     public static LandscapePlot DEFAULT = new LandscapePlot(
         0.2,
         PointsPlot.DEFAULT.strokeSizeRate(),
@@ -181,6 +184,7 @@ public record Configuration(
       double plotMarginWRate,
       double plotMarginHRate,
       double noteMarginHRate) {
+
     public static final Layout DEFAULT = new Layout(
         0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.025, 0.001, 0.001, 0.001, 0.001, 0.005, 0.005,
         0.001);
@@ -194,6 +198,7 @@ public record Configuration(
       List<Color> colors,
       double xExtensionRate,
       double yExtensionRate) {
+
     public static final LinesPlot DEFAULT =
         new LinesPlot(0.0025, 0.3, 0.04, 0.025, Colors.DEFAULT.dataColors, 1.05, 1.05);
   }
@@ -224,6 +229,7 @@ public record Configuration(
       List<Color> colors,
       double xExtensionRate,
       double yExtensionRate) {
+
     public static final PointsPlot DEFAULT = new PointsPlot(
         0.0015,
         0.005,
@@ -246,6 +252,7 @@ public record Configuration(
       double alpha,
       List<Color> colors,
       double yExtensionRate) {
+
     public enum ExtremeType {
       MIN_MAX,
       IQR_1_5
@@ -289,5 +296,22 @@ public record Configuration(
       LEGEND_LABEL,
       NOTE
     }
+  }
+
+  public record VectorialFieldPlot(
+      double strokeSizeRate,
+      double legendImageSizeRate,
+      double srcSizeRate,
+      List<Color> colors,
+      double xExtensionRate,
+      double yExtensionRate) {
+
+    public static final VectorialFieldPlot DEFAULT = new VectorialFieldPlot(
+        0.001,
+        0.02,
+        0.005,
+        Colors.DEFAULT.dataColors(),
+        LinesPlot.DEFAULT.xExtensionRate,
+        LinesPlot.DEFAULT.yExtensionRate);
   }
 }

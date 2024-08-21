@@ -22,7 +22,6 @@ package io.github.ericmedvet.jviz.core.plot.video;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
-import java.awt.Color;
 import java.util.List;
 
 public class LandscapePlotVideoBuilder extends AbstractXYPlotVideoBuilder<LandscapePlot, LandscapePlot.Data> {
@@ -30,9 +29,8 @@ public class LandscapePlotVideoBuilder extends AbstractXYPlotVideoBuilder<Landsc
   public LandscapePlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration.LandscapePlot lpConfiguration,
-      List<Color> colors) {
-    super(c, new LandscapePlotDrawer(iConfiguration, lpConfiguration, colors));
+      io.github.ericmedvet.jviz.core.plot.image.Configuration.LandscapePlot lpConfiguration) {
+    super(c, new LandscapePlotDrawer(iConfiguration, lpConfiguration));
   }
 
   @Override

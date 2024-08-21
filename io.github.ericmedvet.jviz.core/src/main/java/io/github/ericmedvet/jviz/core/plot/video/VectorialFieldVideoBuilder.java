@@ -19,26 +19,27 @@
  */
 package io.github.ericmedvet.jviz.core.plot.video;
 
-import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
-import io.github.ericmedvet.jviz.core.plot.image.BoxPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
+import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries;
+import io.github.ericmedvet.jviz.core.plot.VectorialFieldPlot;
+import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
 import java.util.List;
 
-public class BoxPlotVideoBuilder extends AbstractXYPlotVideoBuilder<DistributionPlot, List<DistributionPlot.Data>> {
+public class VectorialFieldVideoBuilder
+    extends AbstractXYPlotVideoBuilder<VectorialFieldPlot, List<VectorialFieldDataSeries>> {
 
-  public BoxPlotVideoBuilder(
+  public VectorialFieldVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      BoxPlot bpConfiguration) {
-    super(c, new BoxPlotDrawer(iConfiguration, bpConfiguration));
+      io.github.ericmedvet.jviz.core.plot.image.Configuration.VectorialFieldPlot vfpConfiguration) {
+    super(c, new VectorialFieldPlotDrawer(iConfiguration, vfpConfiguration));
   }
 
   @Override
-  protected List<DistributionPlot> split(DistributionPlot p, SplitType splitType) {
+  protected List<VectorialFieldPlot> split(VectorialFieldPlot p, SplitType splitType) {
     return split(p.dataGrid(), splitType).stream()
-        .map(dg -> new DistributionPlot(
-            p.title(), p.xTitleName(), p.yTitleName(), p.xName(), p.yName(), p.yRange(), dg))
+        .map(dg -> new VectorialFieldPlot(
+            p.title(), p.xTitleName(), p.yTitleName(), p.xName(), p.yName(), p.xRange(), p.yRange(), dg))
         .toList();
   }
 }

@@ -212,6 +212,14 @@ public class PlotUtils {
     }
   }
 
+  public static void drawArrow(
+      Graphics2D g, Point2D srcP, Point2D dstP, double srcSize, Color color, double alpha, double strokeSize) {
+    g.setStroke(new BasicStroke((float) strokeSize));
+    g.setColor(GraphicsUtils.alphaed(color, alpha));
+    g.fill(new Ellipse2D.Double(srcP.getX() - srcSize / 2d, srcP.getY() - srcSize / 2d, srcSize, srcSize));
+    g.draw(new Line2D.Double(srcP.getX(), srcP.getY(), dstP.getX(), dstP.getY()));
+  }
+
   public static void drawYAxis(Graphics2D g, Configuration c, Rectangle2D r, String name, Axis a) {
     drawString(
         g,
@@ -505,6 +513,7 @@ public class PlotUtils {
   }
 
   public interface LegendImageDrawer {
+
     void draw(Graphics2D g, Rectangle2D r, Color c);
   }
 

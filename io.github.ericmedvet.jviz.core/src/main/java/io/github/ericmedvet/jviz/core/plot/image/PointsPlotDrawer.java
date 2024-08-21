@@ -20,7 +20,6 @@
 package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
@@ -34,11 +33,11 @@ public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
   private final Configuration.PointsPlot c;
 
   public PointsPlotDrawer() {
-    this(Configuration.DEFAULT, PointsPlot.DEFAULT, Colors.DEFAULT.dataColors());
+    this(Configuration.DEFAULT, PointsPlot.DEFAULT);
   }
 
-  public PointsPlotDrawer(Configuration configuration, PointsPlot c, List<Color> colors) {
-    super(configuration, c.xExtensionRate(), c.yExtensionRate(), colors);
+  public PointsPlotDrawer(Configuration configuration, PointsPlot c) {
+    super(configuration, c.xExtensionRate(), c.yExtensionRate());
     this.c = c;
   }
 
@@ -46,6 +45,11 @@ public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
   protected Point2D computeLegendImageSize(Graphics2D g) {
     GMetrics gm = new GMetrics(g);
     return new Point2D.Double(c.legendImageSizeRate() * gm.refL(), c.legendImageSizeRate() * gm.refL());
+  }
+
+  @Override
+  protected List<Color> colors() {
+    return c.colors();
   }
 
   @Override

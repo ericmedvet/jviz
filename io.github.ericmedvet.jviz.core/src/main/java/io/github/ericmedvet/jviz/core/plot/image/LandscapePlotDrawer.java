@@ -25,7 +25,6 @@ import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -38,16 +37,14 @@ import java.util.function.DoubleBinaryOperator;
 public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, LandscapePlot.Data> {
 
   private final Configuration.LandscapePlot c;
-  private final List<Color> colors;
 
   public LandscapePlotDrawer() {
-    this(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT, Colors.DEFAULT.dataColors());
+    this(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT);
   }
 
-  public LandscapePlotDrawer(Configuration configuration, Configuration.LandscapePlot c, List<Color> colors) {
+  public LandscapePlotDrawer(Configuration configuration, Configuration.LandscapePlot c) {
     super(configuration, c.xExtensionRate(), c.yExtensionRate());
     this.c = c;
-    this.colors = colors;
   }
 
   @Override
@@ -144,7 +141,7 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
             .flatMap(List::stream)
             .map(XYDataSeries::name)
             .toList(),
-        colors);
+        c.colors());
   }
 
   private DoubleRange computeValueRange(LandscapePlot p, GMetrics gm) {

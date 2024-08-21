@@ -37,12 +37,8 @@ import java.util.SortedMap;
 public abstract class AbstractXYDataSeriesPlotDrawer
     extends AbstractXYPlotDrawer<XYDataSeriesPlot, List<XYDataSeries>> {
 
-  private final List<Color> colors;
-
-  public AbstractXYDataSeriesPlotDrawer(
-      Configuration configuration, double xExtensionRate, double yExtensionRate, List<Color> colors) {
+  public AbstractXYDataSeriesPlotDrawer(Configuration configuration, double xExtensionRate, double yExtensionRate) {
     super(configuration, xExtensionRate, yExtensionRate);
-    this.colors = colors;
   }
 
   protected abstract Point2D computeLegendImageSize(Graphics2D g);
@@ -51,6 +47,8 @@ public abstract class AbstractXYDataSeriesPlotDrawer
       Graphics2D g, GMetrics gm, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color);
 
   protected abstract void drawLegendImage(Graphics2D g, Rectangle2D r, Color color);
+
+  protected abstract List<Color> colors();
 
   @Override
   public void drawLegend(Graphics2D g, Rectangle2D r, XYDataSeriesPlot p) {
@@ -73,7 +71,7 @@ public abstract class AbstractXYDataSeriesPlotDrawer
             .flatMap(List::stream)
             .map(XYDataSeries::name)
             .toList(),
-        colors);
+        colors());
   }
 
   @Override

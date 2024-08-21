@@ -32,7 +32,7 @@ public interface XYDataSeries {
   record Point(Value x, Value y) {
     @Override
     public String toString() {
-      return "(%s;%s)".formatted(this.x, this.y);
+      return "(%s;%s)".formatted(x, y);
     }
   }
 

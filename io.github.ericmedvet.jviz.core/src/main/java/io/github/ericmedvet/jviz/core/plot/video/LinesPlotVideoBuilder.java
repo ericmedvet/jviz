@@ -21,16 +21,13 @@ package io.github.ericmedvet.jviz.core.plot.video;
 
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
-import java.awt.Color;
-import java.util.List;
 
 public class LinesPlotVideoBuilder extends AbstractXYDataSeriesPlotVideoBuilder {
 
   public LinesPlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      LinesPlot lpConfiguration,
-      List<Color> colors) {
-    super(c, new LinesPlotDrawer(iConfiguration, lpConfiguration, colors));
+      LinesPlot lpConfiguration) {
+    super(c, new LinesPlotDrawer(iConfiguration, lpConfiguration));
   }
 }
