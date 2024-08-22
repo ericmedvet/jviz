@@ -25,6 +25,7 @@ import io.github.ericmedvet.jviz.core.plot.*;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries.Point;
 import io.github.ericmedvet.jviz.core.plot.XYPlot.TitledData;
+import io.github.ericmedvet.jviz.core.plot.csv.VectorialFieldPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.image.*;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
@@ -157,8 +158,8 @@ public class Main {
         "My plot",
         "x title",
         "y title",
-        "x1",
-        "x2",
+        "x",
+        "y",
         DoubleRange.UNBOUNDED,
         DoubleRange.UNBOUNDED,
         Grid.create(
@@ -180,5 +181,10 @@ public class Main {
                             p -> new Point(
                                 Math.sin(p.x() * gX), Math.sin(p.y() * gY)))))))));
     new VectorialFieldPlotDrawer().show(vfp);
+    System.out.println(new VectorialFieldPlotCsvBuilder(
+            io.github.ericmedvet.jviz.core.plot.csv.Configuration.DEFAULTS.get(
+                io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode.PAPER_FRIENDLY),
+            io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode.PAPER_FRIENDLY)
+        .apply(vfp));
   }
 }
