@@ -24,6 +24,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * @author "Eric Medvet" on 2024/02/23 for jgea
@@ -57,5 +59,17 @@ public interface Drawer<E> extends ImageBuilder<E> {
     draw(g, e);
     g.dispose();
     return image;
+  }
+
+  static <E> Drawer<E> stringWriter(Color color, float fontSize, Function<E, String> f) {
+    return (g, e) -> {
+      g.setFont(g.getFont().deriveFont(fontSize));
+      double x0 = g.getClipBounds().getMinX();
+      double y0 = g.getClipBounds().getMinX();
+      g.setColor(color);
+      double lH = g.getFontMetrics().getHeight();
+      AtomicInteger c = new AtomicInteger(0);
+      f.apply(e).lines().forEach(l -> g.drawString(l, (float) x0, (float) (y0 + lH * c.incrementAndGet())));
+    };
   }
 }

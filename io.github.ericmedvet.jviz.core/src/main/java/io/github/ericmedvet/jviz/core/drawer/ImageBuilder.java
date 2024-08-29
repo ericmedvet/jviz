@@ -35,7 +35,7 @@ public interface ImageBuilder<E> extends Function<E, BufferedImage> {
 
   default <F> ImageBuilder<F> on(Function<? super F, ? extends E> function) {
     ImageBuilder<E> thisImageBuilder = this;
-    return new ImageBuilder<F>() {
+    return new ImageBuilder<>() {
       @Override
       public BufferedImage build(ImageInfo imageInfo, F f) {
         return thisImageBuilder.build(imageInfo, function.apply(f));

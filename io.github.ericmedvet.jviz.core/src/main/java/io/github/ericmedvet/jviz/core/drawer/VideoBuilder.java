@@ -55,7 +55,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
   }
 
   static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, SortedMap<Double, E>> splitter) {
-    return new VideoBuilder<F>() {
+    return new VideoBuilder<>() {
       @Override
       public Video build(VideoInfo videoInfo, F f) {
         SortedMap<Double, E> map = splitter.apply(f);
