@@ -34,10 +34,6 @@ public interface VideoBuilder<E> extends Function<E, Video> {
   int DEFAULT_W = 300;
   int DEFAULT_H = 200;
 
-  record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
-
-  Video build(VideoInfo videoInfo, E e);
-
   static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, double frameRate) {
     return new VideoBuilder<>() {
       @Override
@@ -45,7 +41,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
         List<BufferedImage> images = splitter.apply(f).stream()
             .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
-        return new Video(images, frameRate);
+        return new Video(images, frameRate, videoInfo.encoder);
       }
 
       @Override
@@ -66,7 +62,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
         List<BufferedImage> images = map.values().stream()
             .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
-        return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey());
+        return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey(), videoInfo.encoder);
       }
 
       @Override
@@ -79,28 +75,53 @@ public interface VideoBuilder<E> extends Function<E, Video> {
     };
   }
 
+  default <F> VideoBuilder<F> on(Function<? super F, ? extends E> function) {
+    VideoBuilder<E> thisVideoBuilder = this;
+    return new VideoBuilder<F>() {
+      @Override
+      public Video build(VideoInfo videoInfo, F f) {
+        return thisVideoBuilder.build(videoInfo, function.apply(f));
+      }
+
+      @Override
+      public VideoInfo videoInfo(F f) {
+        return thisVideoBuilder.videoInfo(function.apply(f));
+      }
+
+      @Override
+      public Video apply(F f) {
+        E e = function.apply(f);
+        return thisVideoBuilder.build(thisVideoBuilder.videoInfo(e), e);
+      }
+    };
+  }
+
+  Video build(VideoInfo videoInfo, E e);
+
   @Override
   default Video apply(E e) {
     return build(videoInfo(e), e);
   }
 
   default void save(VideoInfo videoInfo, File file, E e) {
-    try {
-      Files.write(
-          file.toPath(),
-          build(videoInfo, e).data(videoInfo.encoder),
-          StandardOpenOption.CREATE,
-          StandardOpenOption.WRITE);
-    } catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
+    save(build(videoInfo, e), file);
   }
 
   default void save(File file, E e) {
-    save(videoInfo(e), file, e);
+    save(build(videoInfo(e), e), file);
   }
 
   default VideoInfo videoInfo(E e) {
     return new VideoInfo(DEFAULT_W, DEFAULT_H, VideoUtils.defaultEncoder());
   }
+
+  private void save(Video video, File file) {
+    try {
+      Files.write(file.toPath(), video.data(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  record VideoInfo(int w, int h, VideoUtils.EncoderFacility encoder) {}
 }

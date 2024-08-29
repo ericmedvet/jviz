@@ -20,6 +20,7 @@
 package io.github.ericmedvet.jviz.core.drawer;
 
 import io.github.ericmedvet.jviz.core.util.VideoUtils;
+import io.github.ericmedvet.jviz.core.util.VideoUtils.EncoderFacility;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -32,14 +33,16 @@ public final class Video {
   private final List<BufferedImage> images;
   private final double frameRate;
   private transient byte[] data;
+  private final EncoderFacility encoder;
 
-  public Video(List<BufferedImage> images, double frameRate) {
+  public Video(List<BufferedImage> images, double frameRate, EncoderFacility encoder) {
     this.images = images;
     this.frameRate = frameRate;
+    this.encoder = encoder;
     data = null;
   }
 
-  public byte[] data(VideoUtils.EncoderFacility encoder) {
+  public byte[] data() {
     if (data == null) {
       try {
         data = VideoUtils.encode(images, frameRate, encoder);
@@ -48,10 +51,6 @@ public final class Video {
       }
     }
     return data;
-  }
-
-  public byte[] data() {
-    return data(VideoUtils.defaultEncoder());
   }
 
   public double frameRate() {
@@ -70,6 +69,10 @@ public final class Video {
     var that = (Video) obj;
     return Objects.equals(this.images, that.images)
         && Double.doubleToLongBits(this.frameRate) == Double.doubleToLongBits(that.frameRate);
+  }
+
+  public EncoderFacility getEncoder() {
+    return encoder;
   }
 
   @Override

@@ -33,6 +33,27 @@ public interface ImageBuilder<E> extends Function<E, BufferedImage> {
 
   BufferedImage build(ImageInfo imageInfo, E e);
 
+  default <F> ImageBuilder<F> on(Function<? super F, ? extends E> function) {
+    ImageBuilder<E> thisImageBuilder = this;
+    return new ImageBuilder<F>() {
+      @Override
+      public BufferedImage build(ImageInfo imageInfo, F f) {
+        return thisImageBuilder.build(imageInfo, function.apply(f));
+      }
+
+      @Override
+      public ImageInfo imageInfo(F f) {
+        return thisImageBuilder.imageInfo(function.apply(f));
+      }
+
+      @Override
+      public BufferedImage apply(F f) {
+        E e = function.apply(f);
+        return thisImageBuilder.build(thisImageBuilder.imageInfo(e), e);
+      }
+    };
+  }
+
   @Override
   default BufferedImage apply(E e) {
     return build(imageInfo(e), e);
@@ -47,7 +68,7 @@ public interface ImageBuilder<E> extends Function<E, BufferedImage> {
   }
 
   default void save(String formatName, File file, E e) throws IOException {
-    save(imageInfo(e), formatName, file, e);
+    ImageIO.write(apply(e), formatName, file);
   }
 
   default void save(ImageInfo imageInfo, File file, E e) throws IOException {
@@ -56,7 +77,8 @@ public interface ImageBuilder<E> extends Function<E, BufferedImage> {
   }
 
   default void save(File file, E e) throws IOException {
-    save(imageInfo(e), file, e);
+    String[] tokens = file.getName().split("\\.");
+    ImageIO.write(apply(e), tokens[tokens.length - 1], file);
   }
 
   default void show(ImageInfo imageInfo, E e) {
@@ -64,7 +86,7 @@ public interface ImageBuilder<E> extends Function<E, BufferedImage> {
   }
 
   default void show(E e) {
-    show(imageInfo(e), e);
+    Misc.showImage(apply(e));
   }
 
   record ImageInfo(int w, int h) {}
