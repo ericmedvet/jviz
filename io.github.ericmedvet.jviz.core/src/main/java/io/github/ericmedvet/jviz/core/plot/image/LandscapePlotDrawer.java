@@ -131,7 +131,8 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
         c.legendSteps(),
         Configuration.Text.Use.LEGEND_LABEL,
         configuration().colors().legendLabelColor(),
-        AnchorV.B);
+        AnchorV.B,
+        null);
   }
 
   private SortedMap<String, Color> getComputeSeriesDataColors(LandscapePlot p) {
@@ -218,7 +219,8 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
         c.legendSteps(),
         Configuration.Text.Use.TICK_LABEL,
         configuration().colors().tickLabelColor(),
-        AnchorV.T);
+        AnchorV.T,
+        null);
   }
 
   private DoubleRange computeValueRange(Grid.Key k, double w, double h, LandscapePlot p) {

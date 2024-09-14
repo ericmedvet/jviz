@@ -29,6 +29,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.DoubleFunction;
 
@@ -113,7 +114,8 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
         c.legendSteps(),
         Configuration.Text.Use.LEGEND_LABEL,
         configuration().colors().legendLabelColor(),
-        AnchorV.B);
+        AnchorV.B,
+        null);
   }
 
   @Override
@@ -161,6 +163,12 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
     }
     DoubleRange valueRange = computeValueRange(p);
     Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
+    List<Double> allLabels = p.dataGrid().values().stream()
+        .map(td -> computeValueRange(td.data()))
+        .map(dr -> List.of(dr.min(), dr.max()))
+        .flatMap(List::stream)
+        .toList();
+    String rangeLabelFormat = PlotUtils.computeTicksFormat(configuration(), allLabels);
     PlotUtils.drawColorBar(
         g,
         configuration(),
@@ -173,6 +181,7 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
         c.legendSteps(),
         Configuration.Text.Use.TICK_LABEL,
         configuration().colors().tickLabelColor(),
-        AnchorV.T);
+        AnchorV.T,
+        rangeLabelFormat);
   }
 }

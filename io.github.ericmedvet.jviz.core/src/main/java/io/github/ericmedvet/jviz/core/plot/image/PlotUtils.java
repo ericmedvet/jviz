@@ -129,7 +129,8 @@ public class PlotUtils {
       int steps,
       Configuration.Text.Use use,
       Color labelColor,
-      AnchorV labelsAnchor) {
+      AnchorV labelsAnchor,
+      String rangeLabelFormat) {
     Shape clip = g.getClip();
     markRectangle(g, c, r);
     // background
@@ -157,12 +158,15 @@ public class PlotUtils {
     g.setColor(c.colors().plotBorderColor());
     g.draw(barR);
     // labels
-    String format = computeTicksFormat(c, List.of(innerRange.min(), innerRange.max()));
+    if (rangeLabelFormat == null) {
+      rangeLabelFormat = computeTicksFormat(
+          c, List.of(outerRange.min(), innerRange.min(), innerRange.max(), outerRange.max()));
+    }
     drawString(
         g,
         c,
         new Point2D.Double(rRange.denormalize(outerRange.normalize(innerRange.min())), labelsY),
-        format.formatted(innerRange.min()),
+        rangeLabelFormat.formatted(innerRange.min()),
         AnchorH.C,
         AnchorV.B,
         use,
@@ -172,7 +176,7 @@ public class PlotUtils {
         g,
         c,
         new Point2D.Double(rRange.denormalize(outerRange.normalize(innerRange.max())), labelsY),
-        format.formatted(innerRange.max()),
+        rangeLabelFormat.formatted(innerRange.max()),
         AnchorH.C,
         AnchorV.B,
         use,

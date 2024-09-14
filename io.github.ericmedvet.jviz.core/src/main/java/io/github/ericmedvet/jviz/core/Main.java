@@ -145,8 +145,9 @@ public class Main {
                 Grid.create(
                     10,
                     10,
-                    (igx, igy) -> Math.exp(
-                        1 + Math.sin((double) igx / (1 + gX) + (double) igy / (1 + gY)))))));
+                    (igx, igy) -> DoubleRange.SYMMETRIC_UNIT.normalize((gX + gY)
+                        / 6d
+                        * Math.sin((double) igx / (1 + gX) + (double) igy / (1 + gY)))))));
     new UnivariateGridPlotDrawer(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT).show(ugp);
     new UnivariatePlotVideoBuilder(
             io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
