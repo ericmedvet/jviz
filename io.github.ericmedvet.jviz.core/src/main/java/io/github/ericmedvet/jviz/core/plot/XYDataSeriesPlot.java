@@ -23,9 +23,7 @@ import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import java.util.List;
 
-/**
- * @author "Eric Medvet" on 2023/12/10 for jgea
- */
+/** @author "Eric Medvet" on 2023/12/10 for jgea */
 public record XYDataSeriesPlot(
     String title,
     String xTitleName,

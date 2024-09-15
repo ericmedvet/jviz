@@ -99,16 +99,20 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
     Point2D legendImageSize = new Point2D.Double(
         c.markerLegendImageSizeRate() * gm.refL(), c.markerLegendImageSizeRate() * gm.refL());
     PlotUtils.drawItemsLegend(
-        g, configuration(), r, dataColors, legendImageSize.getX(), legendImageSize.getY(), (g1, ir, color) -> {
-          PlotUtils.drawMarker(
-              g1,
-              new Point2D.Double(ir.getCenterX(), ir.getCenterY()),
-              l,
-              c.marker(),
-              color,
-              c.alpha(),
-              c.dataStrokeSizeRate() * gm.refL());
-        });
+        g,
+        configuration(),
+        r,
+        dataColors,
+        legendImageSize.getX(),
+        legendImageSize.getY(),
+        (g1, ir, color) -> PlotUtils.drawMarker(
+            g1,
+            new Point2D.Double(ir.getCenterX(), ir.getCenterY()),
+            l,
+            c.marker(),
+            color,
+            c.alpha(),
+            c.dataStrokeSizeRate() * gm.refL()));
     r = new Rectangle2D.Double(
         r.getX(),
         r.getY() + configuration().layout().legendInnerMarginHRate() * gm.h() + itemsLegendH,

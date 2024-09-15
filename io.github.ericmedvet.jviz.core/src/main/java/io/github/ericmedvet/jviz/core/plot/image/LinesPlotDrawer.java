@@ -72,12 +72,12 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
         ds.points().stream()
             .sorted(Comparator.comparingDouble(p -> p.x().v()))
             .toList());
-    if (ds.points().get(0).y() instanceof RangedValue) {
+    if (ds.points().getFirst().y() instanceof RangedValue) {
       // draw shaded area
       Path2D sPath = new Path2D.Double();
       sPath.moveTo(
-          xA.xIn(ds.points().get(0).x().v(), r),
-          yA.yIn(ds.points().get(0).y().v(), r));
+          xA.xIn(ds.points().getFirst().x().v(), r),
+          yA.yIn(ds.points().getFirst().y().v(), r));
       ds.points().stream()
           .skip(1)
           .forEach(p -> sPath.lineTo(
@@ -96,8 +96,8 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
     g.setStroke(new BasicStroke((float) (c.strokeSizeRate() * gm.refL())));
     Path2D path = new Path2D.Double();
     path.moveTo(
-        xA.xIn(ds.points().get(0).x().v(), r),
-        yA.yIn(ds.points().get(0).y().v(), r));
+        xA.xIn(ds.points().getFirst().x().v(), r),
+        yA.yIn(ds.points().getFirst().y().v(), r));
     ds.points().stream().skip(1).forEach(p -> path.lineTo(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)));
     g.draw(path);
   }

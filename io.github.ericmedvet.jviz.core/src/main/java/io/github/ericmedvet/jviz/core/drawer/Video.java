@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author "Eric Medvet" on 2024/08/14 for jviz
- */
+/** @author "Eric Medvet" on 2024/08/14 for jviz */
 public final class Video {
   private final List<BufferedImage> images;
   private final double frameRate;
@@ -78,7 +76,7 @@ public final class Video {
   @Override
   public String toString() {
     return "(%dx%d)x%d@%.1ffps"
-        .formatted(images.get(0).getWidth(), images.get(0).getHeight(), images.size(), frameRate);
+        .formatted(images.getFirst().getWidth(), images.getFirst().getHeight(), images.size(), frameRate);
   }
 
   public List<BufferedImage> images() {

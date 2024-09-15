@@ -25,9 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * @author "Eric Medvet" on 2023/12/01 for jgea
- */
+/** @author "Eric Medvet" on 2023/12/01 for jgea */
 public interface XYDataSeries {
   record Point(Value x, Value y) {
     @Override

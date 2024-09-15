@@ -24,9 +24,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author "Eric Medvet" on 2023/12/29 for jgea
- */
+/** @author "Eric Medvet" on 2023/12/29 for jgea */
 public record ColorRange(List<Color> colors) {
 
   public ColorRange(Color... colors) {

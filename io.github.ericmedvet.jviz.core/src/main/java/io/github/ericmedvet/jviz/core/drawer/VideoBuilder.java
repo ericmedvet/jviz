@@ -48,7 +48,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
       public VideoInfo videoInfo(F f) {
         VideoInfo vi = VideoBuilder.super.videoInfo(f);
         ImageBuilder.ImageInfo ii =
-            imageBuilder.imageInfo(splitter.apply(f).get(0));
+            imageBuilder.imageInfo(splitter.apply(f).getFirst());
         return new VideoInfo(ii.w(), ii.h(), vi.encoder());
       }
     };
@@ -77,7 +77,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
 
   default <F> VideoBuilder<F> on(Function<? super F, ? extends E> function) {
     VideoBuilder<E> thisVideoBuilder = this;
-    return new VideoBuilder<F>() {
+    return new VideoBuilder<>() {
       @Override
       public Video build(VideoInfo videoInfo, F f) {
         return thisVideoBuilder.build(videoInfo, function.apply(f));

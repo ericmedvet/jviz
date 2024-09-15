@@ -22,9 +22,7 @@ package io.github.ericmedvet.jviz.core.plot;
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 
-/**
- * @author "Eric Medvet" on 2023/12/01 for jgea
- */
+/** @author "Eric Medvet" on 2023/12/01 for jgea */
 public interface XYPlot<D> {
 
   record TitledData<D>(String xTitle, String yTitle, D data) {}

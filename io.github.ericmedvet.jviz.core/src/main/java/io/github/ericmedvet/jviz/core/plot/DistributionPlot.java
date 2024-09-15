@@ -24,9 +24,7 @@ import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.util.Misc;
 import java.util.List;
 
-/**
- * @author "Eric Medvet" on 2024/01/04 for jgea
- */
+/** @author "Eric Medvet" on 2024/01/04 for jgea */
 public record DistributionPlot(
     String title,
     String xTitleName,

@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.DoubleBinaryOperator;
 
-/**
- * @author "Eric Medvet" on 2023/12/10 for jgea
- */
+/** @author "Eric Medvet" on 2023/12/10 for jgea */
 public record LandscapePlot(
     String title,
     String xTitleName,

@@ -132,7 +132,7 @@ public record Configuration(
         0.2,
         0.025,
         true,
-        Colors.DEFAULT.continuousDataColorRanges().get(0));
+        Colors.DEFAULT.continuousDataColorRanges().getFirst());
   }
 
   public record LandscapePlot(
@@ -151,7 +151,7 @@ public record Configuration(
       double xExtensionRate,
       double yExtensionRate) {
 
-    public static LandscapePlot DEFAULT = new LandscapePlot(
+    public static final LandscapePlot DEFAULT = new LandscapePlot(
         0.2,
         PointsPlot.DEFAULT.strokeSizeRate(),
         PointsPlot.DEFAULT.markerSizeRate(),
@@ -163,7 +163,7 @@ public record Configuration(
         UnivariateGridPlot.DEFAULT.legendImageHRate(),
         UnivariateGridPlot.DEFAULT.showRanges(),
         Colors.DEFAULT.dataColors(),
-        Colors.DEFAULT.continuousDataColorRanges().get(0),
+        Colors.DEFAULT.continuousDataColorRanges().getFirst(),
         LinesPlot.DEFAULT.xExtensionRate,
         LinesPlot.DEFAULT.yExtensionRate);
   }

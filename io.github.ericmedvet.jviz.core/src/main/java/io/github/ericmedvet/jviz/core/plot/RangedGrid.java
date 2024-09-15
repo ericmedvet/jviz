@@ -23,9 +23,7 @@ import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import java.util.function.BiFunction;
 
-/**
- * @author "Eric Medvet" on 2023/12/27 for jgea
- */
+/** @author "Eric Medvet" on 2023/12/27 for jgea */
 public interface RangedGrid<T> extends Grid<T> {
   DoubleRange xRange();
 
@@ -48,7 +46,7 @@ public interface RangedGrid<T> extends Grid<T> {
   }
 
   static <T> RangedGrid<T> from(Grid<T> grid, DoubleRange xRange, DoubleRange yRange, String xName, String yName) {
-    return new RangedGrid<T>() {
+    return new RangedGrid<>() {
       @Override
       public DoubleRange xRange() {
         return xRange;

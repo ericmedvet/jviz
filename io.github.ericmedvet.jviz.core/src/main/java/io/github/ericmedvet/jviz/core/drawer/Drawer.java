@@ -27,9 +27,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-/**
- * @author "Eric Medvet" on 2024/02/23 for jgea
- */
+/** @author "Eric Medvet" on 2024/02/23 for jgea */
 public interface Drawer<E> extends ImageBuilder<E> {
 
   Color BG_COLOR = Color.WHITE;
