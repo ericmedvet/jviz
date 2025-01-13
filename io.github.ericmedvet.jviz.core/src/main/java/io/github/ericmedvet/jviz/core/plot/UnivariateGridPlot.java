@@ -32,5 +32,5 @@ public record UnivariateGridPlot(
     DoubleRange xRange,
     DoubleRange yRange,
     DoubleRange valueRange,
-    Grid<TitledData<Grid<Double>>> dataGrid)
-    implements XYPlot<Grid<Double>> {}
+    Grid<TitledData<Grid<Double>>> dataGrid
+) implements XYPlot<Grid<Double>> {}

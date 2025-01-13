@@ -44,7 +44,8 @@ public class Main {
     RandomGenerator r = new Random();
     return new Data(
         "N(%.1f,%.1f)".formatted(mu, sigma),
-        IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)).toList());
+        IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)).toList()
+    );
   }
 
   private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {
@@ -82,7 +83,11 @@ public class Main {
                 List.of(
                     sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
                     sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
-                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)))));
+                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)
+                )
+            )
+        )
+    );
     new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).show(lp);
     new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT).show(lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
@@ -100,7 +105,10 @@ public class Main {
             (gX, gY) -> new TitledData<>(
                 "gx=%d".formatted(gX),
                 "gy=%d".formatted(gY),
-                List.of(gaussian(1d, 1d, 100), gaussian(1.5, 2, 100), gaussian(0.5, 0.2, 200)))));
+                List.of(gaussian(1d, 1d, 100), gaussian(1.5, 2, 100), gaussian(0.5, 0.2, 200))
+            )
+        )
+    );
     BoxPlotDrawer bpd = new BoxPlotDrawer(Configuration.DEFAULT, BoxPlot.DEFAULT);
     bpd.show(bp);
     // landscape plot
@@ -124,7 +132,12 @@ public class Main {
                     List.of(
                         sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
                         sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
-                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 50))))));
+                        sinDS(5, DoubleRange.SYMMETRIC_UNIT, 50)
+                    )
+                )
+            )
+        )
+    );
     new LandscapePlotDrawer(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT).show(lsp);
     // grid plot
     UnivariateGridPlot ugp = new UnivariateGridPlot(
@@ -145,14 +158,19 @@ public class Main {
                 Grid.create(
                     10,
                     10,
-                    (igx, igy) -> DoubleRange.SYMMETRIC_UNIT.normalize((gX + gY)
-                        / 6d
-                        * Math.sin((double) igx / (1 + gX) + (double) igy / (1 + gY)))))));
+                    (igx, igy) -> DoubleRange.SYMMETRIC_UNIT.normalize(
+                        (gX + gY) / 6d * Math.sin((double) igx / (1 + gX) + (double) igy / (1 + gY))
+                    )
+                )
+            )
+        )
+    );
     new UnivariateGridPlotDrawer(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT).show(ugp);
     new UnivariatePlotVideoBuilder(
-            io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
-            Configuration.DEFAULT,
-            Configuration.UnivariateGridPlot.DEFAULT)
+        io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
+        Configuration.DEFAULT,
+        Configuration.UnivariateGridPlot.DEFAULT
+    )
         .save(new File("../gv.mp4"), ugp);
     // field plot
     VectorialFieldPlot vfp = new VectorialFieldPlot(
@@ -169,23 +187,40 @@ public class Main {
             (gX, gY) -> new TitledData<>(
                 "gx=%d".formatted(gX),
                 "gy=%d".formatted(gY),
-                List.of(VectorialFieldDataSeries.of(
-                    "ds1",
-                    DoubleRange.UNIT
-                        .points(9)
-                        .mapToObj(x -> DoubleRange.UNIT
+                List.of(
+                    VectorialFieldDataSeries.of(
+                        "ds1",
+                        DoubleRange.UNIT
                             .points(9)
-                            .mapToObj(y -> new Point(x, y)))
-                        .flatMap(ps -> ps)
-                        .collect(Collectors.toMap(
-                            p -> p,
-                            p -> new Point(
-                                Math.sin(p.x() * gX), Math.sin(p.y() * gY)))))))));
+                            .mapToObj(
+                                x -> DoubleRange.UNIT
+                                    .points(9)
+                                    .mapToObj(y -> new Point(x, y))
+                            )
+                            .flatMap(ps -> ps)
+                            .collect(
+                                Collectors.toMap(
+                                    p -> p,
+                                    p -> new Point(
+                                        Math.sin(p.x() * gX),
+                                        Math.sin(p.y() * gY)
+                                    )
+                                )
+                            )
+                    )
+                )
+            )
+        )
+    );
     new VectorialFieldPlotDrawer().show(vfp);
-    System.out.println(new VectorialFieldPlotCsvBuilder(
+    System.out.println(
+        new VectorialFieldPlotCsvBuilder(
             io.github.ericmedvet.jviz.core.plot.csv.Configuration.DEFAULTS.get(
-                io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode.PAPER_FRIENDLY),
-            io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode.PAPER_FRIENDLY)
-        .apply(vfp));
+                io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode.PAPER_FRIENDLY
+            ),
+            io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode.PAPER_FRIENDLY
+        )
+            .apply(vfp)
+    );
   }
 }

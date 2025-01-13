@@ -25,8 +25,7 @@ import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
 import java.util.List;
 
-public abstract class AbstractXYDataSeriesPlotVideoBuilder
-    extends AbstractXYPlotVideoBuilder<XYDataSeriesPlot, List<XYDataSeries>> {
+public abstract class AbstractXYDataSeriesPlotVideoBuilder extends AbstractXYPlotVideoBuilder<XYDataSeriesPlot, List<XYDataSeries>> {
 
   public AbstractXYDataSeriesPlotVideoBuilder(Configuration c, ImageBuilder<XYDataSeriesPlot> imageBuilder) {
     super(c, imageBuilder);
@@ -35,8 +34,18 @@ public abstract class AbstractXYDataSeriesPlotVideoBuilder
   @Override
   protected List<XYDataSeriesPlot> split(XYDataSeriesPlot p, SplitType splitType) {
     return split(p.dataGrid(), splitType).stream()
-        .map(dg -> new XYDataSeriesPlot(
-            p.title(), p.xTitleName(), p.yTitleName(), p.xName(), p.yName(), p.xRange(), p.yRange(), dg))
+        .map(
+            dg -> new XYDataSeriesPlot(
+                p.title(),
+                p.xTitleName(),
+                p.yTitleName(),
+                p.xName(),
+                p.yName(),
+                p.xRange(),
+                p.yRange(),
+                dg
+            )
+        )
         .toList();
   }
 }

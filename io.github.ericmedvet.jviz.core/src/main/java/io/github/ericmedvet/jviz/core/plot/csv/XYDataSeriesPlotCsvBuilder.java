@@ -43,29 +43,39 @@ public class XYDataSeriesPlotCsvBuilder extends AbstractCsvBuilder<XYDataSeriesP
     StringWriter sw = new StringWriter();
     try (CSVPrinter csvPrinter = new CSVPrinter(sw, c.getCSVFormat())) {
       if (mode.equals(Mode.NORMAL)) {
-        csvPrinter.printRecord(processRecord(List.of(
-            p.xTitleName(),
-            p.yTitleName(),
-            "series",
-            String.join(c.columnNameJoiner(), p.xName(), "min"),
-            p.xName(),
-            String.join(c.columnNameJoiner(), p.xName(), "max"),
-            String.join(c.columnNameJoiner(), p.yName(), "min"),
-            p.yName(),
-            String.join(c.columnNameJoiner(), p.yName(), "max"))));
+        csvPrinter.printRecord(
+            processRecord(
+                List.of(
+                    p.xTitleName(),
+                    p.yTitleName(),
+                    "series",
+                    String.join(c.columnNameJoiner(), p.xName(), "min"),
+                    p.xName(),
+                    String.join(c.columnNameJoiner(), p.xName(), "max"),
+                    String.join(c.columnNameJoiner(), p.yName(), "min"),
+                    p.yName(),
+                    String.join(c.columnNameJoiner(), p.yName(), "max")
+                )
+            )
+        );
         for (XYPlot.TitledData<List<XYDataSeries>> td : p.dataGrid().values()) {
           for (XYDataSeries ds : td.data()) {
             for (XYDataSeries.Point point : ds.points()) {
-              csvPrinter.printRecord(processRecord(List.of(
-                  td.xTitle(),
-                  td.yTitle(),
-                  ds.name(),
-                  RangedValue.range(point.x()).min(),
-                  point.x().v(),
-                  RangedValue.range(point.x()).max(),
-                  RangedValue.range(point.y()).min(),
-                  point.y().v(),
-                  RangedValue.range(point.y()).max())));
+              csvPrinter.printRecord(
+                  processRecord(
+                      List.of(
+                          td.xTitle(),
+                          td.yTitle(),
+                          ds.name(),
+                          RangedValue.range(point.x()).min(),
+                          point.x().v(),
+                          RangedValue.range(point.x()).max(),
+                          RangedValue.range(point.y()).min(),
+                          point.y().v(),
+                          RangedValue.range(point.y()).max()
+                      )
+                  )
+              );
             }
           }
         }
@@ -78,28 +88,41 @@ public class XYDataSeriesPlotCsvBuilder extends AbstractCsvBuilder<XYDataSeriesP
                   point.x().v(),
                   String.join(
                       c.columnNameJoiner(),
-                      List.of(td.xTitle(), td.yTitle(), ds.name(), p.yName())),
-                  point.y().v());
+                      List.of(td.xTitle(), td.yTitle(), ds.name(), p.yName())
+                  ),
+                  point.y().v()
+              );
               t.set(
                   point.x().v(),
                   String.join(
                       c.columnNameJoiner(),
-                      List.of(td.xTitle(), td.yTitle(), ds.name(), p.yName(), "min")),
-                  RangedValue.range(point.y()).min());
+                      List.of(td.xTitle(), td.yTitle(), ds.name(), p.yName(), "min")
+                  ),
+                  RangedValue.range(point.y()).min()
+              );
               t.set(
                   point.x().v(),
                   String.join(
                       c.columnNameJoiner(),
-                      List.of(td.xTitle(), td.yTitle(), ds.name(), p.yName(), "max")),
-                  RangedValue.range(point.y()).max());
+                      List.of(td.xTitle(), td.yTitle(), ds.name(), p.yName(), "max")
+                  ),
+                  RangedValue.range(point.y()).max()
+              );
             }
           }
         }
-        csvPrinter.printRecord(processRecord(Stream.concat(Stream.of(p.xName()), t.colIndexes().stream())
-            .toList()));
+        csvPrinter.printRecord(
+            processRecord(
+                Stream.concat(Stream.of(p.xName()), t.colIndexes().stream())
+                    .toList()
+            )
+        );
         for (Number x : t.rowIndexes()) {
-          csvPrinter.printRecord(processRecord(
-              Stream.concat(Stream.of(x), t.rowValues(x).stream()).toList()));
+          csvPrinter.printRecord(
+              processRecord(
+                  Stream.concat(Stream.of(x), t.rowValues(x).stream()).toList()
+              )
+          );
         }
       }
       return sw.toString();

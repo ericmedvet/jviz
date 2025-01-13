@@ -24,7 +24,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -67,13 +67,11 @@ public class VideoUtils {
 
   private static EncoderFacility defaultEncoder;
 
-  private VideoUtils() {}
+  private VideoUtils() {
+  }
 
   public enum EncoderFacility {
-    DEFAULT,
-    JCODEC,
-    FFMPEG_LARGE,
-    FFMPEG_SMALL
+    DEFAULT, JCODEC, FFMPEG_LARGE, FFMPEG_SMALL
   }
 
   private static void bufImgToPicture(BufferedImage src, Picture dst) {
@@ -99,8 +97,9 @@ public class VideoUtils {
 
   public static EncoderFacility defaultEncoder() {
     if (defaultEncoder == null) {
-      if (PREFERRED_ENCODER.equals(EncoderFacility.FFMPEG_LARGE)
-          || PREFERRED_ENCODER.equals(EncoderFacility.FFMPEG_SMALL)) {
+      if (PREFERRED_ENCODER.equals(EncoderFacility.FFMPEG_LARGE) || PREFERRED_ENCODER.equals(
+          EncoderFacility.FFMPEG_SMALL
+      )) {
         // check if ffmpeg is present
         String command = "ffmpeg -version";
         ProcessBuilder pb = new ProcessBuilder(command.split(" "));
@@ -121,15 +120,22 @@ public class VideoUtils {
     return defaultEncoder;
   }
 
-  public static byte[] encode(List<BufferedImage> images, double frameRate, EncoderFacility encoder)
-      throws IOException {
+  public static byte[] encode(
+      List<BufferedImage> images,
+      double frameRate,
+      EncoderFacility encoder
+  ) throws IOException {
     File tmpFile = File.createTempFile("video", ".mp4");
     encodeAndSave(images, frameRate, tmpFile, encoder);
     return Files.readAllBytes(tmpFile.toPath());
   }
 
-  public static void encodeAndSave(List<BufferedImage> images, double frameRate, File file, EncoderFacility encoder)
-      throws IOException {
+  public static void encodeAndSave(
+      List<BufferedImage> images,
+      double frameRate,
+      File file,
+      EncoderFacility encoder
+  ) throws IOException {
     switch (encoder) {
       case DEFAULT -> encodeAndSave(images, frameRate, file, defaultEncoder());
       case JCODEC -> encodeAndSaveWithJCodec(images, frameRate, file);
@@ -139,7 +145,11 @@ public class VideoUtils {
   }
 
   private static void encodeAndSaveWithFFMpeg(
-      List<BufferedImage> images, double frameRate, File file, int compression) throws IOException {
+      List<BufferedImage> images,
+      double frameRate,
+      File file,
+      int compression
+  ) throws IOException {
     // save all files
     String workingDirName = file.getAbsoluteFile().getParentFile().getPath();
     String outFileName = file.getName();
@@ -156,7 +166,11 @@ public class VideoUtils {
     // invoke ffmpeg
     String command = String.format(
         "ffmpeg -y -r %d -i %s/frame%%06d.jpg -vcodec libx264 -crf %d -pix_fmt yuv420p %s",
-        (int) Math.round(frameRate), imagesDirName, compression, outFileName);
+        (int) Math.round(frameRate),
+        imagesDirName,
+        compression,
+        outFileName
+    );
     L.fine(String.format("Running: %s", command));
     ProcessBuilder pb = new ProcessBuilder(command.split(" "));
     pb.directory(new File(workingDirName));
@@ -188,11 +202,19 @@ public class VideoUtils {
     }
   }
 
-  private static void encodeAndSaveWithJCodec(List<BufferedImage> images, double frameRate, File file)
-      throws IOException {
+  private static void encodeAndSaveWithJCodec(
+      List<BufferedImage> images,
+      double frameRate,
+      File file
+  ) throws IOException {
     SeekableByteChannel channel = NIOUtils.writableChannel(file);
     SequenceEncoder encoder = new SequenceEncoder(
-        channel, Rational.R((int) Math.round(frameRate), 1), Format.MOV, org.jcodec.common.Codec.H264, null);
+        channel,
+        Rational.R((int) Math.round(frameRate), 1),
+        Format.MOV,
+        org.jcodec.common.Codec.H264,
+        null
+    );
     // encode
     try {
       for (BufferedImage image : images) {

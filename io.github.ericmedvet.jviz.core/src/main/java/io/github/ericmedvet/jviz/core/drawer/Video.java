@@ -62,11 +62,13 @@ public final class Video {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (obj == null || obj.getClass() != this.getClass()) return false;
+    if (obj == this)
+      return true;
+    if (obj == null || obj.getClass() != this.getClass())
+      return false;
     var that = (Video) obj;
-    return Objects.equals(this.images, that.images)
-        && Double.doubleToLongBits(this.frameRate) == Double.doubleToLongBits(that.frameRate);
+    return Objects.equals(this.images, that.images) && Double.doubleToLongBits(this.frameRate) == Double
+        .doubleToLongBits(that.frameRate);
   }
 
   public EncoderFacility getEncoder() {

@@ -31,5 +31,5 @@ public record VectorialFieldPlot(
     String yName,
     DoubleRange xRange,
     DoubleRange yRange,
-    Grid<TitledData<List<VectorialFieldDataSeries>>> dataGrid)
-    implements XYPlot<List<VectorialFieldDataSeries>> {}
+    Grid<TitledData<List<VectorialFieldDataSeries>>> dataGrid
+) implements XYPlot<List<VectorialFieldDataSeries>> {}

@@ -29,23 +29,27 @@ public class LandscapePlotVideoBuilder extends AbstractXYPlotVideoBuilder<Landsc
   public LandscapePlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration.LandscapePlot lpConfiguration) {
+      io.github.ericmedvet.jviz.core.plot.image.Configuration.LandscapePlot lpConfiguration
+  ) {
     super(c, new LandscapePlotDrawer(iConfiguration, lpConfiguration));
   }
 
   @Override
   protected List<LandscapePlot> split(LandscapePlot p, SplitType splitType) {
     return split(p.dataGrid(), splitType).stream()
-        .map(dg -> new LandscapePlot(
-            p.title(),
-            p.xTitleName(),
-            p.yTitleName(),
-            p.xName(),
-            p.yName(),
-            p.xRange(),
-            p.yRange(),
-            p.valueRange(),
-            dg))
+        .map(
+            dg -> new LandscapePlot(
+                p.title(),
+                p.xTitleName(),
+                p.yTitleName(),
+                p.xName(),
+                p.yName(),
+                p.xRange(),
+                p.yRange(),
+                p.valueRange(),
+                dg
+            )
+        )
         .toList();
   }
 }

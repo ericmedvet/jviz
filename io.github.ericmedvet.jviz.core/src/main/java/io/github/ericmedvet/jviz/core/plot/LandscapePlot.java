@@ -36,13 +36,14 @@ public record LandscapePlot(
     DoubleRange xRange,
     DoubleRange yRange,
     DoubleRange valueRange,
-    Grid<TitledData<Data>> dataGrid)
-    implements XYPlot<LandscapePlot.Data> {
+    Grid<TitledData<Data>> dataGrid
+) implements XYPlot<LandscapePlot.Data> {
   public record Data(DoubleBinaryOperator f, List<XYDataSeries> xyDataSeries) {}
 
   public LandscapePlot {
     if (xRange.equals(DoubleRange.UNBOUNDED)) {
-      xRange = dataGrid.values().stream()
+      xRange = dataGrid.values()
+          .stream()
           .filter(Objects::nonNull)
           .map(td -> td.data().xyDataSeries)
           .flatMap(Collection::stream)
@@ -51,7 +52,8 @@ public record LandscapePlot(
           .orElseThrow();
     }
     if (yRange.equals(DoubleRange.UNBOUNDED)) {
-      yRange = dataGrid.values().stream()
+      yRange = dataGrid.values()
+          .stream()
           .filter(Objects::nonNull)
           .map(td -> td.data().xyDataSeries)
           .flatMap(Collection::stream)
@@ -70,7 +72,13 @@ public record LandscapePlot(
         yName,
         xRange,
         yRange,
-        dataGrid.map(td -> new XYPlot.TitledData<>(
-            td.xTitle(), td.yTitle(), td.data().xyDataSeries())));
+        dataGrid.map(
+            td -> new XYPlot.TitledData<>(
+                td.xTitle(),
+                td.yTitle(),
+                td.data().xyDataSeries()
+            )
+        )
+    );
   }
 }

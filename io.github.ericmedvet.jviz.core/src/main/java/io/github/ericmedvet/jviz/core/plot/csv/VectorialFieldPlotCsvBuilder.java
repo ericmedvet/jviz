@@ -45,65 +45,92 @@ public class VectorialFieldPlotCsvBuilder extends AbstractCsvBuilder<VectorialFi
     StringWriter sw = new StringWriter();
     try (CSVPrinter csvPrinter = new CSVPrinter(sw, c.getCSVFormat())) {
       if (mode.equals(Mode.NORMAL)) {
-        csvPrinter.printRecord(processRecord(List.of(
-            p.xTitleName(),
-            p.yTitleName(),
-            "name",
-            Stream.of("src", p.xName()).collect(Collectors.joining(c.columnNameJoiner())),
-            Stream.of("src", p.yName()).collect(Collectors.joining(c.columnNameJoiner())),
-            Stream.of("dst", p.xName()).collect(Collectors.joining(c.columnNameJoiner())),
-            Stream.of("dst", p.yName()).collect(Collectors.joining(c.columnNameJoiner())))));
-        for (XYPlot.TitledData<List<VectorialFieldDataSeries>> td :
-            p.dataGrid().values()) {
+        csvPrinter.printRecord(
+            processRecord(
+                List.of(
+                    p.xTitleName(),
+                    p.yTitleName(),
+                    "name",
+                    Stream.of("src", p.xName()).collect(Collectors.joining(c.columnNameJoiner())),
+                    Stream.of("src", p.yName()).collect(Collectors.joining(c.columnNameJoiner())),
+                    Stream.of("dst", p.xName()).collect(Collectors.joining(c.columnNameJoiner())),
+                    Stream.of("dst", p.yName()).collect(Collectors.joining(c.columnNameJoiner()))
+                )
+            )
+        );
+        for (XYPlot.TitledData<List<VectorialFieldDataSeries>> td : p.dataGrid().values()) {
           for (VectorialFieldDataSeries ds : td.data()) {
             for (Map.Entry<Point, Point> pp : ds.pointPairs().entrySet()) {
-              csvPrinter.printRecord(processRecord(processRecord(List.of(
-                  td.xTitle(),
-                  td.yTitle(),
-                  ds.name(),
-                  pp.getKey().x(),
-                  pp.getKey().y(),
-                  pp.getValue().x(),
-                  pp.getValue().y()))));
+              csvPrinter.printRecord(
+                  processRecord(
+                      processRecord(
+                          List.of(
+                              td.xTitle(),
+                              td.yTitle(),
+                              ds.name(),
+                              pp.getKey().x(),
+                              pp.getKey().y(),
+                              pp.getValue().x(),
+                              pp.getValue().y()
+                          )
+                      )
+                  )
+              );
             }
           }
         }
       } else if (mode.equals(Mode.PAPER_FRIENDLY)) {
         Table<VectorialFieldDataSeries.Point, String, VectorialFieldDataSeries.Point> t = new HashMapTable<>();
-        for (XYPlot.TitledData<List<VectorialFieldDataSeries>> td :
-            p.dataGrid().values()) {
+        for (XYPlot.TitledData<List<VectorialFieldDataSeries>> td : p.dataGrid().values()) {
           for (VectorialFieldDataSeries ds : td.data()) {
             for (Map.Entry<Point, Point> e : ds.pointPairs().entrySet()) {
               t.set(
                   e.getKey(),
                   String.join(c.columnNameJoiner(), List.of(td.xTitle(), td.yTitle(), ds.name())),
-                  e.getValue());
+                  e.getValue()
+              );
             }
           }
         }
-        csvPrinter.printRecord(processRecord(Stream.of(
-                List.of(
-                    Stream.of("src", p.xName()).collect(Collectors.joining(c.columnNameJoiner())),
-                    Stream.of("src", p.yName()).collect(Collectors.joining(c.columnNameJoiner()))),
-                t.colIndexes().stream()
-                    .map(n -> List.of(
-                        Stream.of(n, "dst", p.xName())
-                            .collect(Collectors.joining(c.columnNameJoiner())),
-                        Stream.of(n, "dst", p.yName())
-                            .collect(Collectors.joining(c.columnNameJoiner()))))
+        csvPrinter.printRecord(
+            processRecord(
+                Stream.of(
+                    List.of(
+                        Stream.of("src", p.xName()).collect(Collectors.joining(c.columnNameJoiner())),
+                        Stream.of("src", p.yName()).collect(Collectors.joining(c.columnNameJoiner()))
+                    ),
+                    t.colIndexes()
+                        .stream()
+                        .map(
+                            n -> List.of(
+                                Stream.of(n, "dst", p.xName())
+                                    .collect(Collectors.joining(c.columnNameJoiner())),
+                                Stream.of(n, "dst", p.yName())
+                                    .collect(Collectors.joining(c.columnNameJoiner()))
+                            )
+                        )
+                        .flatMap(List::stream)
+                        .toList()
+                )
                     .flatMap(List::stream)
-                    .toList())
-            .flatMap(List::stream)
-            .toList()));
+                    .toList()
+            )
+        );
         for (Point srcP : t.rowIndexes()) {
-          csvPrinter.printRecord(processRecord(Stream.of(
-                  List.of(srcP.x(), srcP.y()),
-                  t.rowValues(srcP).stream()
-                      .map(dstP -> List.of(dstP.x(), dstP.y()))
+          csvPrinter.printRecord(
+              processRecord(
+                  Stream.of(
+                      List.of(srcP.x(), srcP.y()),
+                      t.rowValues(srcP)
+                          .stream()
+                          .map(dstP -> List.of(dstP.x(), dstP.y()))
+                          .flatMap(List::stream)
+                          .toList()
+                  )
                       .flatMap(List::stream)
-                      .toList())
-              .flatMap(List::stream)
-              .toList()));
+                      .toList()
+              )
+          );
         }
       }
     } catch (IOException e) {

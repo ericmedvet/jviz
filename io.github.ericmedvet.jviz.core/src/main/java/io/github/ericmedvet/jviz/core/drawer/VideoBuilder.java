@@ -38,7 +38,8 @@ public interface VideoBuilder<E> extends Function<E, Video> {
     return new VideoBuilder<>() {
       @Override
       public Video build(VideoInfo videoInfo, F f) {
-        List<BufferedImage> images = splitter.apply(f).stream()
+        List<BufferedImage> images = splitter.apply(f)
+            .stream()
             .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
         return new Video(images, frameRate, videoInfo.encoder);
@@ -47,8 +48,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
       @Override
       public VideoInfo videoInfo(F f) {
         VideoInfo vi = VideoBuilder.super.videoInfo(f);
-        ImageBuilder.ImageInfo ii =
-            imageBuilder.imageInfo(splitter.apply(f).getFirst());
+        ImageBuilder.ImageInfo ii = imageBuilder.imageInfo(splitter.apply(f).getFirst());
         return new VideoInfo(ii.w(), ii.h(), vi.encoder());
       }
     };
@@ -59,7 +59,8 @@ public interface VideoBuilder<E> extends Function<E, Video> {
       @Override
       public Video build(VideoInfo videoInfo, F f) {
         SortedMap<Double, E> map = splitter.apply(f);
-        List<BufferedImage> images = map.values().stream()
+        List<BufferedImage> images = map.values()
+            .stream()
             .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
         return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey(), videoInfo.encoder);

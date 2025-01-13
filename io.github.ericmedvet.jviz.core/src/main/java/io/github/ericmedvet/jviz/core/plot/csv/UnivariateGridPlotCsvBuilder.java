@@ -47,12 +47,19 @@ public class UnivariateGridPlotCsvBuilder extends AbstractCsvBuilder<UnivariateG
         for (XYPlot.TitledData<Grid<Double>> td : p.dataGrid().values()) {
           for (Grid.Entry<Double> e : td.data()) {
             if (e.value() != null) {
-              csvPrinter.printRecord(processRecord(processRecord(List.of(
-                  td.xTitle(),
-                  td.yTitle(),
-                  e.key().x(),
-                  e.key().y(),
-                  e.value()))));
+              csvPrinter.printRecord(
+                  processRecord(
+                      processRecord(
+                          List.of(
+                              td.xTitle(),
+                              td.yTitle(),
+                              e.key().x(),
+                              e.key().y(),
+                              e.value()
+                          )
+                      )
+                  )
+              );
             }
           }
         }
@@ -63,11 +70,19 @@ public class UnivariateGridPlotCsvBuilder extends AbstractCsvBuilder<UnivariateG
             t.set(e.key(), String.join(c.columnNameJoiner(), List.of(td.xTitle(), td.yTitle())), e.value());
           }
         }
-        csvPrinter.printRecord(processRecord(Stream.concat(Stream.of("x", "y"), t.colIndexes().stream())
-            .toList()));
+        csvPrinter.printRecord(
+            processRecord(
+                Stream.concat(Stream.of("x", "y"), t.colIndexes().stream())
+                    .toList()
+            )
+        );
         for (Grid.Key k : t.rowIndexes()) {
-          csvPrinter.printRecord(processRecord(Stream.concat(Stream.of(k.x(), k.y()), t.rowValues(k).stream())
-              .toList()));
+          csvPrinter.printRecord(
+              processRecord(
+                  Stream.concat(Stream.of(k.x(), k.y()), t.rowValues(k).stream())
+                      .toList()
+              )
+          );
         }
       }
     } catch (IOException e) {

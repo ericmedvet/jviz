@@ -27,7 +27,8 @@ public class LinesPlotVideoBuilder extends AbstractXYDataSeriesPlotVideoBuilder 
   public LinesPlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      LinesPlot lpConfiguration) {
+      LinesPlot lpConfiguration
+  ) {
     super(c, new LinesPlotDrawer(iConfiguration, lpConfiguration));
   }
 }

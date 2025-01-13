@@ -69,24 +69,34 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
   protected void drawData(Graphics2D g, GMetrics gm, Rectangle2D r, Axis xA, Axis yA, XYDataSeries ds, Color color) {
     ds = XYDataSeries.of(
         ds.name(),
-        ds.points().stream()
+        ds.points()
+            .stream()
             .sorted(Comparator.comparingDouble(p -> p.x().v()))
-            .toList());
+            .toList()
+    );
     if (ds.points().getFirst().y() instanceof RangedValue) {
       // draw shaded area
       Path2D sPath = new Path2D.Double();
       sPath.moveTo(
           xA.xIn(ds.points().getFirst().x().v(), r),
-          yA.yIn(ds.points().getFirst().y().v(), r));
-      ds.points().stream()
+          yA.yIn(ds.points().getFirst().y().v(), r)
+      );
+      ds.points()
+          .stream()
           .skip(1)
-          .forEach(p -> sPath.lineTo(
-              xA.xIn(p.x().v(), r),
-              yA.yIn(RangedValue.range(p.y()).min(), r)));
+          .forEach(
+              p -> sPath.lineTo(
+                  xA.xIn(p.x().v(), r),
+                  yA.yIn(RangedValue.range(p.y()).min(), r)
+              )
+          );
       reverse(ds.points())
-          .forEach(p -> sPath.lineTo(
-              xA.xIn(p.x().v(), r),
-              yA.yIn(RangedValue.range(p.y()).max(), r)));
+          .forEach(
+              p -> sPath.lineTo(
+                  xA.xIn(p.x().v(), r),
+                  yA.yIn(RangedValue.range(p.y()).max(), r)
+              )
+          );
       sPath.closePath();
       g.setColor(GraphicsUtils.alphaed(color, c.alpha()));
       g.fill(sPath);
@@ -97,7 +107,8 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
     Path2D path = new Path2D.Double();
     path.moveTo(
         xA.xIn(ds.points().getFirst().x().v(), r),
-        yA.yIn(ds.points().getFirst().y().v(), r));
+        yA.yIn(ds.points().getFirst().y().v(), r)
+    );
     ds.points().stream().skip(1).forEach(p -> path.lineTo(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)));
     g.draw(path);
   }
@@ -106,14 +117,23 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
   protected void drawLegendImage(Graphics2D g, Rectangle2D r, Color color) {
     GMetrics gm = new GMetrics(g);
     g.setColor(GraphicsUtils.alphaed(color, c.alpha()));
-    g.fill(new Rectangle2D.Double(
-        r.getX() + r.getWidth() * 0.1,
-        r.getCenterY() - r.getHeight() * 0.25,
-        r.getWidth() * 0.8,
-        r.getHeight() * 0.5));
+    g.fill(
+        new Rectangle2D.Double(
+            r.getX() + r.getWidth() * 0.1,
+            r.getCenterY() - r.getHeight() * 0.25,
+            r.getWidth() * 0.8,
+            r.getHeight() * 0.5
+        )
+    );
     g.setColor(color);
     g.setStroke(new BasicStroke((float) (c.strokeSizeRate() * gm.refL())));
-    g.draw(new Line2D.Double(
-        r.getX() + r.getWidth() * 0.1, r.getCenterY(), r.getMaxX() - r.getWidth() * 0.1, r.getCenterY()));
+    g.draw(
+        new Line2D.Double(
+            r.getX() + r.getWidth() * 0.1,
+            r.getCenterY(),
+            r.getMaxX() - r.getWidth() * 0.1,
+            r.getCenterY()
+        )
+    );
   }
 }

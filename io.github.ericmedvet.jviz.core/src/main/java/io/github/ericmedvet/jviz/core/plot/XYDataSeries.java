@@ -43,22 +43,26 @@ public interface XYDataSeries {
     return new HardXYDataSeries(name, points);
   }
 
+  default XYDataSeries firstDifference() {
+    List<Point> points = new ArrayList<>();
+    for (int i = 1; i < points().size(); i = i + 1) {
+      points.add(
+          new Point(
+              Value.of(points().get(i).x().v()),
+              Value.of(points().get(i).y().v() - points().get(i - 1).y().v())
+          )
+      );
+    }
+    return XYDataSeries.of(name(), Collections.unmodifiableList(points));
+  }
+
   default XYDataSeries sorted() {
     return XYDataSeries.of(
         name(),
         points().stream()
             .sorted(Comparator.comparingDouble(p -> p.x().v()))
-            .toList());
-  }
-
-  default XYDataSeries firstDifference() {
-    List<Point> points = new ArrayList<>();
-    for (int i = 1; i < points().size(); i = i + 1) {
-      points.add(new Point(
-          Value.of(points().get(i).x().v()),
-          Value.of(points().get(i).y().v() - points().get(i - 1).y().v())));
-    }
-    return XYDataSeries.of(name(), Collections.unmodifiableList(points));
+            .toList()
+    );
   }
 
   default DoubleRange xRange() {

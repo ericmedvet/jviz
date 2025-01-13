@@ -41,38 +41,44 @@ public interface VectorialFieldDataSeries {
   Map<Point, Point> pointPairs();
 
   static VectorialFieldDataSeries of(String name, Map<Point, Point> pointPairs) {
-    record HardVectorialFieldDataSeries(String name, Map<Point, Point> pointPairs)
-        implements VectorialFieldDataSeries {}
+    record HardVectorialFieldDataSeries(
+        String name, Map<Point, Point> pointPairs
+    ) implements VectorialFieldDataSeries {}
     return new HardVectorialFieldDataSeries(name, pointPairs);
-  }
-
-  default DoubleRange originXRange() {
-    return new DoubleRange(
-        pointPairs().keySet().stream().mapToDouble(p -> p.x).min().orElseThrow(),
-        pointPairs().keySet().stream().mapToDouble(p -> p.x).max().orElseThrow());
-  }
-
-  default DoubleRange originYRange() {
-    return new DoubleRange(
-        pointPairs().keySet().stream().mapToDouble(p -> p.y).min().orElseThrow(),
-        pointPairs().keySet().stream().mapToDouble(p -> p.y).max().orElseThrow());
-  }
-
-  default DoubleRange destinationXRange() {
-    return new DoubleRange(
-        pointPairs().values().stream().mapToDouble(p -> p.x).min().orElseThrow(),
-        pointPairs().values().stream().mapToDouble(p -> p.x).max().orElseThrow());
-  }
-
-  default DoubleRange destinationYRange() {
-    return new DoubleRange(
-        pointPairs().values().stream().mapToDouble(p -> p.y).min().orElseThrow(),
-        pointPairs().values().stream().mapToDouble(p -> p.y).max().orElseThrow());
   }
 
   default DoubleRange destinationMagnitudeRange() {
     return new DoubleRange(
         pointPairs().values().stream().mapToDouble(Point::norm).min().orElseThrow(),
-        pointPairs().values().stream().mapToDouble(Point::norm).max().orElseThrow());
+        pointPairs().values().stream().mapToDouble(Point::norm).max().orElseThrow()
+    );
+  }
+
+  default DoubleRange destinationXRange() {
+    return new DoubleRange(
+        pointPairs().values().stream().mapToDouble(p -> p.x).min().orElseThrow(),
+        pointPairs().values().stream().mapToDouble(p -> p.x).max().orElseThrow()
+    );
+  }
+
+  default DoubleRange destinationYRange() {
+    return new DoubleRange(
+        pointPairs().values().stream().mapToDouble(p -> p.y).min().orElseThrow(),
+        pointPairs().values().stream().mapToDouble(p -> p.y).max().orElseThrow()
+    );
+  }
+
+  default DoubleRange originXRange() {
+    return new DoubleRange(
+        pointPairs().keySet().stream().mapToDouble(p -> p.x).min().orElseThrow(),
+        pointPairs().keySet().stream().mapToDouble(p -> p.x).max().orElseThrow()
+    );
+  }
+
+  default DoubleRange originYRange() {
+    return new DoubleRange(
+        pointPairs().keySet().stream().mapToDouble(p -> p.y).min().orElseThrow(),
+        pointPairs().keySet().stream().mapToDouble(p -> p.y).max().orElseThrow()
+    );
   }
 }

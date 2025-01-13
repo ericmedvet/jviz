@@ -35,7 +35,8 @@ public record Configuration(
     UnivariateGridPlot univariateGridPlot,
     LandscapePlot landscapePlot,
     BoxPlot boxPlot,
-    boolean debug) {
+    boolean debug
+) {
 
   public static final Configuration DEFAULT = new Configuration(
       General.DEFAULT,
@@ -48,7 +49,8 @@ public record Configuration(
       UnivariateGridPlot.DEFAULT,
       LandscapePlot.DEFAULT,
       BoxPlot.DEFAULT,
-      false);
+      false
+  );
 
   public static final Configuration FREE_SCALES = new Configuration(
       General.DEFAULT,
@@ -61,7 +63,43 @@ public record Configuration(
       UnivariateGridPlot.DEFAULT,
       LandscapePlot.DEFAULT,
       BoxPlot.DEFAULT,
-      false);
+      false
+  );
+
+  public record BoxPlot(
+      double strokeSizeRate,
+      double boxWRate,
+      double whiskersWRate,
+      double legendImageWRate,
+      double legendImageHRate,
+      ExtremeType extremeType,
+      MidType midType,
+      double alpha,
+      List<Color> colors,
+      double yExtensionRate
+  ) {
+
+    public static final BoxPlot DEFAULT = new BoxPlot(
+        LinesPlot.DEFAULT.strokeSizeRate,
+        0.9,
+        0.75,
+        0.02,
+        0.05,
+        ExtremeType.IQR_1_5,
+        MidType.MEDIAN,
+        0.5,
+        Colors.DEFAULT.dataColors(),
+        LinesPlot.DEFAULT.yExtensionRate
+    );
+
+    public enum ExtremeType {
+      MIN_MAX, IQR_1_5
+    }
+
+    public enum MidType {
+      MEAN, MEDIAN
+    }
+  }
 
   public record Colors(
       Color bgColor,
@@ -74,7 +112,8 @@ public record Configuration(
       Color tickLabelColor,
       Color noteColor,
       List<Color> dataColors,
-      List<ColorRange> continuousDataColorRanges) {
+      List<ColorRange> continuousDataColorRanges
+  ) {
 
     public static final Colors DEFAULT = new Colors(
         Color.WHITE,
@@ -98,14 +137,17 @@ public record Configuration(
             new Color(166, 206, 227),
             new Color(253, 191, 111),
             new Color(202, 178, 214),
-            new Color(255, 255, 153)),
+            new Color(255, 255, 153)
+        ),
         List.of(
             new ColorRange(new Color(255, 255, 204), new Color(120, 198, 121), new Color(0, 90, 50)),
             new ColorRange(new Color(140, 81, 10), new Color(245, 245, 245), new Color(1, 102, 94)),
             new ColorRange(new Color(69, 117, 180), new Color(255, 255, 191), new Color(215, 48, 39)),
             new ColorRange(new Color(222, 235, 247), new Color(49, 130, 189)),
             new ColorRange(new Color(240, 240, 240), new Color(99, 99, 99)),
-            new ColorRange(new Color(49, 163, 84), new Color(229, 245, 224))));
+            new ColorRange(new Color(49, 163, 84), new Color(229, 245, 224))
+        )
+    );
   }
 
   public record General(
@@ -113,26 +155,10 @@ public record Configuration(
       double plotDataRatio,
       double gridStrokeSizeRate,
       double borderStrokeSizeRate,
-      double maxNOfDecimalDigits) {
+      double maxNOfDecimalDigits
+  ) {
 
     public static final General DEFAULT = new General(1.25, 0.9, 0.0005, 0.001, 5);
-  }
-
-  public record UnivariateGridPlot(
-      double cellSideRate,
-      int legendSteps,
-      double legendImageWRate,
-      double legendImageHRate,
-      boolean showRanges,
-      ColorRange colorRange) {
-
-    public static final UnivariateGridPlot DEFAULT = new UnivariateGridPlot(
-        0.9,
-        20,
-        0.2,
-        0.025,
-        true,
-        Colors.DEFAULT.continuousDataColorRanges().getFirst());
   }
 
   public record LandscapePlot(
@@ -149,7 +175,8 @@ public record Configuration(
       List<Color> colors,
       ColorRange colorRange,
       double xExtensionRate,
-      double yExtensionRate) {
+      double yExtensionRate
+  ) {
 
     public static final LandscapePlot DEFAULT = new LandscapePlot(
         0.2,
@@ -165,7 +192,8 @@ public record Configuration(
         Colors.DEFAULT.dataColors(),
         Colors.DEFAULT.continuousDataColorRanges().getFirst(),
         LinesPlot.DEFAULT.xExtensionRate,
-        LinesPlot.DEFAULT.yExtensionRate);
+        LinesPlot.DEFAULT.yExtensionRate
+    );
   }
 
   public record Layout(
@@ -183,11 +211,26 @@ public record Configuration(
       double xAxisInnerMarginHRate,
       double plotMarginWRate,
       double plotMarginHRate,
-      double noteMarginHRate) {
+      double noteMarginHRate
+  ) {
 
     public static final Layout DEFAULT = new Layout(
-        0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.025, 0.001, 0.001, 0.001, 0.001, 0.005, 0.005,
-        0.001);
+        0.0025,
+        0.0025,
+        0.0025,
+        0.0025,
+        0.0025,
+        0.0025,
+        0.0025,
+        0.025,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.005,
+        0.005,
+        0.001
+    );
   }
 
   public record LinesPlot(
@@ -197,26 +240,34 @@ public record Configuration(
       double legendImageHRate,
       List<Color> colors,
       double xExtensionRate,
-      double yExtensionRate) {
+      double yExtensionRate
+  ) {
 
-    public static final LinesPlot DEFAULT =
-        new LinesPlot(0.0025, 0.3, 0.04, 0.025, Colors.DEFAULT.dataColors, 1.05, 1.05);
+    public static final LinesPlot DEFAULT = new LinesPlot(
+        0.0025,
+        0.3,
+        0.04,
+        0.025,
+        Colors.DEFAULT.dataColors,
+        1.05,
+        1.05
+    );
   }
 
   public record PlotMatrix(Show axesShow, Show titlesShow, Set<Independence> independences) {
 
-    public static final PlotMatrix DEFAULT =
-        new PlotMatrix(Show.BORDER, Show.BORDER, Set.of(Independence.ROWS, Independence.COLS));
+    public static final PlotMatrix DEFAULT = new PlotMatrix(
+        Show.BORDER,
+        Show.BORDER,
+        Set.of(Independence.ROWS, Independence.COLS)
+    );
 
     public enum Independence {
-      ROWS,
-      COLS,
-      ALL
+      ROWS, COLS, ALL
     }
 
     public enum Show {
-      BORDER,
-      ALL
+      BORDER, ALL
     }
   }
 
@@ -228,7 +279,8 @@ public record Configuration(
       XYPlotDrawer.Marker marker,
       List<Color> colors,
       double xExtensionRate,
-      double yExtensionRate) {
+      double yExtensionRate
+  ) {
 
     public static final PointsPlot DEFAULT = new PointsPlot(
         0.0015,
@@ -238,42 +290,8 @@ public record Configuration(
         XYPlotDrawer.Marker.CIRCLE,
         Colors.DEFAULT.dataColors(),
         LinesPlot.DEFAULT.xExtensionRate,
-        LinesPlot.DEFAULT.yExtensionRate);
-  }
-
-  public record BoxPlot(
-      double strokeSizeRate,
-      double boxWRate,
-      double whiskersWRate,
-      double legendImageWRate,
-      double legendImageHRate,
-      ExtremeType extremeType,
-      MidType midType,
-      double alpha,
-      List<Color> colors,
-      double yExtensionRate) {
-
-    public enum ExtremeType {
-      MIN_MAX,
-      IQR_1_5
-    }
-
-    public enum MidType {
-      MEAN,
-      MEDIAN
-    }
-
-    public static final BoxPlot DEFAULT = new BoxPlot(
-        LinesPlot.DEFAULT.strokeSizeRate,
-        0.9,
-        0.75,
-        0.02,
-        0.05,
-        ExtremeType.IQR_1_5,
-        MidType.MEDIAN,
-        0.5,
-        Colors.DEFAULT.dataColors(),
-        LinesPlot.DEFAULT.yExtensionRate);
+        LinesPlot.DEFAULT.yExtensionRate
+    );
   }
 
   public record Text(double fontSizeRate, Map<Use, Double> sizeRates, String fontName) {
@@ -281,21 +299,39 @@ public record Configuration(
     public static final Text DEFAULT = new Text(
         0.0175,
         Map.ofEntries(
-            Map.entry(Use.TITLE, 0.025), Map.entry(Use.TICK_LABEL, 0.0125), Map.entry(Use.NOTE, 0.015)),
-        "SansSerif");
+            Map.entry(Use.TITLE, 0.025),
+            Map.entry(Use.TICK_LABEL, 0.0125),
+            Map.entry(Use.NOTE, 0.015)
+        ),
+        "SansSerif"
+    );
 
     public enum Direction {
-      H,
-      V
+      H, V
     }
 
     public enum Use {
-      TITLE,
-      AXIS_LABEL,
-      TICK_LABEL,
-      LEGEND_LABEL,
-      NOTE
+      TITLE, AXIS_LABEL, TICK_LABEL, LEGEND_LABEL, NOTE
     }
+  }
+
+  public record UnivariateGridPlot(
+      double cellSideRate,
+      int legendSteps,
+      double legendImageWRate,
+      double legendImageHRate,
+      boolean showRanges,
+      ColorRange colorRange
+  ) {
+
+    public static final UnivariateGridPlot DEFAULT = new UnivariateGridPlot(
+        0.9,
+        20,
+        0.2,
+        0.025,
+        true,
+        Colors.DEFAULT.continuousDataColorRanges().getFirst()
+    );
   }
 
   public record VectorialFieldPlot(
@@ -304,7 +340,8 @@ public record Configuration(
       double srcSizeRate,
       List<Color> colors,
       double xExtensionRate,
-      double yExtensionRate) {
+      double yExtensionRate
+  ) {
 
     public static final VectorialFieldPlot DEFAULT = new VectorialFieldPlot(
         0.001,
@@ -312,6 +349,7 @@ public record Configuration(
         0.005,
         Colors.DEFAULT.dataColors(),
         LinesPlot.DEFAULT.xExtensionRate,
-        LinesPlot.DEFAULT.yExtensionRate);
+        LinesPlot.DEFAULT.yExtensionRate
+    );
   }
 }

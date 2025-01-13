@@ -36,6 +36,43 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
 
   Configuration configuration();
 
+  enum AnchorH {
+    L, C, R
+  }
+
+  @Override
+  default ImageInfo imageInfo(P p) {
+    int axisW = ImageBuilder.DEFAULT_W / p.dataGrid().w();
+    int axisH = ImageBuilder.DEFAULT_H / p.dataGrid().h();
+    if (axisW < DEFAULT_AXIS_W || axisH < DEFAULT_AXIS_H) {
+      axisW = DEFAULT_AXIS_W;
+      axisH = DEFAULT_AXIS_H;
+    }
+    return new ImageInfo(axisW * p.dataGrid().w(), axisH * p.dataGrid().h());
+  }
+
+  double computeLegendH(Graphics2D g, P p);
+
+  double computeNoteH(Graphics2D g, Grid.Key k, P p);
+
+  Grid<Axis> computeXAxes(Graphics2D g, Layout l, P p);
+
+  Grid<Axis> computeYAxes(Graphics2D g, Layout l, P p);
+
+  void drawLegend(Graphics2D g, Rectangle2D r, P p);
+
+  void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Grid.Key k, Axis xA, Axis yA, P p);
+
+  void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Grid.Key k, P p);
+
+  enum AnchorV {
+    T, C, B
+  }
+
+  enum Marker {
+    CIRCLE, PLUS, SQUARE, TIMES
+  }
+
   @Override
   default void draw(Graphics2D g, P p) {
     GMetrics gm = new GMetrics(g);
@@ -57,7 +94,8 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
         AnchorV.C,
         Configuration.Text.Use.TITLE,
         Configuration.Text.Direction.H,
-        configuration().colors().titleColor());
+        configuration().colors().titleColor()
+    );
     // draw legend
     PlotUtils.markRectangle(g, configuration(), l.legend());
     drawLegend(g, l.legend(), p);
@@ -71,8 +109,9 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
           PlotUtils.markRectangle(g, configuration(), l.commonYAxis(py));
           PlotUtils.drawYAxis(g, configuration(), l.commonYAxis(py), p.yName(), yAxesGrid.get(0, py));
         }
-        if (px == p.dataGrid().w() - 1
-            && configuration().plotMatrix().titlesShow().equals(Configuration.PlotMatrix.Show.BORDER)) {
+        if (px == p.dataGrid().w() - 1 && configuration().plotMatrix()
+            .titlesShow()
+            .equals(Configuration.PlotMatrix.Show.BORDER)) {
           // draw common row title
           PlotUtils.markRectangle(g, configuration(), l.commonRowTitle(py));
           PlotUtils.drawString(
@@ -84,10 +123,12 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
               AnchorV.C,
               Configuration.Text.Use.AXIS_LABEL,
               Configuration.Text.Direction.V,
-              configuration().colors().titleColor());
+              configuration().colors().titleColor()
+          );
         }
-        if (py == p.dataGrid().h() - 1
-            && configuration().plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.BORDER)) {
+        if (py == p.dataGrid().h() - 1 && configuration().plotMatrix()
+            .axesShow()
+            .equals(Configuration.PlotMatrix.Show.BORDER)) {
           // draw common x-axis
           PlotUtils.markRectangle(g, configuration(), l.commonXAxis(px));
           PlotUtils.drawXAxis(g, configuration(), l.commonXAxis(px), p.xName(), xAxesGrid.get(px, 0));
@@ -104,7 +145,8 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
               AnchorV.C,
               Configuration.Text.Use.AXIS_LABEL,
               Configuration.Text.Direction.H,
-              configuration().colors().titleColor());
+              configuration().colors().titleColor()
+          );
         }
         // draw plot titles
         if (configuration().plotMatrix().titlesShow().equals(Configuration.PlotMatrix.Show.ALL)) {
@@ -118,7 +160,8 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
               AnchorV.C,
               Configuration.Text.Use.AXIS_LABEL,
               Configuration.Text.Direction.H,
-              configuration().colors().titleColor());
+              configuration().colors().titleColor()
+          );
           PlotUtils.markRectangle(g, configuration(), l.rowTitle(px, py));
           PlotUtils.drawString(
               g,
@@ -129,7 +172,8 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
               AnchorV.C,
               Configuration.Text.Use.AXIS_LABEL,
               Configuration.Text.Direction.V,
-              configuration().colors().titleColor());
+              configuration().colors().titleColor()
+          );
         }
         // draw axes
         if (configuration().plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.ALL)) {
@@ -160,54 +204,11 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
             new Grid.Key(px, py),
             xAxesGrid.get(px, py),
             yAxesGrid.get(px, py),
-            p);
+            p
+        );
         g.setClip(clip);
         g.setStroke(new BasicStroke());
       }
     }
-  }
-
-  @Override
-  default ImageInfo imageInfo(P p) {
-    int axisW = ImageBuilder.DEFAULT_W / p.dataGrid().w();
-    int axisH = ImageBuilder.DEFAULT_H / p.dataGrid().h();
-    if (axisW < DEFAULT_AXIS_W || axisH < DEFAULT_AXIS_H) {
-      axisW = DEFAULT_AXIS_W;
-      axisH = DEFAULT_AXIS_H;
-    }
-    return new ImageInfo(axisW * p.dataGrid().w(), axisH * p.dataGrid().h());
-  }
-
-  double computeLegendH(Graphics2D g, P p);
-
-  double computeNoteH(Graphics2D g, Grid.Key k, P p);
-
-  Grid<Axis> computeXAxes(Graphics2D g, Layout l, P p);
-
-  Grid<Axis> computeYAxes(Graphics2D g, Layout l, P p);
-
-  void drawLegend(Graphics2D g, Rectangle2D r, P p);
-
-  void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Grid.Key k, Axis xA, Axis yA, P p);
-
-  void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Grid.Key k, P p);
-
-  enum AnchorH {
-    L,
-    C,
-    R
-  }
-
-  enum AnchorV {
-    T,
-    C,
-    B
-  }
-
-  enum Marker {
-    CIRCLE,
-    PLUS,
-    SQUARE,
-    TIMES
   }
 }

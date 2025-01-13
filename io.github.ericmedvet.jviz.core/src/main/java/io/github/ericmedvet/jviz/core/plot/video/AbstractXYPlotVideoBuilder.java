@@ -46,7 +46,8 @@ public abstract class AbstractXYPlotVideoBuilder<P extends XYPlot<D>, D> impleme
             .map(sp -> imageBuilder.build(new ImageInfo(videoInfo.w(), videoInfo.h()), sp))
             .toList(),
         c.frameRate(),
-        videoInfo.encoder());
+        videoInfo.encoder()
+    );
   }
 
   protected static <T> List<Grid<T>> split(Grid<T> grid, SplitType type) {

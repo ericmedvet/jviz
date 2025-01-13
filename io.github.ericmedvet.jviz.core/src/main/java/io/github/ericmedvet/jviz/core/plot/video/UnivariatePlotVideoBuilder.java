@@ -30,23 +30,27 @@ public class UnivariatePlotVideoBuilder extends AbstractXYPlotVideoBuilder<Univa
   public UnivariatePlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration.UnivariateGridPlot ugpConfiguration) {
+      io.github.ericmedvet.jviz.core.plot.image.Configuration.UnivariateGridPlot ugpConfiguration
+  ) {
     super(c, new UnivariateGridPlotDrawer(iConfiguration, ugpConfiguration));
   }
 
   @Override
   protected List<UnivariateGridPlot> split(UnivariateGridPlot p, SplitType splitType) {
     return split(p.dataGrid(), splitType).stream()
-        .map(dg -> new UnivariateGridPlot(
-            p.title(),
-            p.xTitleName(),
-            p.yTitleName(),
-            p.xName(),
-            p.yName(),
-            p.xRange(),
-            p.yRange(),
-            p.valueRange(),
-            dg))
+        .map(
+            dg -> new UnivariateGridPlot(
+                p.title(),
+                p.xTitleName(),
+                p.yTitleName(),
+                p.xName(),
+                p.yName(),
+                p.xRange(),
+                p.yRange(),
+                p.valueRange(),
+                dg
+            )
+        )
         .toList();
   }
 }

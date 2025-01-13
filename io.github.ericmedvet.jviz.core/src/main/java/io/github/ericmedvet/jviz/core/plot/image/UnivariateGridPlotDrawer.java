@@ -58,14 +58,16 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
   }
 
   private static DoubleRange computeValueRange(Grid<Double> grid) {
-    double[] values = grid.values().stream()
+    double[] values = grid.values()
+        .stream()
         .filter(Objects::nonNull)
         .filter(Double::isFinite)
         .mapToDouble(v -> v)
         .toArray();
     return new DoubleRange(
         Arrays.stream(values).min().orElse(0),
-        Arrays.stream(values).max().orElse(1));
+        Arrays.stream(values).max().orElse(1)
+    );
   }
 
   @Override
@@ -79,19 +81,21 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
   @Override
   public double computeLegendH(Graphics2D g, UnivariateGridPlot p) {
     GMetrics gm = new GMetrics(g);
-    return c.legendImageHRate() * gm.h()
-        + PlotUtils.computeStringH(g, configuration(), Configuration.Text.Use.LEGEND_LABEL)
-        + configuration().layout().legendInnerMarginHRate() * gm.h();
+    return c.legendImageHRate() * gm.h() + PlotUtils.computeStringH(
+        g,
+        configuration(),
+        Configuration.Text.Use.LEGEND_LABEL
+    ) + configuration().layout().legendInnerMarginHRate() * gm.h();
   }
 
   @Override
   public double computeNoteH(Graphics2D g, Key k, UnivariateGridPlot univariateGridPlot) {
     GMetrics gm = new GMetrics(g);
-    return c.showRanges()
-        ? (c.legendImageHRate() * gm.h()
-            + PlotUtils.computeStringH(g, configuration(), Configuration.Text.Use.TICK_LABEL)
-            + configuration().layout().legendInnerMarginHRate() * gm.h())
-        : 0;
+    return c.showRanges() ? (c.legendImageHRate() * gm.h() + PlotUtils.computeStringH(
+        g,
+        configuration(),
+        Configuration.Text.Use.TICK_LABEL
+    ) + configuration().layout().legendInnerMarginHRate() * gm.h()) : 0;
   }
 
   @Override
@@ -106,7 +110,8 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
             r.getCenterX() - c.legendImageWRate() * gm.w() / 2d,
             r.getY(),
             c.legendImageWRate() * gm.w(),
-            r.getHeight()),
+            r.getHeight()
+        ),
         valueRange,
         valueRange,
         c.colorRange(),
@@ -115,20 +120,21 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
         Configuration.Text.Use.LEGEND_LABEL,
         configuration().colors().legendLabelColor(),
         AnchorV.B,
-        null);
+        null
+    );
   }
 
   @Override
   public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, UnivariateGridPlot p) {
     Grid<Double> data = p.dataGrid().get(k).data();
-    DoubleFunction<Color> colorF =
-        v -> c.colorRange().interpolate(computeValueRange(p).normalize(v));
+    DoubleFunction<Color> colorF = v -> c.colorRange().interpolate(computeValueRange(p).normalize(v));
     double cellW = r.getWidth() / (double) data.w() * c.cellSideRate();
     double cellH = r.getHeight() / (double) data.h() * c.cellSideRate();
     double cellMarginW = r.getWidth() / (double) data.w() * (1 - c.cellSideRate()) / 2d;
     double cellMarginH = r.getHeight() / (double) data.h() * (1 - c.cellSideRate()) / 2d;
     if (data instanceof RangedGrid<Double> rg) {
-      data.entries().stream()
+      data.entries()
+          .stream()
           .filter(e -> e.value() != null)
           .filter(e -> Double.isFinite(e.value()))
           .forEach(e -> {
@@ -137,11 +143,13 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
                 xA.xIn(rg.xRange(e.key().x()).min(), r) + cellMarginW,
                 yA.yIn(rg.yRange(e.key().y()).max(), r) + cellMarginH,
                 cellW,
-                cellH);
+                cellH
+            );
             g.fill(cellR);
           });
     } else {
-      data.entries().stream()
+      data.entries()
+          .stream()
           .filter(e -> e.value() != null)
           .filter(e -> Double.isFinite(e.value()))
           .forEach(e -> {
@@ -150,7 +158,8 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
                 xA.xIn(e.key().x(), r) + cellMarginW,
                 yA.yIn(e.key().y() + 1, r) + cellMarginH,
                 cellW,
-                cellH);
+                cellH
+            );
             g.fill(cellR);
           });
     }
@@ -163,7 +172,9 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
     }
     DoubleRange valueRange = computeValueRange(p);
     Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
-    List<Double> allLabels = p.dataGrid().values().stream()
+    List<Double> allLabels = p.dataGrid()
+        .values()
+        .stream()
         .map(td -> computeValueRange(td.data()))
         .map(dr -> List.of(dr.min(), dr.max()))
         .flatMap(List::stream)
@@ -182,6 +193,7 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
         Configuration.Text.Use.TICK_LABEL,
         configuration().colors().tickLabelColor(),
         AnchorV.T,
-        rangeLabelFormat);
+        rangeLabelFormat
+    );
   }
 }

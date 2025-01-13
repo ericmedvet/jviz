@@ -49,7 +49,10 @@ public record ColorRange(List<Color> colors) {
     double maxG = max.getGreen() / 255f;
     double minB = min.getBlue() / 255f;
     double maxB = max.getBlue() / 255f;
-    return new Color((float) (minR + (maxR - minR) * v), (float) (minG + (maxG - minG) * v), (float)
-        (minB + (maxB - minB) * v));
+    return new Color(
+        (float) (minR + (maxR - minR) * v),
+        (float) (minG + (maxG - minG) * v),
+        (float) (minB + (maxB - minB) * v)
+    );
   }
 }

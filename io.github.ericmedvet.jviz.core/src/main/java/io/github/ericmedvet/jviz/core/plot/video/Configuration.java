@@ -20,10 +20,10 @@
 package io.github.ericmedvet.jviz.core.plot.video;
 
 public record Configuration(SplitType splitType, double frameRate) {
+
   public static final Configuration DEFAULT = new Configuration(SplitType.COLUMNS, 20d);
 
   public enum SplitType {
-    ROWS,
-    COLUMNS
+    ROWS, COLUMNS
   }
 }

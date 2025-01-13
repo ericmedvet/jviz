@@ -27,7 +27,8 @@ public class PointsPlotVideoBuilder extends AbstractXYDataSeriesPlotVideoBuilder
   public PointsPlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      PointsPlot ppConfiguration) {
+      PointsPlot ppConfiguration
+  ) {
     super(c, new PointsPlotDrawer(iConfiguration, ppConfiguration));
   }
 }

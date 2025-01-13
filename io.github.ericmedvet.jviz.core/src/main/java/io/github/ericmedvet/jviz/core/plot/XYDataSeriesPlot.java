@@ -32,5 +32,5 @@ public record XYDataSeriesPlot(
     String yName,
     DoubleRange xRange,
     DoubleRange yRange,
-    Grid<TitledData<List<XYDataSeries>>> dataGrid)
-    implements XYPlot<List<XYDataSeries>> {}
+    Grid<TitledData<List<XYDataSeries>>> dataGrid
+) implements XYPlot<List<XYDataSeries>> {}

@@ -40,45 +40,54 @@ public class DistributionPlotCsvBuilder extends AbstractCsvBuilder<DistributionP
     StringWriter sw = new StringWriter();
     try (CSVPrinter csvPrinter = new CSVPrinter(sw, c.getCSVFormat())) {
       if (mode.equals(Mode.NORMAL)) {
-        csvPrinter.printRecord(processRecord(List.of(
-            p.xTitleName(),
-            p.yTitleName(),
-            p.xName(),
-            String.join(c.columnNameJoiner(), p.yName(), "min"),
-            String.join(c.columnNameJoiner(), p.yName(), "q1minus15IQR"),
-            String.join(c.columnNameJoiner(), p.yName(), "q1"),
-            String.join(c.columnNameJoiner(), p.yName(), "mean"),
-            String.join(c.columnNameJoiner(), p.yName(), "median"),
-            String.join(c.columnNameJoiner(), p.yName(), "q3"),
-            String.join(c.columnNameJoiner(), p.yName(), "q3plus15IQR"),
-            String.join(c.columnNameJoiner(), p.yName(), "max"))));
-        for (XYPlot.TitledData<List<DistributionPlot.Data>> td :
-            p.dataGrid().values()) {
+        csvPrinter.printRecord(
+            processRecord(
+                List.of(
+                    p.xTitleName(),
+                    p.yTitleName(),
+                    p.xName(),
+                    String.join(c.columnNameJoiner(), p.yName(), "min"),
+                    String.join(c.columnNameJoiner(), p.yName(), "q1minus15IQR"),
+                    String.join(c.columnNameJoiner(), p.yName(), "q1"),
+                    String.join(c.columnNameJoiner(), p.yName(), "mean"),
+                    String.join(c.columnNameJoiner(), p.yName(), "median"),
+                    String.join(c.columnNameJoiner(), p.yName(), "q3"),
+                    String.join(c.columnNameJoiner(), p.yName(), "q3plus15IQR"),
+                    String.join(c.columnNameJoiner(), p.yName(), "max")
+                )
+            )
+        );
+        for (XYPlot.TitledData<List<DistributionPlot.Data>> td : p.dataGrid().values()) {
           for (DistributionPlot.Data ds : td.data()) {
-            csvPrinter.printRecord(processRecord(List.of(
-                td.xTitle(),
-                td.yTitle(),
-                ds.name(),
-                ds.stats().min(),
-                ds.stats().q1minus15IQR(),
-                ds.stats().q1(),
-                ds.stats().mean(),
-                ds.stats().median(),
-                ds.stats().q3(),
-                ds.stats().q3plus15IQR(),
-                ds.stats().max())));
+            csvPrinter.printRecord(
+                processRecord(
+                    List.of(
+                        td.xTitle(),
+                        td.yTitle(),
+                        ds.name(),
+                        ds.stats().min(),
+                        ds.stats().q1minus15IQR(),
+                        ds.stats().q1(),
+                        ds.stats().mean(),
+                        ds.stats().median(),
+                        ds.stats().q3(),
+                        ds.stats().q3plus15IQR(),
+                        ds.stats().max()
+                    )
+                )
+            );
           }
         }
       } else if (mode.equals(Mode.PAPER_FRIENDLY)) {
         Table<Integer, String, Number> t = new HashMapTable<>();
-        for (XYPlot.TitledData<List<DistributionPlot.Data>> td :
-            p.dataGrid().values()) {
+        for (XYPlot.TitledData<List<DistributionPlot.Data>> td : p.dataGrid().values()) {
           for (DistributionPlot.Data ds : td.data()) {
             for (int i = 0; i < ds.yValues().size(); i++) {
               t.set(
                   i,
                   String.join(c.columnNameJoiner(), List.of(td.xTitle(), td.yTitle(), ds.name())),
-                  ds.yValues().get(i));
+                  ds.yValues().get(i)
+              );
             }
           }
         }

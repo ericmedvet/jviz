@@ -30,15 +30,25 @@ public class BoxPlotVideoBuilder extends AbstractXYPlotVideoBuilder<Distribution
   public BoxPlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      BoxPlot bpConfiguration) {
+      BoxPlot bpConfiguration
+  ) {
     super(c, new BoxPlotDrawer(iConfiguration, bpConfiguration));
   }
 
   @Override
   protected List<DistributionPlot> split(DistributionPlot p, SplitType splitType) {
     return split(p.dataGrid(), splitType).stream()
-        .map(dg -> new DistributionPlot(
-            p.title(), p.xTitleName(), p.yTitleName(), p.xName(), p.yName(), p.yRange(), dg))
+        .map(
+            dg -> new DistributionPlot(
+                p.title(),
+                p.xTitleName(),
+                p.yTitleName(),
+                p.xName(),
+                p.yName(),
+                p.yRange(),
+                dg
+            )
+        )
         .toList();
   }
 }

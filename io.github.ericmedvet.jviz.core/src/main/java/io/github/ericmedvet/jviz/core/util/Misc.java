@@ -41,7 +41,8 @@ public class Misc {
 
   private static final Logger L = Logger.getLogger(Misc.class.getName());
 
-  private Misc() {}
+  private Misc() {
+  }
 
   public static File checkExistenceAndChangeName(File file) {
     String originalFileName = file.getPath();
@@ -68,7 +69,8 @@ public class Misc {
     if (!file.getPath().equals(originalFileName)) {
       L.log(
           Level.WARNING,
-          String.format("Given file name (%s) exists; will write on %s", originalFileName, file.getPath()));
+          String.format("Given file name (%s) exists; will write on %s", originalFileName, file.getPath())
+      );
     }
     return file;
   }

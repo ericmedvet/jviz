@@ -25,21 +25,31 @@ import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
 import java.util.List;
 
-public class VectorialFieldVideoBuilder
-    extends AbstractXYPlotVideoBuilder<VectorialFieldPlot, List<VectorialFieldDataSeries>> {
+public class VectorialFieldVideoBuilder extends AbstractXYPlotVideoBuilder<VectorialFieldPlot, List<VectorialFieldDataSeries>> {
 
   public VectorialFieldVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration.VectorialFieldPlot vfpConfiguration) {
+      io.github.ericmedvet.jviz.core.plot.image.Configuration.VectorialFieldPlot vfpConfiguration
+  ) {
     super(c, new VectorialFieldPlotDrawer(iConfiguration, vfpConfiguration));
   }
 
   @Override
   protected List<VectorialFieldPlot> split(VectorialFieldPlot p, SplitType splitType) {
     return split(p.dataGrid(), splitType).stream()
-        .map(dg -> new VectorialFieldPlot(
-            p.title(), p.xTitleName(), p.yTitleName(), p.xName(), p.yName(), p.xRange(), p.yRange(), dg))
+        .map(
+            dg -> new VectorialFieldPlot(
+                p.title(),
+                p.xTitleName(),
+                p.yTitleName(),
+                p.xName(),
+                p.yName(),
+                p.xRange(),
+                p.yRange(),
+                dg
+            )
+        )
         .toList();
   }
 }

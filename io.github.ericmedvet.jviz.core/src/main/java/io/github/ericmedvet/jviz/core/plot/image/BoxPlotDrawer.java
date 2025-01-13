@@ -65,23 +65,13 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
     // prepare colors
     SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     return PlotUtils.computeItemsLegendSize(
-            g, configuration(), dataColors, c.legendImageWRate() * gm.w(), c.legendImageHRate() * gm.h())
+        g,
+        configuration(),
+        dataColors,
+        c.legendImageWRate() * gm.w(),
+        c.legendImageHRate() * gm.h()
+    )
         .getY();
-  }
-
-  private SortedMap<String, Color> getComputeSeriesDataColors(DistributionPlot p) {
-    return PlotUtils.computeSeriesDataColors(
-        p.dataGrid().values().stream()
-            .map(XYPlot.TitledData::data)
-            .flatMap(List::stream)
-            .map(Data::name)
-            .toList(),
-        c.colors());
-  }
-
-  @Override
-  public double computeNoteH(Graphics2D g, Key k, DistributionPlot p) {
-    return 0;
   }
 
   @Override
@@ -101,14 +91,25 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
             configuration(),
             gm,
             new Rectangle2D.Double(
-                ir.getX() + ir.getWidth() * 0.2, ir.getY(), ir.getWidth() * 0.6, ir.getHeight()),
+                ir.getX() + ir.getWidth() * 0.2,
+                ir.getY(),
+                ir.getWidth() * 0.6,
+                ir.getHeight()
+            ),
             color,
             ir.getY() + ir.getHeight() * 0.2,
             ir.getCenterY(),
             ir.getMaxY() - ir.getHeight() * 0.2,
             c.alpha(),
             c.whiskersWRate(),
-            c.strokeSizeRate()));
+            c.strokeSizeRate()
+        )
+    );
+  }
+
+  @Override
+  public double computeNoteH(Graphics2D g, Key k, DistributionPlot p) {
+    return 0;
   }
 
   @Override
@@ -118,58 +119,99 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
     g.setColor(configuration().colors().gridColor());
     g.setStroke(new BasicStroke((float) (configuration().general().gridStrokeSizeRate() * gm.refL())));
     xA.ticks()
-        .forEach(x -> g.draw(new Line2D.Double(
-            xA.xIn(x, r), yA.yIn(yA.range().min(), r),
-            xA.xIn(x, r), yA.yIn(yA.range().max(), r))));
+        .forEach(
+            x -> g.draw(
+                new Line2D.Double(
+                    xA.xIn(x, r),
+                    yA.yIn(yA.range().min(), r),
+                    xA.xIn(x, r),
+                    yA.yIn(yA.range().max(), r)
+                )
+            )
+        );
     yA.ticks()
-        .forEach(y -> g.draw(new Line2D.Double(
-            xA.xIn(xA.range().min(), r), yA.yIn(y, r),
-            xA.xIn(xA.range().max(), r), yA.yIn(y, r))));
+        .forEach(
+            y -> g.draw(
+                new Line2D.Double(
+                    xA.xIn(xA.range().min(), r),
+                    yA.yIn(y, r),
+                    xA.xIn(xA.range().max(), r),
+                    yA.yIn(y, r)
+                )
+            )
+        );
     // draw data
     List<String> names = dataColors.keySet().stream().toList();
     double w = r.getWidth() / ((double) names.size()) * c.boxWRate();
     IntStream.range(0, names.size())
-        .filter(i -> p.dataGrid().get(k).data().stream()
-            .map(DistributionPlot.Data::name)
-            .anyMatch(n -> names.get(i).equals(n)))
-        .forEach(x -> p.dataGrid().get(k).data().stream()
-            .filter(d -> d.name().equals(names.get(x)))
-            .findFirst()
-            .ifPresent(d -> {
-              double topY = yA.yIn(
-                  switch (c.extremeType()) {
-                    case MIN_MAX -> d.stats().min();
-                    case IQR_1_5 -> d.stats().q1minus15IQR();
-                  },
-                  r);
-              double bottomY = yA.yIn(
-                  switch (c.extremeType()) {
-                    case MIN_MAX -> d.stats().max();
-                    case IQR_1_5 -> d.stats().q3plus15IQR();
-                  },
-                  r);
-              double innerTopY = yA.yIn(d.stats().q1(), r);
-              double innerBottomY = yA.yIn(d.stats().q3(), r);
-              double centerY = yA.yIn(
-                  switch (c.midType()) {
-                    case MEAN -> d.stats().mean();
-                    case MEDIAN -> d.stats().median();
-                  },
-                  r);
-              Rectangle2D bR = new Rectangle2D.Double(xA.xIn(x, r) - w / 2d, bottomY, w, topY - bottomY);
-              PlotUtils.drawBoxAndWhiskers(
-                  g,
-                  configuration(),
-                  gm,
-                  bR,
-                  dataColors.get(names.get(x)),
-                  innerBottomY,
-                  centerY,
-                  innerTopY,
-                  c.alpha(),
-                  c.boxWRate(),
-                  c.strokeSizeRate());
-            }));
+        .filter(
+            i -> p.dataGrid()
+                .get(k)
+                .data()
+                .stream()
+                .map(DistributionPlot.Data::name)
+                .anyMatch(n -> names.get(i).equals(n))
+        )
+        .forEach(
+            x -> p.dataGrid()
+                .get(k)
+                .data()
+                .stream()
+                .filter(d -> d.name().equals(names.get(x)))
+                .findFirst()
+                .ifPresent(d -> {
+                  double topY = yA.yIn(
+                      switch (c.extremeType()) {
+                        case MIN_MAX -> d.stats().min();
+                        case IQR_1_5 -> d.stats().q1minus15IQR();
+                      },
+                      r
+                  );
+                  double bottomY = yA.yIn(
+                      switch (c.extremeType()) {
+                        case MIN_MAX -> d.stats().max();
+                        case IQR_1_5 -> d.stats().q3plus15IQR();
+                      },
+                      r
+                  );
+                  double innerTopY = yA.yIn(d.stats().q1(), r);
+                  double innerBottomY = yA.yIn(d.stats().q3(), r);
+                  double centerY = yA.yIn(
+                      switch (c.midType()) {
+                        case MEAN -> d.stats().mean();
+                        case MEDIAN -> d.stats().median();
+                      },
+                      r
+                  );
+                  Rectangle2D bR = new Rectangle2D.Double(xA.xIn(x, r) - w / 2d, bottomY, w, topY - bottomY);
+                  PlotUtils.drawBoxAndWhiskers(
+                      g,
+                      configuration(),
+                      gm,
+                      bR,
+                      dataColors.get(names.get(x)),
+                      innerBottomY,
+                      centerY,
+                      innerTopY,
+                      c.alpha(),
+                      c.boxWRate(),
+                      c.strokeSizeRate()
+                  );
+                })
+        );
+  }
+
+  private SortedMap<String, Color> getComputeSeriesDataColors(DistributionPlot p) {
+    return PlotUtils.computeSeriesDataColors(
+        p.dataGrid()
+            .values()
+            .stream()
+            .map(XYPlot.TitledData::data)
+            .flatMap(List::stream)
+            .map(Data::name)
+            .toList(),
+        c.colors()
+    );
   }
 
   @Override

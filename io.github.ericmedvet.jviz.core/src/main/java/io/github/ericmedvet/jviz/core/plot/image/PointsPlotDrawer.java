@@ -57,14 +57,17 @@ public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
     double l = c.markerSizeRate() * gm.refL();
     double strokeSize = c.strokeSizeRate() * gm.refL();
     ds.points()
-        .forEach(p -> PlotUtils.drawMarker(
-            g,
-            new Point2D.Double(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)),
-            l,
-            c.marker(),
-            color,
-            c.alpha(),
-            strokeSize));
+        .forEach(
+            p -> PlotUtils.drawMarker(
+                g,
+                new Point2D.Double(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)),
+                l,
+                c.marker(),
+                color,
+                c.alpha(),
+                strokeSize
+            )
+        );
   }
 
   @Override
@@ -78,6 +81,7 @@ public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
         c.marker(),
         color,
         c.alpha(),
-        c.strokeSizeRate() * gm.refL());
+        c.strokeSizeRate() * gm.refL()
+    );
   }
 }

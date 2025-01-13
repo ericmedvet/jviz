@@ -32,18 +32,8 @@ public record DistributionPlot(
     String xName,
     String yName,
     DoubleRange yRange,
-    Grid<TitledData<List<Data>>> dataGrid)
-    implements XYPlot<List<DistributionPlot.Data>> {
-
-  @Override
-  public DoubleRange xRange() {
-    return new DoubleRange(
-        -0.5,
-        dataGrid.values().stream()
-            .mapToDouble(td -> td.data().size() - 0.5d)
-            .max()
-            .orElse(0.5d));
-  }
+    Grid<TitledData<List<Data>>> dataGrid
+) implements XYPlot<List<DistributionPlot.Data>> {
 
   public record Data(String name, List<Double> yValues, Stats stats) {
     public Data(String name, List<Double> yValues) {
@@ -62,16 +52,19 @@ public record DistributionPlot(
         double mean,
         double q3,
         double q3plus15IQR,
-        double max) {
+        double max
+    ) {
       public Stats(List<Double> values) {
         this(
             values.stream().min(Double::compareTo).orElseThrow(),
             values.stream()
-                .filter(v -> v
-                    >= Misc.percentile(values, Double::compareTo, 0.25)
-                        - 1.5
-                            * (Misc.percentile(values, Double::compareTo, 0.75)
-                                - Misc.percentile(values, Double::compareTo, 0.25)))
+                .filter(
+                    v -> v >= Misc.percentile(values, Double::compareTo, 0.25) - 1.5 * (Misc.percentile(
+                        values,
+                        Double::compareTo,
+                        0.75
+                    ) - Misc.percentile(values, Double::compareTo, 0.25))
+                )
                 .min(Double::compareTo)
                 .orElseThrow(),
             Misc.percentile(values, Double::compareTo, 0.25),
@@ -79,15 +72,30 @@ public record DistributionPlot(
             values.stream().mapToDouble(v -> v).average().orElseThrow(),
             Misc.percentile(values, Double::compareTo, 0.75),
             values.stream()
-                .filter(v -> v
-                    <= Misc.percentile(values, Double::compareTo, 0.75)
-                        + 1.5
-                            * (Misc.percentile(values, Double::compareTo, 0.75)
-                                - Misc.percentile(values, Double::compareTo, 0.25)))
+                .filter(
+                    v -> v <= Misc.percentile(values, Double::compareTo, 0.75) + 1.5 * (Misc.percentile(
+                        values,
+                        Double::compareTo,
+                        0.75
+                    ) - Misc.percentile(values, Double::compareTo, 0.25))
+                )
                 .max(Double::compareTo)
                 .orElseThrow(),
-            values.stream().max(Double::compareTo).orElseThrow());
+            values.stream().max(Double::compareTo).orElseThrow()
+        );
       }
     }
+  }
+
+  @Override
+  public DoubleRange xRange() {
+    return new DoubleRange(
+        -0.5,
+        dataGrid.values()
+            .stream()
+            .mapToDouble(td -> td.data().size() - 0.5d)
+            .max()
+            .orElse(0.5d)
+    );
   }
 }
