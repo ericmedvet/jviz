@@ -95,7 +95,7 @@ public abstract class AbstractXYPlotDrawer<P extends XYPlot<D>, D> implements XY
         })
         .map(r -> {
           if (r == null || r.extent() == 0) {
-            L.warning("Computed axis has 0 extent: enlarging it to unit extent");
+            L.fine("Computed axis has 0 extent: enlarging it to unit extent");
             return Objects.isNull(r) ? DoubleRange.UNIT : DoubleRange.UNIT.delta(r.min() - 0.5);
           }
           return r;
