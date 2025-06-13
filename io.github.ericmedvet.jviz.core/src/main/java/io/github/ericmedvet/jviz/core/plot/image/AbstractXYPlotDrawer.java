@@ -34,6 +34,8 @@ public abstract class AbstractXYPlotDrawer<P extends XYPlot<D>, D> implements XY
 
   private static final Logger L = Logger.getLogger(AbstractXYPlotDrawer.class.getName());
 
+  private static final double MIN_EXTENT = 0.00001;
+
   private final Configuration configuration;
   private final double xExtensionRate;
   private final double yExtensionRate;
@@ -94,8 +96,8 @@ public abstract class AbstractXYPlotDrawer<P extends XYPlot<D>, D> implements XY
           return extRange;
         })
         .map(r -> {
-          if (r == null || r.extent() == 0) {
-            L.fine("Computed axis has 0 extent: enlarging it to unit extent");
+          if (r == null || r.extent() == 0 || r.extent() < MIN_EXTENT) {
+            L.fine("Computed axis has ~0 extent: enlarging it to unit extent");
             return Objects.isNull(r) ? DoubleRange.UNIT : DoubleRange.UNIT.delta(r.min() - 0.5);
           }
           return r;

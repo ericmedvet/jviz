@@ -49,22 +49,55 @@ public class Main {
   }
 
   private static XYDataSeries sinDS(double f, DoubleRange xRange, int n) {
-    return new XYDataSeries() {
-      @Override
-      public String name() {
-        return "sin(%.1f*x)".formatted(f);
-      }
+    return XYDataSeries.of(
+        "sin(%.1f*x)".formatted(f),
+        xRange.points(n)
+            .mapToObj(x -> new XYDataSeries.Point(Value.of(x), Value.of(Math.sin(f * x))))
+            .toList()
+    );
+  }
 
-      @Override
-      public List<Point> points() {
-        return xRange.points(n)
-            .mapToObj(x -> new Point(Value.of(x), Value.of(Math.sin(f * x))))
-            .toList();
-      }
-    };
+  private static XYDataSeries preciseData() {
+    return XYDataSeries.of(
+        "five-four-one",
+        List.of(
+            new XYDataSeries.Point(Value.of(-4), Value.of(-5)),
+            new XYDataSeries.Point(Value.of(-3), Value.of(-5)),
+            new XYDataSeries.Point(Value.of(-3), Value.of(-4)),
+            new XYDataSeries.Point(Value.of(-1), Value.of(-4)),
+            new XYDataSeries.Point(Value.of(-1), Value.of(-1)),
+            new XYDataSeries.Point(Value.of(1), Value.of(-1)),
+            new XYDataSeries.Point(Value.of(1), Value.of(1)),
+            new XYDataSeries.Point(Value.of(3), Value.of(1)),
+            new XYDataSeries.Point(Value.of(3), Value.of(4))
+        )
+    );
   }
 
   public static void main(String[] args) {
+    // lines plot
+    new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).show(
+        new XYDataSeriesPlot(
+            "My plot precise",
+            "x title",
+            "y title",
+            "x",
+            "f(x)",
+            DoubleRange.UNBOUNDED,
+            DoubleRange.UNBOUNDED,
+            Grid.create(
+                1,
+                1,
+                (gX, gY) -> new TitledData<>(
+                    "gx=%d".formatted(gX),
+                    "gy=%d".formatted(gY),
+                    List.of(
+                        preciseData()
+                    )
+                )
+            )
+        )
+    );
     // lines plot
     XYDataSeriesPlot lp = new XYDataSeriesPlot(
         "My plot",

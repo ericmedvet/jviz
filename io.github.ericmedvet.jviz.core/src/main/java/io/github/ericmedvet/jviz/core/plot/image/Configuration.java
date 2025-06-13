@@ -158,7 +158,7 @@ public record Configuration(
       double maxNOfDecimalDigits
   ) {
 
-    public static final General DEFAULT = new General(1.25, 0.9, 0.0005, 0.001, 5);
+    public static final General DEFAULT = new General(1.25, 0.95, 0.0005, 0.001, 5);
   }
 
   public record LandscapePlot(
