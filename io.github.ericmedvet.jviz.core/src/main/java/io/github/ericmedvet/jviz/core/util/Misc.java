@@ -102,7 +102,7 @@ public class Misc {
   public static void showImage(BufferedImage image) {
     EventQueue.invokeLater(() -> {
       JFrame frame = new JFrame("Image");
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       frame.add(new JPanel() {
         protected void paintComponent(Graphics g) {
           super.paintComponent(g);
