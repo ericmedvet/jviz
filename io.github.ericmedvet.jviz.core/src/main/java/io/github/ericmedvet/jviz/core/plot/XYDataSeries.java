@@ -2,7 +2,7 @@
  * ========================LICENSE_START=================================
  * jviz-core
  * %%
- * Copyright (C) 2024 Eric Medvet
+ * Copyright (C) 2024 - 2025 Eric Medvet
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/** @author "Eric Medvet" on 2023/12/01 for jgea */
 public interface XYDataSeries {
   record Point(Value x, Value y) {
     @Override

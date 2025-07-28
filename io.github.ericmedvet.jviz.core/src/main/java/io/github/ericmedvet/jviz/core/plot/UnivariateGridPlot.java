@@ -2,7 +2,7 @@
  * ========================LICENSE_START=================================
  * jviz-core
  * %%
- * Copyright (C) 2024 Eric Medvet
+ * Copyright (C) 2024 - 2025 Eric Medvet
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ package io.github.ericmedvet.jviz.core.plot;
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 
-/** @author "Eric Medvet" on 2023/12/10 for jgea */
 public record UnivariateGridPlot(
     String title,
     String xTitleName,

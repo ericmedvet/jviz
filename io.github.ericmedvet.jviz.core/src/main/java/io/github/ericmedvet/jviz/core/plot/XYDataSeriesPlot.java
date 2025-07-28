@@ -2,7 +2,7 @@
  * ========================LICENSE_START=================================
  * jviz-core
  * %%
- * Copyright (C) 2024 Eric Medvet
+ * Copyright (C) 2024 - 2025 Eric Medvet
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import java.util.List;
 
-/** @author "Eric Medvet" on 2023/12/10 for jgea */
 public record XYDataSeriesPlot(
     String title,
     String xTitleName,

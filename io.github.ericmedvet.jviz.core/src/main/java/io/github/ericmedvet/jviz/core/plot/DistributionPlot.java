@@ -2,7 +2,7 @@
  * ========================LICENSE_START=================================
  * jviz-core
  * %%
- * Copyright (C) 2024 Eric Medvet
+ * Copyright (C) 2024 - 2025 Eric Medvet
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.util.Misc;
 import java.util.List;
 
-/** @author "Eric Medvet" on 2024/01/04 for jgea */
 public record DistributionPlot(
     String title,
     String xTitleName,
@@ -36,6 +35,7 @@ public record DistributionPlot(
 ) implements XYPlot<List<DistributionPlot.Data>> {
 
   public record Data(String name, List<Double> yValues, Stats stats) {
+
     public Data(String name, List<Double> yValues) {
       this(name, yValues, new Stats(yValues));
     }
