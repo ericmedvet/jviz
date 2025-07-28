@@ -21,11 +21,11 @@ package io.github.ericmedvet.jviz.core.drawer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /** @author "Eric Medvet" on 2024/02/23 for jgea */
 public interface Drawer<E> extends ImageBuilder<E> {
@@ -48,15 +48,18 @@ public interface Drawer<E> extends ImageBuilder<E> {
   }
 
   @Override
-  default BufferedImage build(ImageInfo imageInfo, E e) {
-    BufferedImage image = new BufferedImage(imageInfo.w(), imageInfo.h(), BufferedImage.TYPE_3BYTE_BGR);
-    Graphics2D g = image.createGraphics();
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setClip(new Rectangle2D.Double(0, 0, image.getWidth(), image.getHeight()));
-    clean(g);
-    draw(g, e);
-    g.dispose();
-    return image;
+  default <O> O build(
+      ImageInfo imageInfo,
+      E e,
+      Supplier<EnhancedGraphics<O>> supplier,
+      UnaryOperator<EnhancedGraphics<O>> operator
+  ) {
+    EnhancedGraphics<O> enhancedGraphics = supplier.get();
+    enhancedGraphics.g2d().setClip(new Rectangle2D.Double(0, 0, imageInfo.w(), imageInfo.h()));
+    clean(enhancedGraphics.g2d());
+    draw(enhancedGraphics.g2d(), e);
+    enhancedGraphics.g2d().dispose();
+    return operator.apply(enhancedGraphics).o();
   }
 
   static <E> Drawer<E> stringWriter(Color color, float fontSize, Function<E, String> f) {

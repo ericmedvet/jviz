@@ -32,6 +32,7 @@ import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.random.RandomGenerator;
@@ -74,7 +75,7 @@ public class Main {
     );
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     // lines plot
     new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).show(
         new XYDataSeriesPlot(
@@ -122,7 +123,9 @@ public class Main {
         )
     );
     new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).show(lp);
+    new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).save(new File("../lineplot.svg"), lp);
     new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT).show(lp);
+    new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT).save(new File("../points.svg"), lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
     // box plot
     DistributionPlot bp = new DistributionPlot(

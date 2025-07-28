@@ -43,7 +43,7 @@ public abstract class AbstractXYPlotVideoBuilder<P extends XYPlot<D>, D> impleme
   public Video build(VideoInfo videoInfo, P p) {
     return new Video(
         split(p, c.splitType()).stream()
-            .map(sp -> imageBuilder.build(new ImageInfo(videoInfo.w(), videoInfo.h()), sp))
+            .map(sp -> imageBuilder.buildRaster(new ImageInfo(videoInfo.w(), videoInfo.h()), sp))
             .toList(),
         c.frameRate(),
         videoInfo.encoder()

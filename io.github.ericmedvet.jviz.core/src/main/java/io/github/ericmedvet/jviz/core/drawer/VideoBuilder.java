@@ -40,7 +40,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
       public Video build(VideoInfo videoInfo, F f) {
         List<BufferedImage> images = splitter.apply(f)
             .stream()
-            .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
+            .map(e -> imageBuilder.buildRaster(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
         return new Video(images, frameRate, videoInfo.encoder);
       }
@@ -61,7 +61,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
         SortedMap<Double, E> map = splitter.apply(f);
         List<BufferedImage> images = map.values()
             .stream()
-            .map(e -> imageBuilder.build(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
+            .map(e -> imageBuilder.buildRaster(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
         return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey(), videoInfo.encoder);
       }

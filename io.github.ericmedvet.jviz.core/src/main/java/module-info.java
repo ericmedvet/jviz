@@ -31,4 +31,5 @@ module io.github.ericmedvet.jviz.core {
   requires io.github.ericmedvet.jnb.datastructure;
   requires java.desktop;
   requires jcodec;
+  requires org.jfree.svg;
 }
