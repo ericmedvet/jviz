@@ -48,13 +48,13 @@ public interface Drawer<E> extends ImageBuilder<E> {
   }
 
   @Override
-  default <O> O build(
+  default <G extends Graphics2D, O> O build(
       ImageInfo imageInfo,
       E e,
-      Supplier<EnhancedGraphics<O>> supplier,
-      UnaryOperator<EnhancedGraphics<O>> operator
+      Supplier<EnhancedGraphics<G, O>> supplier,
+      UnaryOperator<EnhancedGraphics<G, O>> operator
   ) {
-    EnhancedGraphics<O> enhancedGraphics = supplier.get();
+    EnhancedGraphics<G, O> enhancedGraphics = supplier.get();
     enhancedGraphics.g2d().setClip(new Rectangle2D.Double(0, 0, imageInfo.w(), imageInfo.h()));
     clean(enhancedGraphics.g2d());
     draw(enhancedGraphics.g2d(), e);

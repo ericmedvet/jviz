@@ -23,26 +23,32 @@ import io.github.ericmedvet.jviz.core.util.Misc;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
-import org.jfree.svg.SVGGraphics2D;
-import org.jfree.svg.SVGUtils;
+import org.apache.batik.anim.dom.SVGDOMImplementation;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.w3c.dom.Document;
 
 public interface ImageBuilder<E> {
 
   int DEFAULT_W = 1000;
   int DEFAULT_H = 800;
 
-
-  <O> O build(
+  <G extends Graphics2D, O> O build(
       ImageInfo imageInfo,
       E e,
-      Supplier<EnhancedGraphics<O>> supplier,
-      UnaryOperator<EnhancedGraphics<O>> operator
+      Supplier<EnhancedGraphics<G, O>> supplier,
+      UnaryOperator<EnhancedGraphics<G, O>> operator
   );
 
   default BufferedImage buildRaster(ImageInfo imageInfo, E e) {
@@ -64,14 +70,28 @@ public interface ImageBuilder<E> {
   }
 
   default String buildVectorial(ImageInfo imageInfo, E e) {
+    Supplier<EnhancedGraphics<org.apache.batik.svggen.SVGGraphics2D, String>> batikSupplier = () -> {
+      Document doc = GenericDOMImplementation.getDOMImplementation()
+          .createDocument(SVGDOMImplementation.SVG_NAMESPACE_URI, "svg", null);
+      org.apache.batik.svggen.SVGGraphics2D svgGenerator = new org.apache.batik.svggen.SVGGraphics2D(doc);
+      return new EnhancedGraphics<>(svgGenerator, "");
+    };
+    UnaryOperator<EnhancedGraphics<org.apache.batik.svggen.SVGGraphics2D, String>> batikOperator = enhancedGraphics -> {
+      StringWriter sw = new StringWriter();
+      try (sw) {
+        enhancedGraphics.g2d().stream(sw);
+      } catch (IOException ex) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Cannot write svg file for %s".formatted(e), ex);
+      }
+      // hack to fix the wrong behavior of batik who writes the <!DOCTYPE> twice
+      String content = sw.toString().lines().skip(1).collect(Collectors.joining(System.lineSeparator()));
+      return new EnhancedGraphics<>(enhancedGraphics.g2d(), content);
+    };
     return build(
         imageInfo,
         e,
-        () -> new EnhancedGraphics<>(new SVGGraphics2D(imageInfo.w(), imageInfo.h()), ""),
-        enhancedGraphics -> new EnhancedGraphics<>(
-            enhancedGraphics.g2d(),
-            ((SVGGraphics2D) enhancedGraphics.g2d()).getSVGElement()
-        )
+        batikSupplier,
+        batikOperator
     );
   }
 
@@ -79,11 +99,11 @@ public interface ImageBuilder<E> {
     ImageBuilder<E> thisImageBuilder = this;
     return new ImageBuilder<>() {
       @Override
-      public <O> O build(
+      public <G extends Graphics2D, O> O build(
           ImageInfo imageInfo,
           F f,
-          Supplier<EnhancedGraphics<O>> supplier,
-          UnaryOperator<EnhancedGraphics<O>> operator
+          Supplier<EnhancedGraphics<G, O>> supplier,
+          UnaryOperator<EnhancedGraphics<G, O>> operator
       ) {
         return thisImageBuilder.build(imageInfo, function.apply(f), supplier, operator);
       }
@@ -101,7 +121,10 @@ public interface ImageBuilder<E> {
 
   default void save(ImageInfo imageInfo, String formatName, File file, E e) throws IOException {
     if (formatName.equalsIgnoreCase("svg")) {
-      SVGUtils.writeToSVG(file, buildVectorial(imageInfo, e));
+      String content = buildVectorial(imageInfo, e);
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        writer.write(content);
+      }
     } else {
       ImageIO.write(buildRaster(imageInfo, e), formatName, file);
     }
@@ -130,5 +153,5 @@ public interface ImageBuilder<E> {
 
   record ImageInfo(int w, int h) {}
 
-  record EnhancedGraphics<O>(Graphics2D g2d, O o) {}
+  record EnhancedGraphics<G extends Graphics2D, O>(G g2d, O o) {}
 }
