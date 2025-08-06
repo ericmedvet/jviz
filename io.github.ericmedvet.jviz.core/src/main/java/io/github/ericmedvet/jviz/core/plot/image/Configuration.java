@@ -19,6 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.plot.image;
 
+import io.github.ericmedvet.jviz.core.plot.image.XYPlotDrawer.Marker;
 import java.awt.Color;
 import java.util.List;
 import java.util.Map;
@@ -233,27 +234,6 @@ public record Configuration(
     );
   }
 
-  public record LinesPlot(
-      double strokeSizeRate,
-      double alpha,
-      double legendImageWRate,
-      double legendImageHRate,
-      List<Color> colors,
-      double xExtensionRate,
-      double yExtensionRate
-  ) {
-
-    public static final LinesPlot DEFAULT = new LinesPlot(
-        0.0025,
-        0.3,
-        0.04,
-        0.025,
-        Colors.DEFAULT.dataColors,
-        1.05,
-        1.05
-    );
-  }
-
   public record PlotMatrix(Show axesShow, Show titlesShow, Set<Independence> independences) {
 
     public static final PlotMatrix DEFAULT = new PlotMatrix(
@@ -269,6 +249,33 @@ public record Configuration(
     public enum Show {
       BORDER, ALL
     }
+  }
+
+  public record LinesPlot(
+      double strokeSizeRate,
+      double alpha,
+      double markerSizeRate,
+      XYPlotDrawer.Marker marker,
+      boolean markers,
+      double legendImageWRate,
+      double legendImageHRate,
+      List<Color> colors,
+      double xExtensionRate,
+      double yExtensionRate
+  ) {
+
+    public static final LinesPlot DEFAULT = new LinesPlot(
+        0.0025,
+        0.3,
+        0.005,
+        Marker.CIRCLE,
+        true,
+        0.04,
+        0.025,
+        Colors.DEFAULT.dataColors,
+        1.05,
+        1.05
+    );
   }
 
   public record PointsPlot(

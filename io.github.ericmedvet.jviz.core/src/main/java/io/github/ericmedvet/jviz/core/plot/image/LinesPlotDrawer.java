@@ -111,6 +111,22 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
     );
     ds.points().stream().skip(1).forEach(p -> path.lineTo(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)));
     g.draw(path);
+    if (c.markers()) {
+      double l = c.markerSizeRate() * gm.refL();
+      double strokeSize = c.strokeSizeRate() * gm.refL();
+      ds.points()
+          .forEach(
+              p -> PlotUtils.drawMarker(
+                  g,
+                  new Point2D.Double(xA.xIn(p.x().v(), r), yA.yIn(p.y().v(), r)),
+                  l,
+                  c.marker(),
+                  color,
+                  c.alpha(),
+                  strokeSize
+              )
+          );
+    }
   }
 
   @Override
@@ -135,5 +151,17 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
             r.getCenterY()
         )
     );
+    if (c.markers()) {
+      double l = c.markerSizeRate() * gm.refL();
+      PlotUtils.drawMarker(
+          g,
+          new Point2D.Double(r.getCenterX(), r.getCenterY()),
+          l,
+          c.marker(),
+          color,
+          c.alpha(),
+          c.strokeSizeRate() * gm.refL()
+      );
+    }
   }
 }
