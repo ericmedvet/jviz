@@ -269,7 +269,7 @@ public record Configuration(
         0.3,
         0.005,
         Marker.CIRCLE,
-        true,
+        false,
         0.04,
         0.025,
         Colors.DEFAULT.dataColors,
