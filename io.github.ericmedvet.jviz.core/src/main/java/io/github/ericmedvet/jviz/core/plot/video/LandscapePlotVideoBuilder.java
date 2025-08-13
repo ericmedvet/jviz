@@ -28,10 +28,9 @@ public class LandscapePlotVideoBuilder extends AbstractXYPlotVideoBuilder<Landsc
 
   public LandscapePlotVideoBuilder(
       Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration.LandscapePlot lpConfiguration
+      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
   ) {
-    super(c, new LandscapePlotDrawer(iConfiguration, lpConfiguration));
+    super(c, new LandscapePlotDrawer(iConfiguration));
   }
 
   @Override

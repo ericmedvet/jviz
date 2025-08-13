@@ -27,9 +27,6 @@ import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries.Point;
 import io.github.ericmedvet.jviz.core.plot.XYPlot.TitledData;
 import io.github.ericmedvet.jviz.core.plot.csv.VectorialFieldPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.image.*;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +74,7 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     // lines plot
-    new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).show(
+    new LinesPlotDrawer().show(
         new XYDataSeriesPlot(
             "My plot precise",
             "x title",
@@ -122,10 +119,10 @@ public class Main {
             )
         )
     );
-    new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).show(lp);
-    new LinesPlotDrawer(Configuration.DEFAULT, LinesPlot.DEFAULT).save(new File("../lineplot.svg"), lp);
-    new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT).show(lp);
-    new PointsPlotDrawer(Configuration.DEFAULT, PointsPlot.DEFAULT).save(new File("../points.svg"), lp);
+    new LinesPlotDrawer().show(lp);
+    new LinesPlotDrawer().save(new File("../lineplot.svg"), lp);
+    new PointsPlotDrawer().show(lp);
+    new PointsPlotDrawer().save(new File("../points.svg"), lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
     // box plot
     DistributionPlot bp = new DistributionPlot(
@@ -145,7 +142,7 @@ public class Main {
             )
         )
     );
-    BoxPlotDrawer bpd = new BoxPlotDrawer(Configuration.DEFAULT, BoxPlot.DEFAULT);
+    BoxPlotDrawer bpd = new BoxPlotDrawer();
     bpd.show(bp);
     // landscape plot
     LandscapePlot lsp = new LandscapePlot(
@@ -174,7 +171,7 @@ public class Main {
             )
         )
     );
-    new LandscapePlotDrawer(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT).show(lsp);
+    new LandscapePlotDrawer().show(lsp);
     // grid plot
     UnivariateGridPlot ugp = new UnivariateGridPlot(
         "My plot",
@@ -201,11 +198,10 @@ public class Main {
             )
         )
     );
-    new UnivariateGridPlotDrawer(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT).show(ugp);
+    new UnivariateGridPlotDrawer().show(ugp);
     new UnivariatePlotVideoBuilder(
         io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
-        Configuration.DEFAULT,
-        Configuration.UnivariateGridPlot.DEFAULT
+        Configuration.DEFAULT
     )
         .save(new File("../gv.mp4"), ugp);
     // field plot

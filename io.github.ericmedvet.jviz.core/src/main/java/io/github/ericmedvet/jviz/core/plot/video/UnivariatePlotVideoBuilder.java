@@ -29,10 +29,9 @@ public class UnivariatePlotVideoBuilder extends AbstractXYPlotVideoBuilder<Univa
 
   public UnivariatePlotVideoBuilder(
       Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration.UnivariateGridPlot ugpConfiguration
+      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
   ) {
-    super(c, new UnivariateGridPlotDrawer(iConfiguration, ugpConfiguration));
+    super(c, new UnivariateGridPlotDrawer(iConfiguration));
   }
 
   @Override

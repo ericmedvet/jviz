@@ -19,16 +19,14 @@
  */
 package io.github.ericmedvet.jviz.core.plot.video;
 
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
 
 public class PointsPlotVideoBuilder extends AbstractXYDataSeriesPlotVideoBuilder {
 
   public PointsPlotVideoBuilder(
       Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      PointsPlot ppConfiguration
+      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
   ) {
-    super(c, new PointsPlotDrawer(iConfiguration, ppConfiguration));
+    super(c, new PointsPlotDrawer(iConfiguration));
   }
 }

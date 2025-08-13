@@ -38,12 +38,12 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
   private final Configuration.UnivariateGridPlot c;
 
   public UnivariateGridPlotDrawer() {
-    this(Configuration.DEFAULT, Configuration.UnivariateGridPlot.DEFAULT);
+    this(Configuration.DEFAULT);
   }
 
-  public UnivariateGridPlotDrawer(Configuration configuration, Configuration.UnivariateGridPlot c) {
+  public UnivariateGridPlotDrawer(Configuration configuration) {
     super(configuration, 1, 1);
-    this.c = c;
+    this.c = configuration.univariateGridPlot();
   }
 
   private static DoubleRange computeValueRange(UnivariateGridPlot p) {

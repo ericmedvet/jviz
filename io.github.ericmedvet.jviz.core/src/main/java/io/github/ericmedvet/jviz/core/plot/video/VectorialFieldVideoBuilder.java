@@ -29,10 +29,9 @@ public class VectorialFieldVideoBuilder extends AbstractXYPlotVideoBuilder<Vecto
 
   public VectorialFieldVideoBuilder(
       Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration.VectorialFieldPlot vfpConfiguration
+      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
   ) {
-    super(c, new VectorialFieldPlotDrawer(iConfiguration, vfpConfiguration));
+    super(c, new VectorialFieldPlotDrawer(iConfiguration));
   }
 
   @Override

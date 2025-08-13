@@ -24,7 +24,6 @@ import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -40,12 +39,12 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
   private final Configuration.BoxPlot c;
 
   public BoxPlotDrawer() {
-    this(Configuration.DEFAULT, BoxPlot.DEFAULT);
+    this(Configuration.DEFAULT);
   }
 
-  public BoxPlotDrawer(Configuration configuration, BoxPlot c) {
-    super(configuration, 1, c.yExtensionRate());
-    this.c = c;
+  public BoxPlotDrawer(Configuration configuration) {
+    super(configuration, 1, configuration.boxPlot().yExtensionRate());
+    this.c = configuration.boxPlot();
   }
 
   @Override

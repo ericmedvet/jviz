@@ -19,16 +19,14 @@
  */
 package io.github.ericmedvet.jviz.core.plot.video;
 
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
 
 public class LinesPlotVideoBuilder extends AbstractXYDataSeriesPlotVideoBuilder {
 
   public LinesPlotVideoBuilder(
       Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      LinesPlot lpConfiguration
+      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
   ) {
-    super(c, new LinesPlotDrawer(iConfiguration, lpConfiguration));
+    super(c, new LinesPlotDrawer(iConfiguration));
   }
 }

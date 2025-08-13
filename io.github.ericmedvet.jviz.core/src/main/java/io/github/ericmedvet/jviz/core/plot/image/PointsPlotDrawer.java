@@ -20,7 +20,6 @@
 package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.PointsPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -33,12 +32,12 @@ public class PointsPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
   private final Configuration.PointsPlot c;
 
   public PointsPlotDrawer() {
-    this(Configuration.DEFAULT, PointsPlot.DEFAULT);
+    this(Configuration.DEFAULT);
   }
 
-  public PointsPlotDrawer(Configuration configuration, PointsPlot c) {
-    super(configuration, c.xExtensionRate(), c.yExtensionRate());
-    this.c = c;
+  public PointsPlotDrawer(Configuration configuration) {
+    super(configuration, configuration.pointsPlot().xExtensionRate(), configuration.pointsPlot().yExtensionRate());
+    this.c = configuration.pointsPlot();
   }
 
   @Override

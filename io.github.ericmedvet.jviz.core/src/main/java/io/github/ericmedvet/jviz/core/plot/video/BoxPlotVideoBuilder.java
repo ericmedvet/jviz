@@ -21,7 +21,6 @@ package io.github.ericmedvet.jviz.core.plot.video;
 
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.image.BoxPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
 import java.util.List;
 
@@ -29,10 +28,9 @@ public class BoxPlotVideoBuilder extends AbstractXYPlotVideoBuilder<Distribution
 
   public BoxPlotVideoBuilder(
       Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration,
-      BoxPlot bpConfiguration
+      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
   ) {
-    super(c, new BoxPlotDrawer(iConfiguration, bpConfiguration));
+    super(c, new BoxPlotDrawer(iConfiguration));
   }
 
   @Override

@@ -21,7 +21,6 @@ package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jviz.core.plot.RangedValue;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import io.github.ericmedvet.jviz.core.util.GraphicsUtils;
 import java.awt.BasicStroke;
@@ -40,12 +39,12 @@ public class LinesPlotDrawer extends AbstractXYDataSeriesPlotDrawer {
   private final Configuration.LinesPlot c;
 
   public LinesPlotDrawer() {
-    this(Configuration.DEFAULT, LinesPlot.DEFAULT);
+    this(Configuration.DEFAULT);
   }
 
-  public LinesPlotDrawer(Configuration configuration, LinesPlot c) {
-    super(configuration, c.xExtensionRate(), c.yExtensionRate());
-    this.c = c;
+  public LinesPlotDrawer(Configuration configuration) {
+    super(configuration, configuration.linesPlot().xExtensionRate(), configuration.linesPlot().yExtensionRate());
+    this.c = configuration.linesPlot();
   }
 
   private static <T> List<T> reverse(List<T> ts) {

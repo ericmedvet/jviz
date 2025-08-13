@@ -44,13 +44,17 @@ public class VectorialFieldPlotDrawer extends AbstractXYPlotDrawer<VectorialFiel
 
   private final Configuration.VectorialFieldPlot c;
 
-  public VectorialFieldPlotDrawer(Configuration configuration, Configuration.VectorialFieldPlot c) {
-    super(configuration, c.xExtensionRate(), c.yExtensionRate());
-    this.c = c;
+  public VectorialFieldPlotDrawer(Configuration configuration) {
+    super(
+        configuration,
+        configuration.vectorialFieldPlot().xExtensionRate(),
+        configuration.vectorialFieldPlot().yExtensionRate()
+    );
+    this.c = configuration.vectorialFieldPlot();
   }
 
   public VectorialFieldPlotDrawer() {
-    this(Configuration.DEFAULT, Configuration.VectorialFieldPlot.DEFAULT);
+    this(Configuration.DEFAULT);
   }
 
   @Override

@@ -39,12 +39,16 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
   private final Configuration.LandscapePlot c;
 
   public LandscapePlotDrawer() {
-    this(Configuration.DEFAULT, Configuration.LandscapePlot.DEFAULT);
+    this(Configuration.DEFAULT);
   }
 
-  public LandscapePlotDrawer(Configuration configuration, Configuration.LandscapePlot c) {
-    super(configuration, c.xExtensionRate(), c.yExtensionRate());
-    this.c = c;
+  public LandscapePlotDrawer(Configuration configuration) {
+    super(
+        configuration,
+        configuration.landscapePlot().xExtensionRate(),
+        configuration.landscapePlot().yExtensionRate()
+    );
+    this.c = configuration.landscapePlot();
   }
 
   @Override
