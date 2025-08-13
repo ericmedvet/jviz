@@ -36,6 +36,7 @@ public record Configuration(
     UnivariateGridPlot univariateGridPlot,
     LandscapePlot landscapePlot,
     BoxPlot boxPlot,
+    VectorialFieldPlot vectorialFieldPlot,
     boolean debug
 ) {
 
@@ -50,6 +51,7 @@ public record Configuration(
       UnivariateGridPlot.DEFAULT,
       LandscapePlot.DEFAULT,
       BoxPlot.DEFAULT,
+      VectorialFieldPlot.DEFAULT,
       false
   );
 
@@ -64,6 +66,7 @@ public record Configuration(
       UnivariateGridPlot.DEFAULT,
       LandscapePlot.DEFAULT,
       BoxPlot.DEFAULT,
+      VectorialFieldPlot.DEFAULT,
       false
   );
 
