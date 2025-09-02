@@ -65,6 +65,14 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
 
   void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Grid.Key k, P p);
 
+  default boolean showXAxes() {
+    return true;
+  }
+
+  default boolean showYAxes() {
+    return true;
+  }
+
   enum AnchorV {
     T, C, B
   }
@@ -104,7 +112,9 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
     // draw plots
     for (int px = 0; px < p.dataGrid().w(); px = px + 1) {
       for (int py = 0; py < p.dataGrid().h(); py = py + 1) {
-        if (px == 0 && configuration().plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.BORDER)) {
+        if (px == 0 && configuration().plotMatrix()
+            .axesShow()
+            .equals(Configuration.PlotMatrix.Show.BORDER) && showYAxes()) {
           // draw common y-axis
           PlotUtils.markRectangle(g, configuration(), l.commonYAxis(py));
           PlotUtils.drawYAxis(g, configuration(), l.commonYAxis(py), p.yName(), yAxesGrid.get(0, py));
@@ -128,7 +138,7 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
         }
         if (py == p.dataGrid().h() - 1 && configuration().plotMatrix()
             .axesShow()
-            .equals(Configuration.PlotMatrix.Show.BORDER)) {
+            .equals(Configuration.PlotMatrix.Show.BORDER) && showXAxes()) {
           // draw common x-axis
           PlotUtils.markRectangle(g, configuration(), l.commonXAxis(px));
           PlotUtils.drawXAxis(g, configuration(), l.commonXAxis(px), p.xName(), xAxesGrid.get(px, 0));
@@ -177,10 +187,26 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
         }
         // draw axes
         if (configuration().plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.ALL)) {
-          PlotUtils.markRectangle(g, configuration(), l.xAxis(px, py));
-          PlotUtils.drawXAxis(g, configuration(), l.xAxis(px, py), p.xName(), xAxesGrid.get(px, py));
-          PlotUtils.markRectangle(g, configuration(), l.yAxis(px, py));
-          PlotUtils.drawYAxis(g, configuration(), l.yAxis(px, py), p.yName(), yAxesGrid.get(px, py));
+          if (showXAxes()) {
+            PlotUtils.markRectangle(g, configuration(), l.xAxis(px, py));
+            PlotUtils.drawXAxis(
+                g,
+                configuration(),
+                l.xAxis(px, py),
+                p.xName(),
+                xAxesGrid.get(px, py)
+            );
+          }
+          if (showYAxes()) {
+            PlotUtils.markRectangle(g, configuration(), l.yAxis(px, py));
+            PlotUtils.drawYAxis(
+                g,
+                configuration(),
+                l.yAxis(px, py),
+                p.yName(),
+                yAxesGrid.get(px, py)
+            );
+          }
         }
         // draw notes
         PlotUtils.markRectangle(g, configuration(), l.note(px, py));

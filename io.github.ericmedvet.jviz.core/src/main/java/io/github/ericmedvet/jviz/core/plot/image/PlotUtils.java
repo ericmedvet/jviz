@@ -22,6 +22,7 @@ package io.github.ericmedvet.jviz.core.plot.image;
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.PlotMatrix.Show;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Text.Use;
 import io.github.ericmedvet.jviz.core.plot.image.XYPlotDrawer.AnchorH;
 import io.github.ericmedvet.jviz.core.plot.image.XYPlotDrawer.AnchorV;
@@ -63,12 +64,21 @@ public class PlotUtils {
     }
   }
 
-  public static double computeStringH(Graphics2D g, Configuration c, Configuration.Text.Use fontUse) {
+  public static double computeStringH(
+      Graphics2D g,
+      Configuration c,
+      Configuration.Text.Use fontUse
+  ) {
     g.setFont(fonts(g, c).get(fontUse));
     return g.getFontMetrics().getHeight();
   }
 
-  public static double computeStringW(Graphics2D g, Configuration c, String s, Configuration.Text.Use fontUse) {
+  public static double computeStringW(
+      Graphics2D g,
+      Configuration c,
+      String s,
+      Configuration.Text.Use fontUse
+  ) {
     g.setFont(fonts(g, c).get(fontUse));
     return g.getFontMetrics().stringWidth(s);
   }
@@ -93,13 +103,21 @@ public class PlotUtils {
       double legendImageH
   ) {
     GMetrics gm = new GMetrics(g);
-    double lineH = Math.max(legendImageH, computeStringH(g, c, Configuration.Text.Use.LEGEND_LABEL));
+    double lineH = Math.max(
+        legendImageH,
+        computeStringH(g, c, Configuration.Text.Use.LEGEND_LABEL)
+    );
     double lH = lineH;
     double lineL = 0;
     List<Double> lineLs = new ArrayList<>();
     for (String s : items.keySet()) {
       double localL = legendImageW + c.layout().legendInnerMarginWRate() * gm.w + c.layout()
-          .legendItemsGapWRate() * gm.w + computeStringW(g, c, s, Configuration.Text.Use.LEGEND_LABEL);
+          .legendItemsGapWRate() * gm.w + computeStringW(
+              g,
+              c,
+              s,
+              Configuration.Text.Use.LEGEND_LABEL
+          );
       if (lineL + localL > gm.w) {
         lineLs.add(lineL);
         lH = lH + c.layout().legendInnerMarginHRate() * gm.h + lineH;
@@ -145,10 +163,14 @@ public class PlotUtils {
             .map(e -> e.value().yTitle())
             .allMatch(String::isEmpty) ? 0 : (computeStringH(g, c, Configuration.Text.Use.AXIS_LABEL) + 2d * c.layout()
                 .rowTitleMarginWRate() * gm.w) : 0,
-        c.plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.BORDER) ? initialXAxisL : 0,
-        c.plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.BORDER) ? initialYAxisL : 0,
-        c.plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.BORDER) ? 0 : initialXAxisL,
-        c.plotMatrix().axesShow().equals(Configuration.PlotMatrix.Show.BORDER) ? 0 : initialYAxisL,
+        plotDrawer.showXAxes() ? (c.plotMatrix()
+            .axesShow()
+            .equals(Configuration.PlotMatrix.Show.BORDER) ? initialXAxisL : 0) : 0,
+        plotDrawer.showYAxes() ? (c.plotMatrix()
+            .axesShow()
+            .equals(Configuration.PlotMatrix.Show.BORDER) ? initialYAxisL : 0) : 0,
+        plotDrawer.showXAxes() ? (c.plotMatrix().axesShow().equals(Show.ALL) ? initialXAxisL : 0) : 0,
+        plotDrawer.showYAxes() ? (c.plotMatrix().axesShow().equals(Show.ALL) ? initialYAxisL : 0) : 0,
         c.plotMatrix().titlesShow().equals(Configuration.PlotMatrix.Show.BORDER) ? 0 : plot.dataGrid()
             .entries()
             .stream()
@@ -193,17 +215,22 @@ public class PlotUtils {
           .mapToDouble(s -> computeStringW(g, c, s, Configuration.Text.Use.TICK_LABEL))
           .max()
           .orElse(0);
+      double newXAxisH = maxXTickL + computeStringH(g, c, Use.AXIS_LABEL) + 2d * c.layout()
+          .xAxisMarginHRate() * gm.h + c.layout().xAxisInnerMarginHRate() * gm.h;
+      double newYAxisW = maxYTickL + computeStringH(g, c, Use.AXIS_LABEL) + 2d * c.layout()
+          .yAxisMarginWRate() * gm.w + c.layout().yAxisInnerMarginWRate() * gm.w;
       l = l.refit(
-          maxXTickL + computeStringH(g, c, Configuration.Text.Use.AXIS_LABEL) + 2d * c.layout()
-              .xAxisMarginHRate() * gm.h + c.layout().xAxisInnerMarginHRate() * gm.h,
-          maxYTickL + computeStringH(g, c, Configuration.Text.Use.AXIS_LABEL) + 2d * c.layout()
-              .yAxisMarginWRate() * gm.w + c.layout().yAxisInnerMarginWRate() * gm.w
+          plotDrawer.showXAxes() ? newXAxisH : 0,
+          plotDrawer.showYAxes() ? newYAxisW : 0
       );
     }
     return l;
   }
 
-  public static SortedMap<String, Color> computeSeriesDataColors(List<String> names, List<Color> colors) {
+  public static SortedMap<String, Color> computeSeriesDataColors(
+      List<String> names,
+      List<Color> colors
+  ) {
     names = names.stream().distinct().sorted(String::compareTo).toList();
     return new TreeMap<>(
         IntStream.range(0, names.size())
@@ -237,7 +264,14 @@ public class PlotUtils {
   ) {
     g.setStroke(new BasicStroke((float) strokeSize));
     g.setColor(GraphicsUtils.alphaed(color, alpha));
-    g.fill(new Ellipse2D.Double(srcP.getX() - srcSize / 2d, srcP.getY() - srcSize / 2d, srcSize, srcSize));
+    g.fill(
+        new Ellipse2D.Double(
+            srcP.getX() - srcSize / 2d,
+            srcP.getY() - srcSize / 2d,
+            srcSize,
+            srcSize
+        )
+    );
     g.draw(new Line2D.Double(srcP.getX(), srcP.getY(), dstP.getX(), dstP.getY()));
   }
 
@@ -366,19 +400,37 @@ public class PlotUtils {
   ) {
     GMetrics gm = new GMetrics(g);
     double legendW = computeItemsLegendSize(g, c, items, legendImageW, legendImageH).getX();
-    r = new Rectangle2D.Double(r.getX() + (r.getWidth() - legendW) / 2d, r.getY(), legendW, r.getHeight());
+    r = new Rectangle2D.Double(
+        r.getX() + (r.getWidth() - legendW) / 2d,
+        r.getY(),
+        legendW,
+        r.getHeight()
+    );
     markRectangle(g, c, r);
-    double lineH = Math.max(legendImageH, computeStringH(g, c, Configuration.Text.Use.LEGEND_LABEL));
+    double lineH = Math.max(
+        legendImageH,
+        computeStringH(g, c, Configuration.Text.Use.LEGEND_LABEL)
+    );
     double x = 0;
     double y = 0;
     for (Map.Entry<String, Color> e : items.entrySet()) {
       double localL = legendImageW + c.layout().legendInnerMarginWRate() * gm.w + c.layout()
-          .legendItemsGapWRate() * gm.w + computeStringW(g, c, e.getKey(), Configuration.Text.Use.LEGEND_LABEL);
+          .legendItemsGapWRate() * gm.w + computeStringW(
+              g,
+              c,
+              e.getKey(),
+              Configuration.Text.Use.LEGEND_LABEL
+          );
       if (x + localL > r.getWidth()) {
         y = y + c.layout().legendInnerMarginHRate() * gm.h + lineH;
         x = 0;
       }
-      Rectangle2D legendImageR = new Rectangle2D.Double(r.getX() + x, r.getY() + y, legendImageW, legendImageH);
+      Rectangle2D legendImageR = new Rectangle2D.Double(
+          r.getX() + x,
+          r.getY() + y,
+          legendImageW,
+          legendImageH
+      );
       g.setColor(c.colors().plotBgColor());
       g.fill(legendImageR);
       legendImageDrawer.draw(g, legendImageR, e.getValue());
@@ -558,7 +610,9 @@ public class PlotUtils {
                 u -> new Font(
                     c.text().fontName(),
                     Font.PLAIN,
-                    (int) Math.round(gm.refL * c.text().sizeRates().getOrDefault(u, c.text().fontSizeRate()))
+                    (int) Math.round(
+                        gm.refL * c.text().sizeRates().getOrDefault(u, c.text().fontSizeRate())
+                    )
                 )
             )
         );

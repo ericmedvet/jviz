@@ -255,4 +255,9 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
   public void drawNote(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, DistributionPlot p) {
     // do nothing
   }
+
+  @Override
+  public boolean showXAxes() {
+    return false;
+  }
 }
