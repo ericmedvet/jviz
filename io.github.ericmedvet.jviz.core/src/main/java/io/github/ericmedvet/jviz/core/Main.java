@@ -30,19 +30,24 @@ import io.github.ericmedvet.jviz.core.plot.image.*;
 import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Main {
 
-  private static DistributionPlot.Data gaussian(double mu, double sigma, int n) {
+  private static DistributionPlot.Data gaussian(double mu, double sigma, int n, double... outliers) {
     RandomGenerator r = new Random();
     return new Data(
         "N(%.1f,%.1f)".formatted(mu, sigma),
-        IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)).toList()
+        Stream.concat(
+            IntStream.range(0, n).mapToObj(i -> r.nextGaussian(mu, sigma)),
+            Arrays.stream(outliers).boxed()
+        ).toList()
     );
   }
 
@@ -124,6 +129,25 @@ public class Main {
     new PointsPlotDrawer().show(lp);
     new PointsPlotDrawer().save(new File("../points.svg"), lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
+    // box plot with outlier
+    DistributionPlot bpo = new DistributionPlot(
+        "Boxplot with outliers",
+        "x title",
+        "y title",
+        "x",
+        "f(x)",
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            1,
+            1,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                List.of(gaussian(1d, 1d, 100, 10, -10), gaussian(1.5, 2, 100))
+            )
+        )
+    );
+    new BoxPlotDrawer().show(bpo);
     // box plot
     DistributionPlot bp = new DistributionPlot(
         "My plot",

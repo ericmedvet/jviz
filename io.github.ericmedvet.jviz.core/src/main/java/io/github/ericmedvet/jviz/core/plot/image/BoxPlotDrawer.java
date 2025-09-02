@@ -24,14 +24,18 @@ import io.github.ericmedvet.jnb.datastructure.Grid.Key;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot.ExtremeType;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Random;
 import java.util.SortedMap;
+import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 
 public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<Data>> {
@@ -47,15 +51,23 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
     this.c = configuration.boxPlot();
   }
 
+
   @Override
   protected DoubleRange computeRange(List<Data> data, boolean isXAxis, DistributionPlot p) {
     if (isXAxis) {
       return p.xRange();
     }
     return data.stream()
-        .map(DistributionPlot.Data::range)
+        .map(this::dataRange)
         .reduce(DoubleRange::largest)
         .orElseThrow();
+  }
+
+  private DoubleRange dataRange(Data d) {
+    if (c.markers() || c.extremeType().equals(ExtremeType.MIN_MAX)) {
+      return new DoubleRange(d.stats().min(), d.stats().max());
+    }
+    return new DoubleRange(d.stats().q1minus15IQR(), d.stats().q3plus15IQR());
   }
 
   @Override
@@ -112,22 +124,21 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
   }
 
   @Override
-  public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, DistributionPlot p) {
+  public void drawPlot(
+      Graphics2D g,
+      GMetrics gm,
+      Rectangle2D r,
+      Key k,
+      Axis xA,
+      Axis yA,
+      DistributionPlot p
+  ) {
     // prepare colors
     SortedMap<String, Color> dataColors = getComputeSeriesDataColors(p);
     g.setColor(configuration().colors().gridColor());
-    g.setStroke(new BasicStroke((float) (configuration().general().gridStrokeSizeRate() * gm.refL())));
-    xA.ticks()
-        .forEach(
-            x -> g.draw(
-                new Line2D.Double(
-                    xA.xIn(x, r),
-                    yA.yIn(yA.range().min(), r),
-                    xA.xIn(x, r),
-                    yA.yIn(yA.range().max(), r)
-                )
-            )
-        );
+    g.setStroke(
+        new BasicStroke((float) (configuration().general().gridStrokeSizeRate() * gm.refL()))
+    );
     yA.ticks()
         .forEach(
             y -> g.draw(
@@ -159,6 +170,7 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
                 .filter(d -> d.name().equals(names.get(x)))
                 .findFirst()
                 .ifPresent(d -> {
+                  // draw box
                   double topY = yA.yIn(
                       switch (c.extremeType()) {
                         case MIN_MAX -> d.stats().min();
@@ -182,7 +194,12 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
                       },
                       r
                   );
-                  Rectangle2D bR = new Rectangle2D.Double(xA.xIn(x, r) - w / 2d, bottomY, w, topY - bottomY);
+                  Rectangle2D bR = new Rectangle2D.Double(
+                      xA.xIn(x, r) - w / 2d,
+                      bottomY,
+                      w,
+                      topY - bottomY
+                  );
                   PlotUtils.drawBoxAndWhiskers(
                       g,
                       configuration(),
@@ -196,6 +213,27 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
                       c.boxWRate(),
                       c.strokeSizeRate()
                   );
+                  // draw markers
+                  if (c.markers()) {
+                    RandomGenerator rg = new Random(1);
+                    double l = c.markerSizeRate() * gm.refL();
+                    double strokeSize = c.strokeSizeRate() * gm.refL();
+                    d.yValues()
+                        .forEach(
+                            y -> PlotUtils.drawMarker(
+                                g,
+                                new Point2D.Double(
+                                    xA.xIn(x, r) - w / 2 + w * (c.jitter() ? rg.nextDouble(0, 1) : 0.5),
+                                    yA.yIn(y, r)
+                                ),
+                                l,
+                                c.marker(),
+                                dataColors.get(names.get(x)),
+                                c.alpha(),
+                                strokeSize
+                            )
+                        );
+                  }
                 })
         );
   }

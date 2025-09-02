@@ -72,6 +72,8 @@ public record Configuration(
 
   public record BoxPlot(
       double strokeSizeRate,
+      double markerSizeRate,
+      XYPlotDrawer.Marker marker,
       double boxWRate,
       double whiskersWRate,
       double legendImageWRate,
@@ -80,11 +82,15 @@ public record Configuration(
       MidType midType,
       double alpha,
       List<Color> colors,
-      double yExtensionRate
+      double yExtensionRate,
+      boolean markers,
+      boolean jitter
   ) {
 
     public static final BoxPlot DEFAULT = new BoxPlot(
         LinesPlot.DEFAULT.strokeSizeRate,
+        LinesPlot.DEFAULT.markerSizeRate,
+        LinesPlot.DEFAULT.marker,
         0.9,
         0.75,
         0.02,
@@ -93,7 +99,9 @@ public record Configuration(
         MidType.MEDIAN,
         0.5,
         Colors.DEFAULT.dataColors(),
-        LinesPlot.DEFAULT.yExtensionRate
+        LinesPlot.DEFAULT.yExtensionRate,
+        false,
+        true
     );
 
     public enum ExtremeType {

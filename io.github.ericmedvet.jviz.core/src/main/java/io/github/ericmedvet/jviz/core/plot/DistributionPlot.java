@@ -40,10 +40,6 @@ public record DistributionPlot(
       this(name, yValues, new Stats(yValues));
     }
 
-    public DoubleRange range() {
-      return new DoubleRange(stats.min, stats.max);
-    }
-
     public record Stats(
         double min,
         double q1minus15IQR,
