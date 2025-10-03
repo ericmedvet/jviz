@@ -21,7 +21,6 @@ package io.github.ericmedvet.jviz.core.plot.image;
 
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.drawer.Drawer;
-import io.github.ericmedvet.jviz.core.drawer.ImageBuilder;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.image.PlotUtils.GMetrics;
 import java.awt.BasicStroke;
@@ -42,8 +41,8 @@ public interface XYPlotDrawer<P extends XYPlot<D>, D> extends Drawer<P> {
 
   @Override
   default ImageInfo imageInfo(P p) {
-    int axisW = ImageBuilder.DEFAULT_W / p.dataGrid().w();
-    int axisH = ImageBuilder.DEFAULT_H / p.dataGrid().h();
+    int axisW = Drawer.DEFAULT_W / p.dataGrid().w();
+    int axisH = Drawer.DEFAULT_H / p.dataGrid().h();
     if (axisW < DEFAULT_AXIS_W || axisH < DEFAULT_AXIS_H) {
       axisW = DEFAULT_AXIS_W;
       axisH = DEFAULT_AXIS_H;

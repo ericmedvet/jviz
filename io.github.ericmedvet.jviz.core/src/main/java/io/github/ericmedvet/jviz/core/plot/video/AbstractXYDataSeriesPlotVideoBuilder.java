@@ -19,7 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.plot.video;
 
-import io.github.ericmedvet.jviz.core.drawer.ImageBuilder;
+import io.github.ericmedvet.jviz.core.drawer.Drawer;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
@@ -27,8 +27,8 @@ import java.util.List;
 
 public abstract class AbstractXYDataSeriesPlotVideoBuilder extends AbstractXYPlotVideoBuilder<XYDataSeriesPlot, List<XYDataSeries>> {
 
-  public AbstractXYDataSeriesPlotVideoBuilder(Configuration c, ImageBuilder<XYDataSeriesPlot> imageBuilder) {
-    super(c, imageBuilder);
+  public AbstractXYDataSeriesPlotVideoBuilder(Configuration c, Drawer<XYDataSeriesPlot> drawer) {
+    super(c, drawer);
   }
 
   @Override

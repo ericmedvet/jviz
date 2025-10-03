@@ -34,13 +34,13 @@ public interface VideoBuilder<E> extends Function<E, Video> {
   int DEFAULT_W = 300;
   int DEFAULT_H = 200;
 
-  static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, List<E>> splitter, double frameRate) {
+  static <F, E> VideoBuilder<F> from(Drawer<E> drawer, Function<F, List<E>> splitter, double frameRate) {
     return new VideoBuilder<>() {
       @Override
       public Video build(VideoInfo videoInfo, F f) {
         List<BufferedImage> images = splitter.apply(f)
             .stream()
-            .map(e -> imageBuilder.buildRaster(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
+            .map(e -> drawer.buildRaster(new Drawer.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
         return new Video(images, frameRate, videoInfo.encoder);
       }
@@ -48,20 +48,20 @@ public interface VideoBuilder<E> extends Function<E, Video> {
       @Override
       public VideoInfo videoInfo(F f) {
         VideoInfo vi = VideoBuilder.super.videoInfo(f);
-        ImageBuilder.ImageInfo ii = imageBuilder.imageInfo(splitter.apply(f).getFirst());
+        Drawer.ImageInfo ii = drawer.imageInfo(splitter.apply(f).getFirst());
         return new VideoInfo(ii.w(), ii.h(), vi.encoder());
       }
     };
   }
 
-  static <F, E> VideoBuilder<F> from(ImageBuilder<E> imageBuilder, Function<F, SortedMap<Double, E>> splitter) {
+  static <F, E> VideoBuilder<F> from(Drawer<E> drawer, Function<F, SortedMap<Double, E>> splitter) {
     return new VideoBuilder<>() {
       @Override
       public Video build(VideoInfo videoInfo, F f) {
         SortedMap<Double, E> map = splitter.apply(f);
         List<BufferedImage> images = map.values()
             .stream()
-            .map(e -> imageBuilder.buildRaster(new ImageBuilder.ImageInfo(videoInfo.w, videoInfo.h), e))
+            .map(e -> drawer.buildRaster(new Drawer.ImageInfo(videoInfo.w, videoInfo.h), e))
             .toList();
         return new Video(images, ((double) map.size()) / (map.lastKey()) - map.firstKey(), videoInfo.encoder);
       }
@@ -70,7 +70,7 @@ public interface VideoBuilder<E> extends Function<E, Video> {
       public VideoInfo videoInfo(F f) {
         VideoInfo vi = VideoBuilder.super.videoInfo(f);
         SortedMap<Double, E> map = splitter.apply(f);
-        ImageBuilder.ImageInfo ii = imageBuilder.imageInfo(map.get(map.firstKey()));
+        Drawer.ImageInfo ii = drawer.imageInfo(map.get(map.firstKey()));
         return new VideoInfo(ii.w(), ii.h(), vi.encoder());
       }
     };

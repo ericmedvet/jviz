@@ -21,6 +21,7 @@ package io.github.ericmedvet.jviz.core;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jviz.core.drawer.Drawer.Arrangement;
 import io.github.ericmedvet.jviz.core.plot.*;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries.Point;
@@ -79,29 +80,6 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     // lines plot
-    new LinesPlotDrawer().show(
-        new XYDataSeriesPlot(
-            "My plot precise",
-            "x title",
-            "y title",
-            "x",
-            "f(x)",
-            DoubleRange.UNBOUNDED,
-            DoubleRange.UNBOUNDED,
-            Grid.create(
-                1,
-                1,
-                (gX, gY) -> new TitledData<>(
-                    "gx=%d".formatted(gX),
-                    "gy=%d".formatted(gY),
-                    List.of(
-                        preciseData()
-                    )
-                )
-            )
-        )
-    );
-    // lines plot
     XYDataSeriesPlot lp = new XYDataSeriesPlot(
         "My plot",
         "x title",
@@ -125,7 +103,9 @@ public class Main {
         )
     );
     new LinesPlotDrawer().show(lp);
+    new LinesPlotDrawer().multi(Arrangement.HORIZONTAL).show(List.of(lp, lp));
     new LinesPlotDrawer().save(new File("../lineplot.svg"), lp);
+    new LinesPlotDrawer().multi(Arrangement.VERTICAL).save(new File("../lineplots.svg"), List.of(lp, lp));
     new PointsPlotDrawer().show(lp);
     new PointsPlotDrawer().save(new File("../points.svg"), lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));

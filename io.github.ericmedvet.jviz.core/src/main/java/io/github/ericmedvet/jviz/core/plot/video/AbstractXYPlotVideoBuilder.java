@@ -20,8 +20,7 @@
 package io.github.ericmedvet.jviz.core.plot.video;
 
 import io.github.ericmedvet.jnb.datastructure.Grid;
-import io.github.ericmedvet.jviz.core.drawer.ImageBuilder;
-import io.github.ericmedvet.jviz.core.drawer.ImageBuilder.ImageInfo;
+import io.github.ericmedvet.jviz.core.drawer.Drawer;
 import io.github.ericmedvet.jviz.core.drawer.Video;
 import io.github.ericmedvet.jviz.core.drawer.VideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
@@ -32,18 +31,18 @@ import java.util.stream.IntStream;
 public abstract class AbstractXYPlotVideoBuilder<P extends XYPlot<D>, D> implements VideoBuilder<P> {
 
   protected final Configuration c;
-  private final ImageBuilder<P> imageBuilder;
+  private final Drawer<P> drawer;
 
-  public AbstractXYPlotVideoBuilder(Configuration c, ImageBuilder<P> imageBuilder) {
+  public AbstractXYPlotVideoBuilder(Configuration c, Drawer<P> drawer) {
     this.c = c;
-    this.imageBuilder = imageBuilder;
+    this.drawer = drawer;
   }
 
   @Override
   public Video build(VideoInfo videoInfo, P p) {
     return new Video(
         split(p, c.splitType()).stream()
-            .map(sp -> imageBuilder.buildRaster(new ImageInfo(videoInfo.w(), videoInfo.h()), sp))
+            .map(sp -> drawer.buildRaster(new Drawer.ImageInfo(videoInfo.w(), videoInfo.h()), sp))
             .toList(),
         c.frameRate(),
         videoInfo.encoder()
