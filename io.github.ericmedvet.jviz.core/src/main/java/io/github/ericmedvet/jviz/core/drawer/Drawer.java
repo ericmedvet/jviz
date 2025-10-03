@@ -86,16 +86,22 @@ public interface Drawer<E> {
             int h = imageInfos.subList(0, i).stream().mapToInt(ImageInfo::h).sum();
             ty = iXRange.denormalize(nXRange.normalize(h));
           }
+          AffineTransform t = g.getTransform();
+          t.translate(tx, ty);
+          g.setTransform(t);
           g.setClip(
               new Rectangle2D.Double(
-                  tx,
-                  ty,
-                  iXRange.extent() / nXRange.extent() * imageInfos.get(i).w,
-                  iYRange.extent() / nYRange.extent() * imageInfos.get(i).h
+                  0,
+                  0,
+                  iXRange.extent() / nXRange.extent() * imageInfos.get(i).w(),
+                  iYRange.extent() / nYRange.extent() * imageInfos.get(i).h()
               )
           );
-          g.setTransform(AffineTransform.getTranslateInstance(tx, ty));
           thisDrawer.draw(g, es.get(i));
+          if (arrangement.equals(Arrangement.HORIZONTAL)) {
+            g.setTransform(new AffineTransform());
+          }
+          g.setClip(clipBounds);
         }
       }
 
