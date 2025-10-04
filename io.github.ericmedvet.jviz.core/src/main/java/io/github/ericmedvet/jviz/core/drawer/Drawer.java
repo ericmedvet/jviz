@@ -19,13 +19,13 @@
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
-import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jviz.core.util.Misc;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,13 +42,48 @@ public interface Drawer<E> {
   int DEFAULT_H = 800;
   Color BG_COLOR = Color.WHITE;
 
-  enum Arrangement { HORIZONTAL, VERTICAL }
+  static void clean(Graphics2D g) {
+    g.setColor(BG_COLOR);
+    g.fill(new Rectangle2D.Double(0, 0, g.getClipBounds().getWidth(), g.getClipBounds().getHeight()));
+  }
 
-  void draw(Graphics2D g, E e);
+  static <E> Drawer<E> stringWriter(Color color, float fontSize, Function<E, String> f) {
+    return new Drawer<E>() {
+      @Override
+      public void draw(Graphics2D g, E e) {
+        g.setFont(g.getFont().deriveFont(fontSize));
+        double x0 = g.getClipBounds().getMinX();
+        double y0 = g.getClipBounds().getMinY();
+        g.setColor(color);
+        double lH = g.getFontMetrics().getHeight();
+        AtomicInteger c = new AtomicInteger(0);
+        f.apply(e)
+            .lines()
+            .forEach(l -> g.drawString(l, (float) x0, (float) (y0 + lH * c.incrementAndGet())));
+      }
+
+      @Override
+      public ImageInfo imageInfo(E e) {
+        List<Integer> lengths = f.apply(e).lines().map(String::length).toList();
+        return new ImageInfo(
+            Math.round(lengths.stream().max(Integer::compareTo).orElse(0) * fontSize),
+            Math.round(lengths.size() * fontSize * 2)
+        );
+      }
+    };
+  }
+
+  default Drawer<E> andThen(Drawer<E> other) {
+    Drawer<E> thisDrawer = this;
+    return (g, e) -> {
+      thisDrawer.draw(g, e);
+      other.draw(g, e);
+    };
+  }
 
   default Drawer<E> bordered(Color color) {
     Drawer<E> thisDrawer = this;
-    return new Drawer<E>() {
+    return new Drawer<>() {
       @Override
       public void draw(Graphics2D g, E e) {
         g.setColor(color);
@@ -63,45 +98,53 @@ public interface Drawer<E> {
     };
   }
 
+  default <O> O build(G2DProvider<O> provider, E e) {
+    clean(provider.g2D());
+    draw(provider.g2D(), e);
+    provider.g2D().dispose();
+    return provider.output();
+  }
+
+  default BufferedImage buildRaster(ImageInfo imageInfo, E e) {
+    return build(new BufferedImageG2DProvider(imageInfo), e);
+  }
+
+  default String buildVectorial(ImageInfo imageInfo, E e) {
+    return build(new SvgG2DProvider(imageInfo), e);
+  }
+
+  void draw(Graphics2D g, E e);
+
+  default ImageInfo imageInfo(E e) {
+    return new ImageInfo(DEFAULT_W, DEFAULT_H);
+  }
+
   default Drawer<List<E>> multi(Arrangement arrangement) {
     Drawer<E> thisDrawer = this;
     return new Drawer<>() {
       @Override
       public void draw(Graphics2D g, List<E> es) {
-        Rectangle clipBounds = g.getClipBounds();
-        DoubleRange iXRange = new DoubleRange(clipBounds.getX(), clipBounds.getMaxX());
-        DoubleRange iYRange = new DoubleRange(clipBounds.getY(), clipBounds.getMaxY());
-        ImageInfo imageInfo = imageInfo(es);
-        List<ImageInfo> imageInfos = es.stream().map(thisDrawer::imageInfo).toList();
-        DoubleRange nXRange = new DoubleRange(0, imageInfo.w());
-        DoubleRange nYRange = new DoubleRange(0, imageInfo.h());
-        for (int i = 0; i < es.size(); i = i + 1) {
-          double tx = 0d;
-          double ty = 0d;
-          if (arrangement.equals(Arrangement.HORIZONTAL)) {
-            int w = imageInfos.subList(0, i).stream().mapToInt(ImageInfo::w).sum();
-            tx = iXRange.denormalize(nXRange.normalize(w));
-          }
-          if (arrangement.equals(Arrangement.VERTICAL)) {
-            int h = imageInfos.subList(0, i).stream().mapToInt(ImageInfo::h).sum();
-            ty = iXRange.denormalize(nXRange.normalize(h));
-          }
-          AffineTransform t = g.getTransform();
-          t.translate(tx, ty);
-          g.setTransform(t);
-          g.setClip(
-              new Rectangle2D.Double(
-                  0,
-                  0,
-                  iXRange.extent() / nXRange.extent() * imageInfos.get(i).w(),
-                  iYRange.extent() / nYRange.extent() * imageInfos.get(i).h()
-              )
+        ImageInfo allII = imageInfo(es);
+        Rectangle bounds = g.getClipBounds();
+        double wScale = bounds.getWidth() / allII.w();
+        double hScale = bounds.getHeight() / allII.h();
+        g.scale(wScale, hScale);
+        for (E e : es) {
+          ImageInfo ii = thisDrawer.imageInfo(e);
+          g.setClip(new Double(0, 0, ii.w(), ii.h()));
+          AffineTransform preTransform = g.getTransform();
+          thisDrawer.draw(g, e);
+          g.setTransform(preTransform);
+          g.translate(
+              switch (arrangement) {
+                case HORIZONTAL -> ii.w();
+                case VERTICAL -> 0;
+              },
+              switch (arrangement) {
+                case HORIZONTAL -> 0;
+                case VERTICAL -> ii.h();
+              }
           );
-          thisDrawer.draw(g, es.get(i));
-          if (arrangement.equals(Arrangement.HORIZONTAL)) {
-            g.setTransform(new AffineTransform());
-          }
-          g.setClip(clipBounds);
         }
       }
 
@@ -122,29 +165,6 @@ public interface Drawer<E> {
     };
   }
 
-  default Drawer<E> andThen(Drawer<E> other) {
-    Drawer<E> thisDrawer = this;
-    return (g, e) -> {
-      thisDrawer.draw(g, e);
-      other.draw(g, e);
-    };
-  }
-
-  default <O> O build(G2DProvider<O> provider, E e) {
-    clean(provider.g2D());
-    draw(provider.g2D(), e);
-    provider.g2D().dispose();
-    return provider.output();
-  }
-
-  default BufferedImage buildRaster(ImageInfo imageInfo, E e) {
-    return build(new BufferedImageG2DProvider(imageInfo), e);
-  }
-
-  default String buildVectorial(ImageInfo imageInfo, E e) {
-    return build(new SvgG2DProvider(imageInfo), e);
-  }
-
   default <F> Drawer<F> on(Function<? super F, ? extends E> function) {
     Drawer<E> thisDrawer = this;
     return new Drawer<>() {
@@ -158,10 +178,6 @@ public interface Drawer<E> {
         return thisDrawer.imageInfo(function.apply(f));
       }
     };
-  }
-
-  default ImageInfo imageInfo(E e) {
-    return new ImageInfo(DEFAULT_W, DEFAULT_H);
   }
 
   default void save(
@@ -201,38 +217,9 @@ public interface Drawer<E> {
     Misc.showImage(buildRaster(imageInfo(e), e));
   }
 
+  enum Arrangement { HORIZONTAL, VERTICAL }
+
   record ImageInfo(int w, int h) {
 
-  }
-
-  static void clean(Graphics2D g) {
-    g.setColor(BG_COLOR);
-    g.fill(new Rectangle2D.Double(0, 0, g.getClipBounds().width, g.getClipBounds().height));
-  }
-
-  static <E> Drawer<E> stringWriter(Color color, float fontSize, Function<E, String> f) {
-    return new Drawer<E>() {
-      @Override
-      public void draw(Graphics2D g, E e) {
-        g.setFont(g.getFont().deriveFont(fontSize));
-        double x0 = g.getClipBounds().getMinX();
-        double y0 = g.getClipBounds().getMinY();
-        g.setColor(color);
-        double lH = g.getFontMetrics().getHeight();
-        AtomicInteger c = new AtomicInteger(0);
-        f.apply(e)
-            .lines()
-            .forEach(l -> g.drawString(l, (float) x0, (float) (y0 + lH * c.incrementAndGet())));
-      }
-
-      @Override
-      public ImageInfo imageInfo(E e) {
-        List<Integer> lengths = f.apply(e).lines().map(String::length).toList();
-        return new ImageInfo(
-            Math.round(lengths.stream().max(Integer::compareTo).orElse(0) * fontSize),
-            Math.round(lengths.size() * fontSize * 2)
-        );
-      }
-    };
   }
 }
