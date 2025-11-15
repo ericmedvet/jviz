@@ -26,8 +26,7 @@ import io.github.ericmedvet.jnb.datastructure.Table;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import java.util.function.Function;
 
-public abstract class AbstractMultipleKPAF<E, P extends XYPlot<D>, K, D, L, V> implements PlotAccumulatorFactory<E, P, K, D>,
-    Sized {
+public abstract class AbstractMultipleKPAF<E, P extends XYPlot<D>, K, D, L, V> implements PlotAccumulatorFactory<E, P, K, D>, Sized {
 
   protected final Function<? super K, ? extends L> xSubplotFunction;
   protected final Function<? super K, ? extends L> ySubplotFunction;

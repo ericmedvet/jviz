@@ -29,8 +29,7 @@ import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import java.util.List;
 import java.util.function.Function;
 
-public class XYDataSeriesSRPAF<E, K> extends
-    AbstractSingleKPAF<E, XYDataSeriesPlot, K, List<XYDataSeries>> {
+public class XYDataSeriesSRPAF<E, K> extends AbstractSingleKPAF<E, XYDataSeriesPlot, K, List<XYDataSeries>> {
 
   private final Function<? super E, ? extends Number> xFunction;
   private final List<Function<? super E, ? extends Number>> yFunctions;

@@ -36,8 +36,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-public class DistributionMRPAF<E, K, L, X> extends
-    AbstractMultipleKPAF<E, DistributionPlot, K, List<Data>, L, Map<L, Map<K, List<Number>>>> {
+public class DistributionMRPAF<E, K, L, X> extends AbstractMultipleKPAF<E, DistributionPlot, K, List<Data>, L, Map<L, Map<K, List<Number>>>> {
 
   protected final Function<? super E, X> predicateValueFunction;
   private final Function<? super K, ? extends L> lineFunction;

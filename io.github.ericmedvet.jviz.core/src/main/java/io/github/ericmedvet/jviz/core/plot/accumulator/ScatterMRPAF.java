@@ -38,8 +38,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-public class ScatterMRPAF<E, K, L, X> extends
-    AbstractMultipleKPAF<E, XYDataSeriesPlot, K, List<XYDataSeries>, L, Map<L, Map<K, List<Point>>>> {
+public class ScatterMRPAF<E, K, L, X> extends AbstractMultipleKPAF<E, XYDataSeriesPlot, K, List<XYDataSeries>, L, Map<L, Map<K, List<Point>>>> {
 
   private final Function<? super K, ? extends L> groupFunction;
   private final Function<? super E, ? extends Number> xFunction;

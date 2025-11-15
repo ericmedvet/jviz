@@ -37,8 +37,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public abstract class AggregatedXYDataSeriesMKPAF<E, K, L> extends
-    AbstractMultipleKPAF<E, XYDataSeriesPlot, K, List<XYDataSeries>, L, Table<Number, L, Map<K, List<Number>>>> {
+public abstract class AggregatedXYDataSeriesMKPAF<E, K, L> extends AbstractMultipleKPAF<E, XYDataSeriesPlot, K, List<XYDataSeries>, L, Table<Number, L, Map<K, List<Number>>>> {
 
   private final Function<? super K, ? extends L> lineFunction;
   private final Function<? super E, ? extends Number> yFunction;
