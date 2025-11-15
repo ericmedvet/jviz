@@ -28,6 +28,7 @@
 
   <modules>
     <module>io.github.ericmedvet.jviz.core</module>
+    <module>io.github.ericmedvet.jviz.buildable</module>
   </modules>
 
   <scm>

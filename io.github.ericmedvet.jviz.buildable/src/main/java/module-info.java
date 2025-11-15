@@ -1,6 +1,6 @@
 /*-
  * ========================LICENSE_START=================================
- * jviz-core
+ * jviz-buildable
  * %%
  * Copyright (C) 2024 - 2025 Eric Medvet
  * %%
@@ -17,16 +17,11 @@
  * limitations under the License.
  * =========================LICENSE_END==================================
  */
-package io.github.ericmedvet.jviz.core.plot.video;
+module io.github.ericmedvet.jviz.buildable {
+  requires io.github.ericmedvet.jnb.core;
+  requires io.github.ericmedvet.jviz.core;
 
-import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
+  exports io.github.ericmedvet.jviz.buildable.builders;
 
-public class LinesPlotVideoBuilder extends AbstractXYDataSeriesPlotVideoBuilder {
-
-  public LinesPlotVideoBuilder(
-      Configuration c,
-      io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
-  ) {
-    super(c, new LinesPlotDrawer(iConfiguration));
-  }
+  opens io.github.ericmedvet.jviz.buildable.builders to io.github.ericmedvet.jnb.core;
 }
