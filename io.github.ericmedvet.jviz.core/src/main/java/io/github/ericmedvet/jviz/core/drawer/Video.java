@@ -19,6 +19,7 @@
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
+import io.github.ericmedvet.jnb.datastructure.Binarizable;
 import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import io.github.ericmedvet.jviz.core.util.VideoUtils.EncoderFacility;
 import java.awt.image.BufferedImage;
@@ -26,7 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-public final class Video {
+public final class Video implements Binarizable {
   private final List<BufferedImage> images;
   private final double frameRate;
   private transient byte[] data;
@@ -39,6 +40,7 @@ public final class Video {
     data = null;
   }
 
+  @Override
   public byte[] data() {
     if (data == null) {
       try {
