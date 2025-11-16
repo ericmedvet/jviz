@@ -40,6 +40,13 @@ import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.video.AbstractXYDataSeriesPlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.BoxPlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.LandscapePlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.LinesPlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.PointsPlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.VectorialFieldVideoBuilder;
 import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -224,4 +231,69 @@ public class Functions {
     return NamedFunction.from(f, "to.video[%s]".formatted(videoBuilder)).compose(beforeF);
   }
 
+  @SuppressWarnings("unused")
+  @Cacheable
+  public static <X, P extends XYPlot<D>, D> NamedFunction<X, Video> videoPlotter(
+      @Param(value = "of", dNPM = "f.identity()") Function<X, P> beforeF,
+      @Param(value = "w", dI = -1) int w,
+      @Param(value = "h", dI = -1) int h,
+      @Param(value = "encoder", dS = "default") VideoUtils.EncoderFacility encoder,
+      @Param(value = "frameRate", dD = 10) double frameRate,
+      @Param(value = "configuration", dNPM = "viz.plot.configuration.image()") Configuration iConfiguration,
+      @Param("secondary") boolean secondary
+  ) {
+    UnaryOperator<VideoBuilder.VideoInfo> viAdapter = vi -> new VideoBuilder.VideoInfo(
+        w == -1 ? vi.w() : w,
+        h == -1 ? vi.h() : h,
+        encoder
+    );
+    io.github.ericmedvet.jviz.core.plot.video.Configuration vConfiguration = new io.github.ericmedvet.jviz.core.plot.video.Configuration(
+        io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT.splitType(),
+        frameRate
+    );
+    Function<P, Video> f = p -> {
+      if (p instanceof DistributionPlot dp) {
+        BoxPlotVideoBuilder vb = new BoxPlotVideoBuilder(
+            vConfiguration,
+            iConfiguration
+        );
+        return vb.build(viAdapter.apply(vb.videoInfo(dp)), dp);
+      }
+      if (p instanceof LandscapePlot lsp) {
+        LandscapePlotVideoBuilder vb = new LandscapePlotVideoBuilder(
+            vConfiguration,
+            iConfiguration
+        );
+        return vb.build(viAdapter.apply(vb.videoInfo(lsp)), lsp);
+      }
+      if (p instanceof XYDataSeriesPlot xyp) {
+        AbstractXYDataSeriesPlotVideoBuilder vb = (!secondary) ? new LinesPlotVideoBuilder(
+            vConfiguration,
+            iConfiguration
+        ) : new PointsPlotVideoBuilder(
+            vConfiguration,
+            iConfiguration
+        );
+        return vb.build(viAdapter.apply(vb.videoInfo(xyp)), xyp);
+      }
+      if (p instanceof UnivariateGridPlot ugp) {
+        UnivariatePlotVideoBuilder vb = new UnivariatePlotVideoBuilder(
+            vConfiguration,
+            iConfiguration
+        );
+        return vb.build(viAdapter.apply(vb.videoInfo(ugp)), ugp);
+      }
+      if (p instanceof VectorialFieldPlot vfp) {
+        VectorialFieldVideoBuilder vb = new VectorialFieldVideoBuilder(
+            vConfiguration,
+            iConfiguration
+        );
+        return vb.build(viAdapter.apply(vb.videoInfo(vfp)), vfp);
+      }
+      throw new IllegalArgumentException(
+          "Unsupported type of plot %s".formatted(p.getClass().getSimpleName())
+      );
+    };
+    return NamedFunction.from(f, "video.plotter").compose(beforeF);
+  }
 }
