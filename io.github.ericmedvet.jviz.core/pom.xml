@@ -14,11 +14,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-csv</artifactId>
-      <version>1.14.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.jcodec</groupId>
       <artifactId>jcodec</artifactId>
       <version>0.2.5</version>
