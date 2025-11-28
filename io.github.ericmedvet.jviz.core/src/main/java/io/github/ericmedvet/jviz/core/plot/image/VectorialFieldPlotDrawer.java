@@ -95,6 +95,23 @@ public class VectorialFieldPlotDrawer extends AbstractXYPlotDrawer<VectorialFiel
   }
 
   @Override
+  protected DoubleRange computeRange(
+      List<VectorialFieldDataSeries> data,
+      boolean isXAxis,
+      VectorialFieldPlot vectorialFieldPlot
+  ) {
+    return data.stream()
+        .map(d -> isXAxis ? d.originXRange() : d.originYRange())
+        .reduce(DoubleRange::unionWith)
+        .orElseThrow();
+  }
+
+  @Override
+  public double computeNoteH(Graphics2D g, Key k, VectorialFieldPlot vectorialFieldPlot) {
+    return 0;
+  }
+
+  @Override
   public void drawPlot(Graphics2D g, GMetrics gm, Rectangle2D r, Key k, Axis xA, Axis yA, VectorialFieldPlot p) {
     g.setColor(configuration().colors().gridColor());
     g.setStroke(new BasicStroke((float) (configuration().general().gridStrokeSizeRate() * gm.refL())));
@@ -137,7 +154,7 @@ public class VectorialFieldPlotDrawer extends AbstractXYPlotDrawer<VectorialFiel
                 e -> e.getValue()
                     .stream()
                     .map(VectorialFieldDataSeries::destinationXRange)
-                    .reduce(DoubleRange::largest)
+                    .reduce(DoubleRange::unionWith)
                     .orElseThrow()
             )
         );
@@ -148,7 +165,7 @@ public class VectorialFieldPlotDrawer extends AbstractXYPlotDrawer<VectorialFiel
                 e -> e.getValue()
                     .stream()
                     .map(VectorialFieldDataSeries::destinationYRange)
-                    .reduce(DoubleRange::largest)
+                    .reduce(DoubleRange::unionWith)
                     .orElseThrow()
             )
         );
@@ -185,23 +202,6 @@ public class VectorialFieldPlotDrawer extends AbstractXYPlotDrawer<VectorialFiel
               )
           );
     });
-  }
-
-  @Override
-  public double computeNoteH(Graphics2D g, Key k, VectorialFieldPlot vectorialFieldPlot) {
-    return 0;
-  }
-
-  @Override
-  protected DoubleRange computeRange(
-      List<VectorialFieldDataSeries> data,
-      boolean isXAxis,
-      VectorialFieldPlot vectorialFieldPlot
-  ) {
-    return data.stream()
-        .map(d -> isXAxis ? d.originXRange() : d.originYRange())
-        .reduce(DoubleRange::largest)
-        .orElseThrow();
   }
 
   private void drawLegendImage(Graphics2D g, Rectangle2D r, Color color) {

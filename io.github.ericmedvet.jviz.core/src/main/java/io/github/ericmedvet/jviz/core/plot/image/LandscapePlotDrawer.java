@@ -210,24 +210,24 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
     );
   }
 
-  private DoubleRange computeValueRange(LandscapePlot p, GMetrics gm) {
-    DoubleRange valueRange;
-    if (p.valueRange().equals(DoubleRange.UNBOUNDED)) {
-      Grid<DoubleRange> valueRanges = computeValueRanges(p, gm);
-      valueRange = DoubleRange.largest(valueRanges.values().stream().toList());
-    } else {
-      valueRange = p.valueRange();
-    }
-    return valueRange;
-  }
-
   @Override
   protected DoubleRange computeRange(Data data, boolean isXAxis, LandscapePlot p) {
     return data.xyDataSeries()
         .stream()
         .map(d -> isXAxis ? d.xRange() : d.yRange())
-        .reduce(DoubleRange::largest)
+        .reduce(DoubleRange::unionWith)
         .orElseThrow();
+  }
+
+  private DoubleRange computeValueRange(LandscapePlot p, GMetrics gm) {
+    DoubleRange valueRange;
+    if (p.valueRange().equals(DoubleRange.UNBOUNDED)) {
+      Grid<DoubleRange> valueRanges = computeValueRanges(p, gm);
+      valueRange = DoubleRange.union(valueRanges.values().stream().toList());
+    } else {
+      valueRange = p.valueRange();
+    }
+    return valueRange;
   }
 
   private DoubleRange computeValueRange(Grid.Key k, double w, double h, LandscapePlot p) {

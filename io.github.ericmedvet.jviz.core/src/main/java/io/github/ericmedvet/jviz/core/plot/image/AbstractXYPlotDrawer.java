@@ -102,9 +102,9 @@ public abstract class AbstractXYPlotDrawer<P extends XYPlot<D>, D> implements XY
           }
           return r;
         });
-    List<DoubleRange> colLargestRanges = grid.columns().stream().map(DoubleRange::largest).toList();
-    List<DoubleRange> rowLargestRanges = grid.rows().stream().map(DoubleRange::largest).toList();
-    DoubleRange largestRange = DoubleRange.largest(
+    List<DoubleRange> colLargestRanges = grid.columns().stream().map(DoubleRange::union).toList();
+    List<DoubleRange> rowLargestRanges = grid.rows().stream().map(DoubleRange::union).toList();
+    DoubleRange largestRange = DoubleRange.union(
         Stream.of(colLargestRanges, rowLargestRanges)
             .flatMap(List::stream)
             .toList()

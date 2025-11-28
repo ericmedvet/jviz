@@ -47,7 +47,7 @@ public record LandscapePlot(
           .map(td -> td.data().xyDataSeries)
           .flatMap(Collection::stream)
           .map(XYDataSeries::xRange)
-          .reduce(DoubleRange::largest)
+          .reduce(DoubleRange::unionWith)
           .orElseThrow();
     }
     if (yRange.equals(DoubleRange.UNBOUNDED)) {
@@ -57,7 +57,7 @@ public record LandscapePlot(
           .map(td -> td.data().xyDataSeries)
           .flatMap(Collection::stream)
           .map(XYDataSeries::yRange)
-          .reduce(DoubleRange::largest)
+          .reduce(DoubleRange::unionWith)
           .orElseThrow();
     }
   }

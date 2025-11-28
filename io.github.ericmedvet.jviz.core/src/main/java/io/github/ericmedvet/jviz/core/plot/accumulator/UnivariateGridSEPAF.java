@@ -26,6 +26,7 @@ import io.github.ericmedvet.jnb.datastructure.Table;
 import io.github.ericmedvet.jviz.core.plot.RangedGrid;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -75,6 +76,8 @@ public class UnivariateGridSEPAF<E, K, X, G> extends AbstractSingleEPAF<E, Univa
 
   @Override
   protected UnivariateGridPlot buildPlot(Table<String, String, Grid<Double>> data, K k) {
+    List<String> colIndexes = new ArrayList<>(data.colIndexes());
+    List<String> rowIndexes = new ArrayList<>(data.rowIndexes());
     return new UnivariateGridPlot(
         titleFunction.apply(k),
         NamedFunction.name(predicateValueFunction),
@@ -85,11 +88,11 @@ public class UnivariateGridSEPAF<E, K, X, G> extends AbstractSingleEPAF<E, Univa
         DoubleRange.UNBOUNDED,
         valueRange,
         Grid.create(
-            data.nColumns(),
-            data.nRows(),
+            data.nOfColumns(),
+            data.nOfRows(),
             (x, y) -> new XYPlot.TitledData<>(
-                data.colIndexes().get(x),
-                data.rowIndexes().get(y),
+                colIndexes.get(x),
+                rowIndexes.get(y),
                 data.get(x, y)
             )
         )

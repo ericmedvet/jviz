@@ -27,6 +27,7 @@ import io.github.ericmedvet.jviz.core.plot.Value;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,8 @@ public class XYDataSeriesSEPAF<E, K, X, P> extends AbstractSingleEPAF<E, XYDataS
 
   @Override
   protected XYDataSeriesPlot buildPlot(Table<String, String, List<XYDataSeries>> data, K k) {
+    List<String> colIndexes = new ArrayList<>(data.colIndexes());
+    List<String> rowIndexes = new ArrayList<>(data.rowIndexes());
     return new XYDataSeriesPlot(
         titleFunction.apply(k),
         NamedFunction.name(predicateValueFunction),
@@ -104,11 +107,11 @@ public class XYDataSeriesSEPAF<E, K, X, P> extends AbstractSingleEPAF<E, XYDataS
         xRange,
         yRange,
         Grid.create(
-            data.nColumns(),
-            data.nRows(),
+            data.nOfColumns(),
+            data.nOfRows(),
             (x, y) -> new XYPlot.TitledData<>(
-                data.colIndexes().get(x),
-                data.rowIndexes().get(y),
+                colIndexes.get(x),
+                rowIndexes.get(y),
                 data.get(x, y)
             )
         )

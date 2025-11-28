@@ -28,6 +28,7 @@ import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.Value;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +107,8 @@ public class LandscapeSEPAF<E, K, X, P> extends AbstractSingleEPAF<E, LandscapeP
 
   @Override
   protected LandscapePlot buildPlot(Table<String, String, LandscapePlot.Data> data, K k) {
+    List<String> colIndexes = new ArrayList<>(data.colIndexes());
+    List<String> rowIndexes = new ArrayList<>(data.rowIndexes());
     return new LandscapePlot(
         titleFunction.apply(k),
         NamedFunction.name(predicateValueFunction),
@@ -116,11 +119,11 @@ public class LandscapeSEPAF<E, K, X, P> extends AbstractSingleEPAF<E, LandscapeP
         yRange,
         valueRange,
         Grid.create(
-            data.nColumns(),
-            data.nRows(),
+            data.nOfColumns(),
+            data.nOfRows(),
             (x, y) -> new XYPlot.TitledData<>(
-                data.colIndexes().get(x),
-                data.rowIndexes().get(y),
+                colIndexes.get(x),
+                rowIndexes.get(y),
                 data.get(x, y)
             )
         )

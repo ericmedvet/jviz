@@ -128,14 +128,16 @@ public abstract class AggregatedXYDataSeriesMKPAF<E, K, L> extends AbstractMulti
 
   @Override
   protected XYDataSeriesPlot buildPlot(Table<L, L, List<XYDataSeries>> data) {
+    List<L> colIndexes = new ArrayList<>(data.colIndexes());
+    List<L> rowIndexes = new ArrayList<>(data.rowIndexes());
     Grid<XYPlot.TitledData<List<XYDataSeries>>> grid = Grid.create(
-        data.nColumns(),
-        data.nRows(),
+        data.nOfColumns(),
+        data.nOfRows(),
         (x, y) -> new XYPlot.TitledData<>(
             FormattedFunction.format(xSubplotFunction)
-                .formatted(data.colIndexes().get(x)),
+                .formatted(colIndexes.get(x)),
             FormattedFunction.format(ySubplotFunction)
-                .formatted(data.rowIndexes().get(y)),
+                .formatted(rowIndexes.get(y)),
             data.get(x, y)
         )
     );

@@ -65,7 +65,7 @@ public abstract class AbstractMultipleKPAF<E, P extends XYPlot<D>, K, D, L, V> i
       @Override
       public P get() {
         synchronized (table) {
-          return buildPlot(table.map((xL, yL, v) -> buildData(xL, yL, v == null ? init(xL, yL) : v)));
+          return buildPlot(table.mapValues((xL, yL, v) -> buildData(xL, yL, v == null ? init(xL, yL) : v)));
         }
       }
 

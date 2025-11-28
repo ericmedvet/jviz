@@ -50,7 +50,7 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
     DoubleRange valueRange;
     Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
     if (p.valueRange().equals(DoubleRange.UNBOUNDED)) {
-      valueRange = DoubleRange.largest(valueRanges.values().stream().toList());
+      valueRange = DoubleRange.union(valueRanges.values().stream().toList());
     } else {
       valueRange = p.valueRange();
     }

@@ -26,6 +26,7 @@ import io.github.ericmedvet.jnb.datastructure.Table;
 import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries;
 import io.github.ericmedvet.jviz.core.plot.VectorialFieldPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -87,6 +88,8 @@ public class VectorialFieldSEPAF<E, K, X, F> extends AbstractSingleEPAF<E, Vecto
 
   @Override
   protected VectorialFieldPlot buildPlot(Table<String, String, List<VectorialFieldDataSeries>> data, K k) {
+    List<String> colIndexes = new ArrayList<>(data.colIndexes());
+    List<String> rowIndexes = new ArrayList<>(data.rowIndexes());
     return new VectorialFieldPlot(
         titleFunction.apply(k),
         NamedFunction.name(predicateValueFunction),
@@ -96,11 +99,11 @@ public class VectorialFieldSEPAF<E, K, X, F> extends AbstractSingleEPAF<E, Vecto
         DoubleRange.UNBOUNDED,
         DoubleRange.UNBOUNDED,
         Grid.create(
-            data.nColumns(),
-            data.nRows(),
+            data.nOfColumns(),
+            data.nOfRows(),
             (x, y) -> new XYPlot.TitledData<>(
-                data.colIndexes().get(x),
-                data.rowIndexes().get(y),
+                colIndexes.get(x),
+                rowIndexes.get(y),
                 data.get(x, y)
             )
         )

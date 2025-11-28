@@ -72,7 +72,7 @@ public interface XYDataSeries {
           }
           return new DoubleRange(p.x.v(), p.x.v());
         })
-        .reduce(DoubleRange::largest)
+        .reduce(DoubleRange::unionWith)
         .orElseThrow();
   }
 
@@ -84,7 +84,7 @@ public interface XYDataSeries {
           }
           return new DoubleRange(p.y.v(), p.y.v());
         })
-        .reduce(DoubleRange::largest)
+        .reduce(DoubleRange::unionWith)
         .orElseThrow();
   }
 }

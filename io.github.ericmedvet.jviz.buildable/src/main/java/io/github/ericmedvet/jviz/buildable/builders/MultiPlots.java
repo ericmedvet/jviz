@@ -24,10 +24,10 @@ import io.github.ericmedvet.jnb.core.Param;
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
 import io.github.ericmedvet.jviz.core.plot.accumulator.AggregatedXYDataSeriesMKPAF;
-import io.github.ericmedvet.jviz.core.plot.accumulator.DistributionMRPAF;
+import io.github.ericmedvet.jviz.core.plot.accumulator.DistributionMKPAF;
 import io.github.ericmedvet.jviz.core.plot.accumulator.EAggregatedXYDataSeriesMKPAF;
 import io.github.ericmedvet.jviz.core.plot.accumulator.KAggregatedXYDataSeriesMKPAF;
-import io.github.ericmedvet.jviz.core.plot.accumulator.ScatterMRPAF;
+import io.github.ericmedvet.jviz.core.plot.accumulator.ScatterMKPAF;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -39,7 +39,7 @@ public class MultiPlots {
   }
 
   @SuppressWarnings("unused")
-  public static <E, K, X> ScatterMRPAF<E, K, String, X> scatter(
+  public static <E, K, X> ScatterMKPAF<E, K, String, X> scatter(
       @Param("xSubplot") Function<? super K, String> xSubplotFunction,
       @Param("ySubplot") Function<? super K, String> ySubplotFunction,
       @Param("group") Function<? super K, String> groupFunction,
@@ -55,7 +55,7 @@ public class MultiPlots {
         values.getLast()
     ) : UnaryOperator
         .identity();
-    return new ScatterMRPAF<>(
+    return new ScatterMKPAF<>(
         xSubplotFunction,
         ySubplotFunction,
         groupFunction,
@@ -119,7 +119,7 @@ public class MultiPlots {
   }
 
   @SuppressWarnings("unused")
-  public static <E, R, X> DistributionMRPAF<E, R, String, X> yBoxplot(
+  public static <E, R, X> DistributionMKPAF<E, R, String, X> yBoxplot(
       @Param("xSubplot") Function<? super R, String> xSubplotFunction,
       @Param("ySubplot") Function<? super R, String> ySubplotFunction,
       @Param("box") Function<? super R, String> boxFunction,
@@ -131,7 +131,7 @@ public class MultiPlots {
   ) {
     UnaryOperator<List<Number>> rFilter = limitOneYForK ? values -> List.of(values.getLast()) : UnaryOperator
         .identity();
-    return new DistributionMRPAF<>(
+    return new DistributionMKPAF<>(
         xSubplotFunction,
         ySubplotFunction,
         boxFunction,

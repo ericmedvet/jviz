@@ -24,10 +24,8 @@ import io.github.ericmedvet.jnb.datastructure.FormattedFunction;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jnb.datastructure.NamedFunction;
 import io.github.ericmedvet.jnb.datastructure.Table;
-import io.github.ericmedvet.jviz.core.plot.Value;
-import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
-import io.github.ericmedvet.jviz.core.plot.XYDataSeries.Point;
-import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
+import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
+import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,42 +36,36 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-public class ScatterMRPAF<E, K, L, X> extends AbstractMultipleKPAF<E, XYDataSeriesPlot, K, List<XYDataSeries>, L, Map<L, Map<K, List<Point>>>> {
+public class DistributionMKPAF<E, K, L, X> extends AbstractMultipleKPAF<E, DistributionPlot, K, List<Data>, L, Map<L, Map<K, List<Number>>>> {
 
-  private final Function<? super K, ? extends L> groupFunction;
-  private final Function<? super E, ? extends Number> xFunction;
+  protected final Function<? super E, X> predicateValueFunction;
+  private final Function<? super K, ? extends L> lineFunction;
   private final Function<? super E, ? extends Number> yFunction;
-  private final Function<? super E, X> predicateValueFunction;
   private final Predicate<? super X> predicate;
-  private final UnaryOperator<List<Point>> rFilter;
-  private final DoubleRange xRange;
+  private final UnaryOperator<List<Number>> rFilter;
   private final DoubleRange yRange;
 
-  public ScatterMRPAF(
+  public DistributionMKPAF(
       Function<? super K, ? extends L> xSubplotFunction,
       Function<? super K, ? extends L> ySubplotFunction,
-      Function<? super K, ? extends L> groupFunction,
-      Function<? super E, ? extends Number> xFunction,
+      Function<? super K, ? extends L> lineFunction,
       Function<? super E, ? extends Number> yFunction,
       Function<? super E, X> predicateValueFunction,
       Predicate<? super X> predicate,
-      UnaryOperator<List<Point>> rFilter,
-      DoubleRange xRange,
+      UnaryOperator<List<Number>> rFilter,
       DoubleRange yRange
   ) {
     super(xSubplotFunction, ySubplotFunction);
-    this.groupFunction = groupFunction;
-    this.xFunction = xFunction;
+    this.lineFunction = lineFunction;
     this.yFunction = yFunction;
     this.predicateValueFunction = predicateValueFunction;
     this.predicate = predicate;
     this.rFilter = rFilter;
-    this.xRange = xRange;
     this.yRange = yRange;
   }
 
   @Override
-  protected int size(Map<L, Map<K, List<Point>>> kMap) {
+  protected int size(Map<L, Map<K, List<Number>>> kMap) {
     return kMap.values()
         .stream()
         .mapToInt(
@@ -86,17 +78,18 @@ public class ScatterMRPAF<E, K, L, X> extends AbstractMultipleKPAF<E, XYDataSeri
   }
 
   @Override
-  protected List<XYDataSeries> buildData(L xL, L yL, Map<L, Map<K, List<Point>>> map) {
+  protected List<DistributionPlot.Data> buildData(L xL, L yL, Map<L, Map<K, List<Number>>> map) {
     return map.entrySet()
         .stream()
         .map(
-            entry -> XYDataSeries.of(
-                FormattedFunction.format(groupFunction).formatted(entry.getKey()),
-                entry.getValue()
+            e -> new DistributionPlot.Data(
+                FormattedFunction.format(lineFunction).formatted(e.getKey()),
+                e.getValue()
                     .values()
                     .stream()
                     .map(rFilter)
                     .flatMap(Collection::stream)
+                    .map(Number::doubleValue)
                     .toList()
             )
         )
@@ -104,15 +97,17 @@ public class ScatterMRPAF<E, K, L, X> extends AbstractMultipleKPAF<E, XYDataSeri
   }
 
   @Override
-  protected XYDataSeriesPlot buildPlot(Table<L, L, List<XYDataSeries>> data) {
-    Grid<XYPlot.TitledData<List<XYDataSeries>>> grid = Grid.create(
-        data.nColumns(),
-        data.nRows(),
+  protected DistributionPlot buildPlot(Table<L, L, List<DistributionPlot.Data>> data) {
+    List<L> colIndexes = new ArrayList<>(data.colIndexes());
+    List<L> rowIndexes = new ArrayList<>(data.rowIndexes());
+    Grid<XYPlot.TitledData<List<DistributionPlot.Data>>> grid = Grid.create(
+        data.nOfColumns(),
+        data.nOfRows(),
         (x, y) -> new XYPlot.TitledData<>(
             FormattedFunction.format(xSubplotFunction)
-                .formatted(data.colIndexes().get(x)),
+                .formatted(colIndexes.get(x)),
             FormattedFunction.format(ySubplotFunction)
-                .formatted(data.rowIndexes().get(y)),
+                .formatted(rowIndexes.get(y)),
             data.get(x, y)
         )
     );
@@ -127,54 +122,46 @@ public class ScatterMRPAF<E, K, L, X> extends AbstractMultipleKPAF<E, XYDataSeri
           NamedFunction.name(ySubplotFunction)
       );
     }
-    return new XYDataSeriesPlot(
-        "%s vs. %s%s"
+    return new DistributionPlot(
+        "%s distribution%s"
             .formatted(
                 NamedFunction.name(yFunction),
-                NamedFunction.name(xFunction),
                 subtitle.isEmpty() ? subtitle : (" (%s)".formatted(subtitle))
             ),
         NamedFunction.name(xSubplotFunction),
         NamedFunction.name(ySubplotFunction),
-        NamedFunction.name(xFunction),
+        NamedFunction.name(lineFunction),
         NamedFunction.name(yFunction),
-        xRange,
         yRange,
         grid
     );
   }
 
   @Override
-  protected Map<L, Map<K, List<Point>>> init(L xL, L yL) {
+  protected Map<L, Map<K, List<Number>>> init(L xL, L yL) {
     return new HashMap<>();
   }
 
   @Override
-  protected Map<L, Map<K, List<Point>>> update(
+  protected Map<L, Map<K, List<Number>>> update(
       L xL,
       L yL,
-      Map<L, Map<K, List<Point>>> map,
+      Map<L, Map<K, List<Number>>> map,
       E e,
       K k
   ) {
     X predicateValue = predicateValueFunction.apply(e);
     if (predicate.test(predicateValue)) {
-      L groupL = groupFunction.apply(k);
-      map.computeIfAbsent(groupL, l -> new HashMap<>())
+      L lineL = lineFunction.apply(k);
+      map.computeIfAbsent(lineL, l -> new HashMap<>())
           .computeIfAbsent(k, thisK -> new ArrayList<>())
-          .add(
-              new Point(
-                  Value.of(xFunction.apply(e).doubleValue()),
-                  Value.of(yFunction.apply(e).doubleValue())
-              )
-          );
+          .add(yFunction.apply(e));
     }
     return map;
   }
 
   @Override
   public String toString() {
-    return "scatterMRPAF(xFunction=" + xFunction + ";yFunction=" + yFunction + ')';
+    return "distributionMRPAF(yFunction=" + yFunction + ')';
   }
-
 }

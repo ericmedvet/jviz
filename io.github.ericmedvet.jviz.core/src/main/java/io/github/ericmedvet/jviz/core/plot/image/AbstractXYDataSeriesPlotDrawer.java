@@ -128,7 +128,7 @@ public abstract class AbstractXYDataSeriesPlotDrawer extends AbstractXYPlotDrawe
     return data.stream()
         .filter(d -> !d.points().isEmpty())
         .map(d -> isXAxis ? d.xRange() : d.yRange())
-        .reduce(DoubleRange::largest)
+        .reduce(DoubleRange::unionWith)
         .orElse(new DoubleRange(0d, 0d));
   }
 

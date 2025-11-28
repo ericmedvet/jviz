@@ -59,7 +59,7 @@ public class BoxPlotDrawer extends AbstractXYPlotDrawer<DistributionPlot, List<D
     }
     return data.stream()
         .map(this::dataRange)
-        .reduce(DoubleRange::largest)
+        .reduce(DoubleRange::unionWith)
         .orElseThrow();
   }
 

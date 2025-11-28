@@ -91,7 +91,7 @@ public class DistributionPlotCsvBuilder extends AbstractCsvBuilder<DistributionP
             }
           }
         }
-        csvPrinter.printRecord(processRecord(t.colIndexes()));
+        csvPrinter.printRecord(processRecord(t.colIndexes().stream().toList()));
         for (int i : t.rowIndexes()) {
           csvPrinter.printRecord(processRecord(t.rowValues(i)));
         }
