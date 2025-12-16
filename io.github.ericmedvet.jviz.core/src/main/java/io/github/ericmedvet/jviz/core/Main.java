@@ -1,33 +1,44 @@
-/*-
- * ========================LICENSE_START=================================
- * jviz-core
- * %%
- * Copyright (C) 2024 - 2025 Eric Medvet
- * %%
+/*
+ * Copyright 2025 eric
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * =========================LICENSE_END==================================
  */
 package io.github.ericmedvet.jviz.core;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jviz.core.drawer.Drawer.Arrangement;
-import io.github.ericmedvet.jviz.core.plot.*;
+import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
+import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
+import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
+import io.github.ericmedvet.jviz.core.plot.Value;
+import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries;
 import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries.Point;
+import io.github.ericmedvet.jviz.core.plot.VectorialFieldPlot;
+import io.github.ericmedvet.jviz.core.plot.XYDataSeries;
+import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot.TitledData;
+import io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode;
 import io.github.ericmedvet.jviz.core.plot.csv.VectorialFieldPlotCsvBuilder;
-import io.github.ericmedvet.jviz.core.plot.image.*;
+import io.github.ericmedvet.jviz.core.plot.csv.XYDataSeriesPlotCsvBuilder;
+import io.github.ericmedvet.jviz.core.plot.image.BoxPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration;
+import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +52,12 @@ import java.util.stream.Stream;
 
 public class Main {
 
-  private static DistributionPlot.Data gaussian(double mu, double sigma, int n, double... outliers) {
+  private static DistributionPlot.Data gaussian(
+      double mu,
+      double sigma,
+      int n,
+      double... outliers
+  ) {
     RandomGenerator r = new Random();
     return new Data(
         "N(%.1f,%.1f)".formatted(mu, sigma),
@@ -79,6 +95,10 @@ public class Main {
   }
 
   public static void main(String[] args) throws IOException {
+    missingValues();
+  }
+
+  private static void manyPlots() throws IOException {
     // lines plot
     XYDataSeriesPlot lp = new XYDataSeriesPlot(
         "My plot",
@@ -105,7 +125,8 @@ public class Main {
     new LinesPlotDrawer().show(lp);
     new LinesPlotDrawer().multi(Arrangement.HORIZONTAL).show(List.of(lp, lp));
     new LinesPlotDrawer().save(new File("../lineplot.svg"), lp);
-    new LinesPlotDrawer().multi(Arrangement.VERTICAL).save(new File("../lineplots.svg"), List.of(lp, lp));
+    new LinesPlotDrawer().multi(Arrangement.VERTICAL)
+        .save(new File("../lineplots.svg"), List.of(lp, lp));
     new PointsPlotDrawer().show(lp);
     new PointsPlotDrawer().save(new File("../points.svg"), lp);
     // Misc.showImage(new ImagePlotter(ImageBuilder.DEFAULT_W, ImageBuilder.DEFAULT_H).lines(lp));
@@ -257,6 +278,38 @@ public class Main {
             io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode.PAPER_FRIENDLY
         )
             .apply(vfp)
+    );
+  }
+
+  private static void missingValues() {
+    XYDataSeriesPlot lp = new XYDataSeriesPlot(
+        "My plot",
+        "x title",
+        "y title",
+        "x",
+        "f(x)",
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            1,
+            1,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                List.of(
+                    XYDataSeries.of("zero", List.of(new XYDataSeries.Point(Value.of(0), Value.of(1)))),
+                    XYDataSeries.of("one", List.of(new XYDataSeries.Point(Value.of(1), Value.of(1))))
+                )
+            )
+        )
+    );
+    System.out.println(
+        new XYDataSeriesPlotCsvBuilder(
+            io.github.ericmedvet.jviz.core.plot.csv.Configuration.DEFAULTS.get(
+                Mode.PAPER_FRIENDLY
+            ),
+            Mode.PAPER_FRIENDLY
+        ).apply(lp)
     );
   }
 }
