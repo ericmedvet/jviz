@@ -20,6 +20,7 @@
 package io.github.ericmedvet.jviz.core.drawer;
 
 import io.github.ericmedvet.jviz.core.drawer.Drawer.ImageInfo;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class SvgG2DProvider implements G2DProvider<String> {
         .createDocument(SVGDOMImplementation.SVG_NAMESPACE_URI, "svg", null);
     g2D = new org.apache.batik.svggen.SVGGraphics2D(doc);
     g2D.setClip(new Rectangle2D.Double(0, 0, imageInfo.w(), imageInfo.h()));
+    g2D.setSVGCanvasSize(new Dimension(imageInfo.w(), imageInfo.h()));
   }
 
   @Override

@@ -99,7 +99,34 @@ public class Main {
   }
 
   public static void main(String[] args) throws IOException {
-    missingValues();
+    onePlot();
+  }
+
+  public static void onePlot() throws IOException {
+    // lines plot
+    XYDataSeriesPlot lp = new XYDataSeriesPlot(
+        "My plot",
+        "x title",
+        "y title",
+        "x",
+        "f(x)",
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            3,
+            2,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                List.of(
+                    sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
+                    sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
+                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)
+                )
+            )
+        )
+    );
+    new LinesPlotDrawer().save(new File("../lineplot.svg"), lp);
   }
 
   private static void manyPlots() throws IOException {
