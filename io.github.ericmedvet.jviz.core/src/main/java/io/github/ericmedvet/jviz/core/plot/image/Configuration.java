@@ -1,21 +1,17 @@
-/*-
- * ========================LICENSE_START=================================
- * jviz-core
- * %%
- * Copyright (C) 2024 - 2025 Eric Medvet
- * %%
+/*
+ * Copyright 2026 eric
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * =========================LICENSE_END==================================
  */
 package io.github.ericmedvet.jviz.core.plot.image;
 
@@ -37,6 +33,7 @@ public record Configuration(
     LandscapePlot landscapePlot,
     BoxPlot boxPlot,
     VectorialFieldPlot vectorialFieldPlot,
+    TrajectoryPlot trajectoryPlot,
     boolean debug
 ) {
 
@@ -52,6 +49,7 @@ public record Configuration(
       LandscapePlot.DEFAULT,
       BoxPlot.DEFAULT,
       VectorialFieldPlot.DEFAULT,
+      TrajectoryPlot.DEFAULT,
       false
   );
 
@@ -60,13 +58,18 @@ public record Configuration(
       Layout.DEFAULT,
       Colors.DEFAULT,
       Text.DEFAULT,
-      new PlotMatrix(PlotMatrix.Show.ALL, PlotMatrix.Show.BORDER, Set.of(PlotMatrix.Independence.ALL)),
+      new PlotMatrix(
+          PlotMatrix.Show.ALL,
+          PlotMatrix.Show.BORDER,
+          Set.of(PlotMatrix.Independence.ALL)
+      ),
       LinesPlot.DEFAULT,
       PointsPlot.DEFAULT,
       UnivariateGridPlot.DEFAULT,
       LandscapePlot.DEFAULT,
       BoxPlot.DEFAULT,
       VectorialFieldPlot.DEFAULT,
+      TrajectoryPlot.DEFAULT,
       false
   );
 
@@ -152,9 +155,17 @@ public record Configuration(
             new Color(255, 255, 153)
         ),
         List.of(
-            new ColorRange(new Color(255, 255, 204), new Color(120, 198, 121), new Color(0, 90, 50)),
+            new ColorRange(
+                new Color(255, 255, 204),
+                new Color(120, 198, 121),
+                new Color(0, 90, 50)
+            ),
             new ColorRange(new Color(140, 81, 10), new Color(245, 245, 245), new Color(1, 102, 94)),
-            new ColorRange(new Color(69, 117, 180), new Color(255, 255, 191), new Color(215, 48, 39)),
+            new ColorRange(
+                new Color(69, 117, 180),
+                new Color(255, 255, 191),
+                new Color(215, 48, 39)
+            ),
             new ColorRange(new Color(222, 235, 247), new Color(49, 130, 189)),
             new ColorRange(new Color(240, 240, 240), new Color(99, 99, 99)),
             new ColorRange(new Color(49, 163, 84), new Color(229, 245, 224))
@@ -245,23 +256,6 @@ public record Configuration(
     );
   }
 
-  public record PlotMatrix(Show axesShow, Show titlesShow, Set<Independence> independences) {
-
-    public static final PlotMatrix DEFAULT = new PlotMatrix(
-        Show.BORDER,
-        Show.BORDER,
-        Set.of(Independence.ROWS, Independence.COLS)
-    );
-
-    public enum Independence {
-      ROWS, COLS, ALL
-    }
-
-    public enum Show {
-      BORDER, ALL
-    }
-  }
-
   public record LinesPlot(
       double strokeSizeRate,
       double alpha,
@@ -287,6 +281,23 @@ public record Configuration(
         1.05,
         1.05
     );
+  }
+
+  public record PlotMatrix(Show axesShow, Show titlesShow, Set<Independence> independences) {
+
+    public static final PlotMatrix DEFAULT = new PlotMatrix(
+        Show.BORDER,
+        Show.BORDER,
+        Set.of(Independence.ROWS, Independence.COLS)
+    );
+
+    public enum Independence {
+      ROWS, COLS, ALL
+    }
+
+    public enum Show {
+      BORDER, ALL
+    }
   }
 
   public record PointsPlot(
@@ -331,6 +342,35 @@ public record Configuration(
     public enum Use {
       TITLE, AXIS_LABEL, TICK_LABEL, LEGEND_LABEL, NOTE
     }
+  }
+
+  public record TrajectoryPlot(
+      XYPlotDrawer.Marker startMarker,
+      XYPlotDrawer.Marker midMarker,
+      XYPlotDrawer.Marker endMarker,
+      double strokeSizeRate,
+      double markerSizeRate,
+      double legendImageXRate,
+      double legendImageYRate,
+      List<Color> colors,
+      double xExtensionRate,
+      double yExtensionRate,
+      int nOfMidPoints
+  ) {
+
+    public static final TrajectoryPlot DEFAULT = new TrajectoryPlot(
+        Marker.CIRCLE,
+        Marker.TIMES,
+        Marker.SQUARE,
+        0.0015,
+        0.010,
+        0.08,
+        0.02,
+        Colors.DEFAULT.dataColors(),
+        LinesPlot.DEFAULT.xExtensionRate,
+        LinesPlot.DEFAULT.yExtensionRate,
+        4
+    );
   }
 
   public record UnivariateGridPlot(

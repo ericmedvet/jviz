@@ -1,21 +1,17 @@
-/*-
- * ========================LICENSE_START=================================
- * jviz-buildable
- * %%
- * Copyright (C) 2024 - 2025 Eric Medvet
- * %%
+/*
+ * Copyright 2026 eric
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * =========================LICENSE_END==================================
  */
 package io.github.ericmedvet.jviz.buildable.builders;
 
@@ -29,6 +25,7 @@ import io.github.ericmedvet.jviz.core.drawer.Video;
 import io.github.ericmedvet.jviz.core.drawer.VideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
+import io.github.ericmedvet.jviz.core.plot.TrajectoryPlot;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import io.github.ericmedvet.jviz.core.plot.VectorialFieldPlot;
 import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
@@ -43,6 +40,7 @@ import io.github.ericmedvet.jviz.core.plot.image.Configuration;
 import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.TrajectoryPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.AbstractXYDataSeriesPlotVideoBuilder;
@@ -166,6 +164,12 @@ public class Functions {
         return new ConditionedDrawer<VectorialFieldPlot>().apply(
             new VectorialFieldPlotDrawer(configuration),
             vfp
+        );
+      }
+      if (p instanceof TrajectoryPlot tp) {
+        return new ConditionedDrawer<TrajectoryPlot>().apply(
+            new TrajectoryPlotDrawer(configuration),
+            tp
         );
       }
       throw new IllegalArgumentException(

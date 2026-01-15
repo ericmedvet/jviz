@@ -34,4 +34,8 @@ module io.github.ericmedvet.jviz.core {
   requires jcodec;
   requires batik.all;
   requires java.xml;
+  requires smile.core;
+  requires smile.base;
+  requires org.jspecify;
+  requires commons.math3;
 }

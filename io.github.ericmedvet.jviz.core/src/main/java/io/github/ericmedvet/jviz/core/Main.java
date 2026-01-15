@@ -1,21 +1,17 @@
-/*-
- * ========================LICENSE_START=================================
- * jviz-core
- * %%
- * Copyright (C) 2024 - 2025 Eric Medvet
- * %%
+/*
+ * Copyright 2026 eric
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * =========================LICENSE_END==================================
  */
 package io.github.ericmedvet.jviz.core;
 
@@ -25,6 +21,8 @@ import io.github.ericmedvet.jviz.core.drawer.Drawer.Arrangement;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
+import io.github.ericmedvet.jviz.core.plot.TrajectoryPlot;
+import io.github.ericmedvet.jviz.core.plot.TrajectoryPlot.Data.ReductionType;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
 import io.github.ericmedvet.jviz.core.plot.Value;
 import io.github.ericmedvet.jviz.core.plot.VectorialFieldDataSeries;
@@ -41,6 +39,7 @@ import io.github.ericmedvet.jviz.core.plot.image.Configuration;
 import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
+import io.github.ericmedvet.jviz.core.plot.image.TrajectoryPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
@@ -48,7 +47,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -99,7 +100,7 @@ public class Main {
   }
 
   public static void main(String[] args) throws IOException {
-    onePlot();
+    trajectory();
   }
 
   public static void onePlot() throws IOException {
@@ -328,8 +329,14 @@ public class Main {
                 "gx=%d".formatted(gX),
                 "gy=%d".formatted(gY),
                 List.of(
-                    XYDataSeries.of("zero", List.of(new XYDataSeries.Point(Value.of(0), Value.of(1)))),
-                    XYDataSeries.of("one", List.of(new XYDataSeries.Point(Value.of(1), Value.of(1))))
+                    XYDataSeries.of(
+                        "zero",
+                        List.of(new XYDataSeries.Point(Value.of(0), Value.of(1)))
+                    ),
+                    XYDataSeries.of(
+                        "one",
+                        List.of(new XYDataSeries.Point(Value.of(1), Value.of(1)))
+                    )
                 )
             )
         )
@@ -342,5 +349,65 @@ public class Main {
             Mode.PAPER_FRIENDLY
         ).apply(lp)
     );
+  }
+
+  private static void trajectory() {
+    double noiseS = 0.01;
+    RandomGenerator rg = RandomGenerator.getDefault();
+    TrajectoryPlot tp = new TrajectoryPlot(
+        "My plot",
+        "x title",
+        "y title",
+        "x",
+        "y",
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            1,
+            1,
+            new TitledData<>(
+                "",
+                "",
+                TrajectoryPlot.Data.from(
+                    Map.ofEntries(
+                        Map.entry(
+                            "spiral",
+                            new DoubleRange(1, 8).points(1000)
+                                .boxed()
+                                .collect(
+                                    Collectors.toMap(
+                                        t -> t,
+                                        t -> new double[]{0.1 * t * Math.cos(10 * t) + noiseS * rg
+                                            .nextGaussian(), 0.2 * t * Math.sin(10 * t) + noiseS * rg
+                                                .nextGaussian(), 0.0001 * t + noiseS * rg.nextGaussian()
+                                        },
+                                        (p1, p2) -> p2,
+                                        TreeMap::new
+                                    )
+                                )
+                        ),
+                        Map.entry(
+                            "linear",
+                            new DoubleRange(2, 11).points(100)
+                                .boxed()
+                                .collect(
+                                    Collectors.toMap(
+                                        t -> t,
+                                        t -> new double[]{-0.1 + 0.15 * (t - 2) + noiseS * rg
+                                            .nextGaussian(), -0.2 + 0.085 * (t - 2) + noiseS * rg
+                                                .nextGaussian(), 0.0001 * t + noiseS * rg.nextGaussian()
+                                        },
+                                        (p1, p2) -> p2,
+                                        TreeMap::new
+                                    )
+                                )
+                        )
+                    ),
+                    ReductionType.PCA
+                )
+            )
+        )
+    );
+    new TrajectoryPlotDrawer().show(tp);
   }
 }
