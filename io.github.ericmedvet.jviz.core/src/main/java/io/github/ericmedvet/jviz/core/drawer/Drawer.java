@@ -1,24 +1,21 @@
-/*-
- * ========================LICENSE_START=================================
- * jviz-core
- * %%
- * Copyright (C) 2024 - 2026 Eric Medvet
- * %%
+/*
+ * Copyright 2026 eric
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * =========================LICENSE_END==================================
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
+import io.github.ericmedvet.jnb.datastructure.Pair;
 import io.github.ericmedvet.jviz.core.util.Misc;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -44,7 +41,109 @@ public interface Drawer<E> {
 
   static void clean(Graphics2D g) {
     g.setColor(BG_COLOR);
-    g.fill(new Rectangle2D.Double(0, 0, g.getClipBounds().getWidth(), g.getClipBounds().getHeight()));
+    g.fill(
+        new Rectangle2D.Double(0, 0, g.getClipBounds().getWidth(), g.getClipBounds().getHeight())
+    );
+  }
+
+  static <A, B> Drawer<Pair<A, B>> paired(
+      Drawer<A> aDrawer,
+      Drawer<B> bDrawer,
+      Arrangement arrangement,
+      double abSizeRate
+  ) {
+    if (abSizeRate > 0 && abSizeRate < 1) {
+      throw new IllegalArgumentException("abSizeRate must be negative or >=1");
+    }
+    return new Drawer<>() {
+      @Override
+      public void draw(Graphics2D g, Pair<A, B> pair) {
+        ImageInfo allII = imageInfo(pair);
+        Rectangle bounds = g.getClipBounds();
+        double wScale = bounds.getWidth() / allII.w();
+        double hScale = bounds.getHeight() / allII.h();
+        g.scale(wScale, hScale);
+        ImageInfo aII = aDrawer.imageInfo(pair.first());
+        if (abSizeRate <= 0) {
+          g.setClip(new Double(0, 0, aII.w(), aII.h()));
+        } else if (abSizeRate <= 1) {
+          if (arrangement.equals(Arrangement.HORIZONTAL)) {
+            g.setClip(new Double(0, 0, aII.w() / abSizeRate, aII.h()));
+          } else {
+            g.setClip(new Double(0, 0, aII.w(), aII.h() / abSizeRate));
+          }
+        }
+        AffineTransform preTransform = g.getTransform();
+        aDrawer.draw(g, pair.first());
+        g.setTransform(preTransform);
+        g.translate(
+            switch (arrangement) {
+              case HORIZONTAL -> aII.w();
+              case VERTICAL -> 0;
+            },
+            switch (arrangement) {
+              case HORIZONTAL -> 0;
+              case VERTICAL -> aII.h();
+            }
+        );
+        ImageInfo bII = bDrawer.imageInfo(pair.second());
+        if (abSizeRate <= 0) {
+          g.setClip(new Double(0, 0, bII.w(), bII.h()));
+        } else if (abSizeRate >= 1) {
+          if (arrangement.equals(Arrangement.HORIZONTAL)) {
+            g.setClip(new Double(0, 0, bII.w() / abSizeRate, bII.h()));
+          } else {
+            g.setClip(new Double(0, 0, bII.w(), bII.h() / abSizeRate));
+          }
+        }
+        preTransform = g.getTransform();
+        bDrawer.draw(g, pair.second());
+        g.setTransform(preTransform);
+        g.translate(
+            switch (arrangement) {
+              case HORIZONTAL -> bII.w();
+              case VERTICAL -> 0;
+            },
+            switch (arrangement) {
+              case HORIZONTAL -> 0;
+              case VERTICAL -> bII.h();
+            }
+        );
+      }
+
+      @Override
+      public ImageInfo imageInfo(Pair<A, B> pair) {
+        ImageInfo aII = aDrawer.imageInfo(pair.first());
+        ImageInfo bII = bDrawer.imageInfo(pair.second());
+        return switch (arrangement) {
+          case HORIZONTAL -> {
+            if (abSizeRate <= 0) {
+              yield new ImageInfo(aII.w + bII.w, Math.max(aII.h, bII.h));
+            } else {
+              yield new ImageInfo(
+                  (int) (aII.w + bII.w / abSizeRate),
+                  (int) (Math.max(aII.h, bII.h / abSizeRate))
+              );
+            }
+          }
+          case VERTICAL -> {
+            if (abSizeRate <= 0) {
+              yield new ImageInfo(Math.max(aII.w, bII.w), aII.h + bII.h);
+            } else {
+              yield new ImageInfo(
+                  (int) Math.max(aII.w, bII.w / abSizeRate),
+                  (int) (aII.h + bII.h / abSizeRate)
+              );
+            }
+          }
+        };
+      }
+
+      @Override
+      public String toString() {
+        return "%s+%s".formatted(aDrawer, bDrawer);
+      }
+    };
   }
 
   static <E> Drawer<E> stringWriter(Color color, float fontSize, Function<E, String> f) {
@@ -161,6 +260,11 @@ public interface Drawer<E> {
               imageInfos.stream().mapToInt(ImageInfo::h).sum()
           );
         };
+      }
+
+      @Override
+      public String toString() {
+        return "multi[%s]".formatted(thisDrawer.toString());
       }
     };
   }

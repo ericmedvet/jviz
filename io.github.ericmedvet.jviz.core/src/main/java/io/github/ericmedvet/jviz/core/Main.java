@@ -1,26 +1,24 @@
-/*-
- * ========================LICENSE_START=================================
- * jviz-core
- * %%
- * Copyright (C) 2024 - 2026 Eric Medvet
- * %%
+/*
+ * Copyright 2026 eric
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * =========================LICENSE_END==================================
  */
 package io.github.ericmedvet.jviz.core;
 
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jnb.datastructure.Pair;
+import io.github.ericmedvet.jviz.core.drawer.Drawer;
 import io.github.ericmedvet.jviz.core.drawer.Drawer.Arrangement;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
@@ -104,7 +102,7 @@ public class Main {
   }
 
   public static void main(String[] args) throws IOException {
-    trajectory();
+    pairedPlots();
   }
 
   public static void onePlot() throws IOException {
@@ -185,6 +183,8 @@ public class Main {
         )
     );
     new BoxPlotDrawer().show(bpo);
+    Drawer.paired(new LinesPlotDrawer(), new BoxPlotDrawer(), Arrangement.HORIZONTAL, -1)
+        .show(new Pair<>(lp, bpo));
     // box plot
     DistributionPlot bp = new DistributionPlot(
         "My plot",
@@ -315,6 +315,57 @@ public class Main {
         )
             .apply(vfp)
     );
+  }
+
+  private static void pairedPlots() {
+    // lines plot
+    XYDataSeriesPlot lp = new XYDataSeriesPlot(
+        "My plot",
+        "x title",
+        "y title",
+        "x",
+        "f(x)",
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            3,
+            2,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                List.of(
+                    sinDS(0.2, DoubleRange.SYMMETRIC_UNIT, 100),
+                    sinDS(2, DoubleRange.SYMMETRIC_UNIT, 100),
+                    sinDS(5, DoubleRange.SYMMETRIC_UNIT, 100)
+                )
+            )
+        )
+    );
+    DistributionPlot bpo = new DistributionPlot(
+        "Boxplot with outliers",
+        "x title",
+        "y title",
+        "x",
+        "f(x)",
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            1,
+            1,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                List.of(gaussian(1d, 1d, 100, 10, -10), gaussian(1.5, 2, 100))
+            )
+        )
+    );
+    Drawer.paired(new LinesPlotDrawer(), new BoxPlotDrawer(), Arrangement.HORIZONTAL, -1)
+        .show(new Pair<>(lp, bpo));
+    Drawer.paired(new LinesPlotDrawer(), new BoxPlotDrawer(), Arrangement.HORIZONTAL, 3)
+        .show(new Pair<>(lp, bpo));
+    Drawer.paired(new LinesPlotDrawer(), new BoxPlotDrawer(), Arrangement.VERTICAL, -1)
+        .show(new Pair<>(lp, bpo));
+    Drawer.paired(new LinesPlotDrawer(), new BoxPlotDrawer(), Arrangement.VERTICAL, 0.5)
+        .show(new Pair<>(lp, bpo));
   }
 
   private static void missingValues() {
