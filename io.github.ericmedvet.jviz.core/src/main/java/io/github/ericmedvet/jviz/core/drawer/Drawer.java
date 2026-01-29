@@ -1,3 +1,22 @@
+/*-
+ * ========================LICENSE_START=================================
+ * jviz-core
+ * %%
+ * Copyright (C) 2024 - 2026 Eric Medvet
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =========================LICENSE_END==================================
+ */
 /*
  * Copyright 2026 eric
  *
@@ -5,7 +24,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +40,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
@@ -29,8 +47,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 public interface Drawer<E> {
@@ -41,9 +61,66 @@ public interface Drawer<E> {
 
   static void clean(Graphics2D g) {
     g.setColor(BG_COLOR);
-    g.fill(
-        new Rectangle2D.Double(0, 0, g.getClipBounds().getWidth(), g.getClipBounds().getHeight())
-    );
+    g.fill(g.getClipBounds());
+  }
+
+  static <E> Drawer<E> stacked(List<? extends Drawer<? super E>> drawers, Arrangement arrangement) {
+    return new Drawer<>() {
+      @Override
+      public void draw(Graphics2D g, E e) {
+        double gW = g.getClipBounds().getWidth();
+        double gH = g.getClipBounds().getHeight();
+        ImageInfo allII = imageInfo(e);
+        double scaleW = gW / allII.w();
+        double scaleH = gH / allII.h();
+        AffineTransform preTransform = g.getTransform();
+        double x = 0;
+        double y = 0;
+        for (Drawer<? super E> d : drawers) {
+          ImageInfo ii = d.imageInfo(e);
+          double w = ii.w() * scaleW;
+          double h = ii.h() * scaleH;
+          switch (arrangement) {
+            case HORIZONTAL -> g.translate(0, (gH - h) / 2d);
+            case VERTICAL -> g.translate((gW - w) / 2d, 0);
+          }
+          g.setClip(new Double(0, 0, w, h));
+          d.draw(g, e);
+          switch (arrangement) {
+            case HORIZONTAL -> g.translate(0, -(gH - h) / 2d);
+            case VERTICAL -> g.translate(-(gW - w) / 2d, 0);
+          }
+          switch (arrangement) {
+            case HORIZONTAL -> g.translate(w, 0);
+            case VERTICAL -> g.translate(0, h);
+          }
+        }
+        g.setTransform(preTransform);
+      }
+
+      @Override
+      public ImageInfo imageInfo(E e) {
+        List<ImageInfo> imageInfos = drawers.stream().map(d -> d.imageInfo(e)).toList();
+        return new ImageInfo(
+            switch (arrangement) {
+              case HORIZONTAL -> imageInfos.stream().mapToInt(ImageInfo::w).sum();
+              case VERTICAL -> imageInfos.stream().mapToInt(ImageInfo::w).max().orElse(0);
+            },
+            switch (arrangement) {
+              case HORIZONTAL -> imageInfos.stream().mapToInt(ImageInfo::h).max().orElse(0);
+              case VERTICAL -> imageInfos.stream().mapToInt(ImageInfo::h).sum();
+            }
+        );
+      }
+
+      @Override
+      public String toString() {
+        return "%s[%s]".formatted(
+            arrangement.name().substring(0, 1),
+            drawers.stream().map(Drawer::toString).collect(Collectors.joining(";"))
+        );
+      }
+    };
   }
 
   static <A, B> Drawer<Pair<A, B>> paired(
@@ -146,14 +223,18 @@ public interface Drawer<E> {
     };
   }
 
-  static <E> Drawer<E> stringWriter(Color color, float fontSize, Function<E, String> f) {
+  static <E> Drawer<E> stringWriter(Color bgColor, Color fgColor, float fontSize, Function<E, String> f) {
     return new Drawer<E>() {
       @Override
       public void draw(Graphics2D g, E e) {
+        if (Objects.nonNull(bgColor)) {
+          g.setColor(bgColor);
+          g.fill(g.getClipBounds());
+        }
         g.setFont(g.getFont().deriveFont(fontSize));
         double x0 = g.getClipBounds().getMinX();
         double y0 = g.getClipBounds().getMinY();
-        g.setColor(color);
+        g.setColor(fgColor);
         double lH = g.getFontMetrics().getHeight();
         AtomicInteger c = new AtomicInteger(0);
         f.apply(e)

@@ -66,7 +66,6 @@ public class Functions {
   private Functions() {
   }
 
-  @SuppressWarnings("unused")
   @Cacheable
   public static <X, P extends XYPlot<D>, D> NamedFunction<X, String> csvPlotter(
       @Param(value = "of", dNPM = "f.identity()") Function<X, P> beforeF,
@@ -106,7 +105,6 @@ public class Functions {
     return NamedFunction.from(f, "csv.plotter").compose(beforeF);
   }
 
-  @SuppressWarnings("unused")
   @Cacheable
   public static <X, P extends XYPlot<D>, D> NamedFunction<X, Object> imagePlotter(
       @Param(value = "of", dNPM = "f.identity()") Function<X, P> beforeF,
@@ -183,7 +181,6 @@ public class Functions {
     return NamedFunction.from(f, "image.plotter").compose(beforeF);
   }
 
-  @SuppressWarnings("unused")
   @Cacheable
   public static <X, D> NamedFunction<X, Object> toImage(
       @Param(value = "of", dNPM = "f.identity()") Function<X, D> beforeF,
@@ -206,7 +203,6 @@ public class Functions {
     return NamedFunction.from(f, "to.image[%s]".formatted(drawer)).compose(beforeF);
   }
 
-  @SuppressWarnings("unused")
   @Cacheable
   public static <X, D> NamedFunction<X, Video> toImagesVideo(
       @Param(value = "of", dNPM = "f.identity()") Function<X, List<D>> beforeF,
@@ -236,7 +232,6 @@ public class Functions {
         .compose(beforeF);
   }
 
-  @SuppressWarnings("unused")
   @Cacheable
   public static <X, D> NamedFunction<X, Object> toMultiImage(
       @Param(value = "of", dNPM = "f.identity()") Function<X, List<D>> beforeF,
@@ -261,7 +256,6 @@ public class Functions {
     return NamedFunction.from(f, "to.image[%s]".formatted(drawer)).compose(beforeF);
   }
 
-  @SuppressWarnings("unused")
   @Cacheable
   public static <X, D> NamedFunction<X, Video> toVideo(
       @Param(value = "of", dNPM = "f.identity()") Function<X, D> beforeF,
@@ -284,7 +278,6 @@ public class Functions {
     return NamedFunction.from(f, "to.video[%s]".formatted(videoBuilder)).compose(beforeF);
   }
 
-  @SuppressWarnings("unused")
   @Cacheable
   public static <X, P extends XYPlot<D>, D> NamedFunction<X, Video> videoPlotter(
       @Param(value = "of", dNPM = "f.identity()") Function<X, P> beforeF,
