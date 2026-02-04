@@ -34,8 +34,10 @@
  */
 package io.github.ericmedvet.jviz.core.drawer;
 
+import io.github.ericmedvet.jnb.datastructure.Accumulator;
 import io.github.ericmedvet.jnb.datastructure.Pair;
 import io.github.ericmedvet.jviz.core.util.Misc;
+import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -46,6 +48,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -392,6 +395,26 @@ public interface Drawer<E> {
 
   default void save(File file, E e) throws IOException {
     save(imageInfo(e), file, e);
+  }
+
+  default Accumulator<E, Video> videoAccumulator(double frameRate, VideoUtils.EncoderFacility encoder) {
+    List<BufferedImage> images = new ArrayList<>();
+    return new Accumulator<>() {
+      ImageInfo imageInfo = null;
+
+      @Override
+      public Video get() {
+        return new Video(images, frameRate, encoder);
+      }
+
+      @Override
+      public void listen(E e) {
+        if (imageInfo == null) {
+          imageInfo = imageInfo(e);
+        }
+        images.add(buildRaster(imageInfo, e));
+      }
+    };
   }
 
   default void show(ImageInfo imageInfo, E e) {
