@@ -33,6 +33,14 @@ public class Drawers {
   }
 
   @Cacheable
+  public static <E> Drawer<List<E>> multi(
+      @Param("drawer") Drawer<E> drawer,
+      @Param(value = "arrangement", dS = "vertical") Arrangement arrangement
+  ) {
+    return drawer.multi(arrangement);
+  }
+
+  @Cacheable
   public static <E> Drawer<E> stacked(
       @Param("drawers") List<? extends Drawer<? super E>> drawers,
       @Param(value = "arrangement", dS = "vertical") Arrangement arrangement
