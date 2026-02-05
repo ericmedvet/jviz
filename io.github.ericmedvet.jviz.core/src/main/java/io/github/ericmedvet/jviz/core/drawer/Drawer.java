@@ -71,28 +71,22 @@ public interface Drawer<E> {
     return new Drawer<>() {
       @Override
       public void draw(Graphics2D g, E e) {
+        AffineTransform preTransform = g.getTransform();
         double gW = g.getClipBounds().getWidth();
         double gH = g.getClipBounds().getHeight();
         ImageInfo allII = imageInfo(e);
         double scaleW = gW / allII.w();
         double scaleH = gH / allII.h();
-        AffineTransform preTransform = g.getTransform();
         double x = 0;
         double y = 0;
         for (Drawer<? super E> d : drawers) {
           ImageInfo ii = d.imageInfo(e);
           double w = ii.w() * scaleW;
           double h = ii.h() * scaleH;
-          switch (arrangement) {
-            case HORIZONTAL -> g.translate(0, (gH - h) / 2d);
-            case VERTICAL -> g.translate((gW - w) / 2d, 0);
-          }
           g.setClip(new Double(0, 0, w, h));
+          AffineTransform localPreTransform = g.getTransform();
           d.draw(g, e);
-          switch (arrangement) {
-            case HORIZONTAL -> g.translate(0, -(gH - h) / 2d);
-            case VERTICAL -> g.translate(-(gW - w) / 2d, 0);
-          }
+          g.setTransform(localPreTransform);
           switch (arrangement) {
             case HORIZONTAL -> g.translate(w, 0);
             case VERTICAL -> g.translate(0, h);
@@ -307,6 +301,7 @@ public interface Drawer<E> {
     return new Drawer<>() {
       @Override
       public void draw(Graphics2D g, List<E> es) {
+        AffineTransform preTransform = g.getTransform();
         ImageInfo allII = imageInfo(es);
         Rectangle bounds = g.getClipBounds();
         double wScale = bounds.getWidth() / allII.w();
@@ -315,9 +310,9 @@ public interface Drawer<E> {
         for (E e : es) {
           ImageInfo ii = thisDrawer.imageInfo(e);
           g.setClip(new Double(0, 0, ii.w(), ii.h()));
-          AffineTransform preTransform = g.getTransform();
+          AffineTransform localPreTransform = g.getTransform();
           thisDrawer.draw(g, e);
-          g.setTransform(preTransform);
+          g.setTransform(localPreTransform);
           g.translate(
               switch (arrangement) {
                 case HORIZONTAL -> ii.w();
@@ -329,6 +324,7 @@ public interface Drawer<E> {
               }
           );
         }
+        g.setTransform(preTransform);
       }
 
       @Override

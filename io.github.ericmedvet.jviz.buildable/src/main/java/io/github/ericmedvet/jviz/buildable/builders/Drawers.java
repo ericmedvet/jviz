@@ -25,6 +25,7 @@ import io.github.ericmedvet.jnb.core.Param;
 import io.github.ericmedvet.jviz.core.drawer.Drawer;
 import io.github.ericmedvet.jviz.core.drawer.Drawer.Arrangement;
 import java.util.List;
+import java.util.function.Function;
 
 @Discoverable(prefixTemplate = "viz.drawer|d")
 public class Drawers {
@@ -33,9 +34,17 @@ public class Drawers {
   }
 
   @Cacheable
+  public static <X, E> Drawer<X> composition(
+      @Param("drawer") Drawer<E> drawer,
+      @Param("f") Function<X, E> f
+  ) {
+    return drawer.on(f);
+  }
+
+  @Cacheable
   public static <E> Drawer<List<E>> multi(
       @Param("drawer") Drawer<E> drawer,
-      @Param(value = "arrangement", dS = "vertical") Arrangement arrangement
+      @Param(value = "arrangement", dS = "horizontal") Arrangement arrangement
   ) {
     return drawer.multi(arrangement);
   }
