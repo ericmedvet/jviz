@@ -40,7 +40,19 @@ import java.util.stream.IntStream;
 
 public interface Polygon {
 
-  List<Point> vertexes();
+  static Polygon of(List<Point> vertexes) {
+    record HardPolygon(List<Point> vertexes) implements Polygon {
+
+    }
+    return new HardPolygon(vertexes);
+  }
+
+  default Point center() {
+    return new Point(
+        vertexes().stream().mapToDouble(Point::x).average().orElseThrow(),
+        vertexes().stream().mapToDouble(Point::y).average().orElseThrow()
+    );
+  }
 
   default List<Segment> sides() {
     return IntStream.range(0, vertexes().size())
@@ -53,18 +65,6 @@ public interface Polygon {
         .toList();
   }
 
-  default Point center() {
-    return new Point(
-        vertexes().stream().mapToDouble(Point::x).average().orElseThrow(),
-        vertexes().stream().mapToDouble(Point::y).average().orElseThrow()
-    );
-  }
-
-  static Polygon from(List<Point> vertexes) {
-    record HardPolygon(List<Point> vertexes) implements Polygon {
-
-    }
-    return new HardPolygon(vertexes);
-  }
+  List<Point> vertexes();
 
 }
