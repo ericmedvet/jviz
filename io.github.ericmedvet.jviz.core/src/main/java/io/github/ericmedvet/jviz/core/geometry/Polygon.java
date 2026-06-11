@@ -60,4 +60,11 @@ public interface Polygon {
     );
   }
 
+  static Polygon from(List<Point> vertexes) {
+    record HardPolygon(List<Point> vertexes) implements Polygon {
+
+    }
+    return new HardPolygon(vertexes);
+  }
+
 }
