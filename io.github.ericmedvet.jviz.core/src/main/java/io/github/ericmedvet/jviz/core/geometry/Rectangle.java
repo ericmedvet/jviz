@@ -49,6 +49,11 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
   }
 
   @Override
+  public Rectangle boundingBox() {
+    return this;
+  }
+
+  @Override
   public Point center() {
     return new Point(
         topLeft.x() / 2d + bottomRight.x() / 2d,
@@ -103,12 +108,27 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
     return new Segment(topRight(), bottomRight);
   }
 
+  @Override
+  public String toString() {
+    return "r(%s->%s)".formatted(min(), max());
+  }
+
   public Segment topEdge() {
     return new Segment(topLeft, topRight());
   }
 
   public Point topRight() {
     return new Point(bottomRight.x(), topLeft.y());
+  }
+
+  @Override
+  public List<Point> vertexes() {
+    return List.of(
+        min(),
+        new Point(min().x(), max().y()),
+        max(),
+        new Point(max().x(), max().y())
+    );
   }
 
   public List<Point> verticalEdgesIntersections(Segment segment, double precision) {
@@ -125,20 +145,5 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
 
   public double width() {
     return bottomRight.x() - topLeft.x();
-  }
-
-  @Override
-  public String toString() {
-    return "r(%s->%s)".formatted(min(), max());
-  }
-
-  @Override
-  public List<Point> vertexes() {
-    return List.of(
-        min(),
-        new Point(min().x(), max().y()),
-        max(),
-        new Point(max().x(), max().y())
-    );
   }
 }

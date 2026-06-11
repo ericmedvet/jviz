@@ -28,6 +28,7 @@ import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot.ExtremeTy
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.BoxPlot.MidType;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Colors;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.General;
+import io.github.ericmedvet.jviz.core.plot.image.Configuration.HeatPolyMapPlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.Layout;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration.LinesPlot;
@@ -140,6 +141,7 @@ public class PlotConfigurations {
             TrajectoryPlot.DEFAULT.yExtensionRate(),
             TrajectoryPlot.DEFAULT.nOfMidPoints()
         ),
+        HeatPolyMapPlot.DEFAULT,
         debug
     );
   }

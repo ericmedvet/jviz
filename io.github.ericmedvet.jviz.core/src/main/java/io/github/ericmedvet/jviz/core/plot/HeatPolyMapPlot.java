@@ -33,51 +33,27 @@
  * limitations under the License.
  */
 
-package io.github.ericmedvet.jviz.core.geometry;
+package io.github.ericmedvet.jviz.core.plot;
 
-import java.util.List;
-import java.util.stream.IntStream;
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
+import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jviz.core.geometry.Point;
+import io.github.ericmedvet.jviz.core.geometry.Polygon;
+import io.github.ericmedvet.jviz.core.plot.HeatPolyMapPlot.ValuedPoint;
+import java.util.Map;
 
-public interface Polygon {
+public record HeatPolyMapPlot(
+    String title,
+    String xTitleName,
+    String yTitleName,
+    String xName,
+    String yName,
+    DoubleRange xRange,
+    DoubleRange yRange,
+    DoubleRange valueRange,
+    Grid<TitledData<Map<Polygon, ValuedPoint>>> dataGrid
+) implements XYPlot<Map<Polygon, ValuedPoint>> {
 
-  static Polygon of(List<Point> vertexes) {
-    record HardPolygon(List<Point> vertexes) implements Polygon {
-
-    }
-    return new HardPolygon(vertexes);
-  }
-
-  default Point center() {
-    return new Point(
-        vertexes().stream().mapToDouble(Point::x).average().orElseThrow(),
-        vertexes().stream().mapToDouble(Point::y).average().orElseThrow()
-    );
-  }
-
-  default List<Segment> sides() {
-    return IntStream.range(0, vertexes().size())
-        .mapToObj(
-            i -> new Segment(
-                vertexes().get(i),
-                (i == vertexes().size() - 1) ? vertexes().getFirst() : vertexes().get(i + 1)
-            )
-        )
-        .toList();
-  }
-
-  default Rectangle boundingBox() {
-    return Rectangle.of(
-        new Point(
-            vertexes().stream().mapToDouble(Point::x).min().orElseThrow(),
-            vertexes().stream().mapToDouble(Point::y).min().orElseThrow()
-        ),
-        new Point(
-            vertexes().stream().mapToDouble(Point::x).max().orElseThrow(),
-            vertexes().stream().mapToDouble(Point::y).max().orElseThrow()
-        )
-    );
-  }
-
-  List<Point> vertexes();
+  public record ValuedPoint(Point point, double value) {}
 
 }

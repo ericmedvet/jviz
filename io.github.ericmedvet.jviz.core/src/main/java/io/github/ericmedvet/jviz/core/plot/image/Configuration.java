@@ -38,6 +38,7 @@ public record Configuration(
     BoxPlot boxPlot,
     VectorialFieldPlot vectorialFieldPlot,
     TrajectoryPlot trajectoryPlot,
+    HeatPolyMapPlot heatPolyMapPlot,
     boolean debug
 ) {
 
@@ -54,6 +55,7 @@ public record Configuration(
       BoxPlot.DEFAULT,
       VectorialFieldPlot.DEFAULT,
       TrajectoryPlot.DEFAULT,
+      HeatPolyMapPlot.DEFAULT,
       false
   );
 
@@ -74,6 +76,7 @@ public record Configuration(
       BoxPlot.DEFAULT,
       VectorialFieldPlot.DEFAULT,
       TrajectoryPlot.DEFAULT,
+      HeatPolyMapPlot.DEFAULT,
       false
   );
 
@@ -186,6 +189,12 @@ public record Configuration(
   ) {
 
     public static final General DEFAULT = new General(1.25, 0.95, 0.0005, 0.001, 5);
+  }
+
+  public record HeatPolyMapPlot(
+    // TODO fill
+  ) {
+    public static final HeatPolyMapPlot DEFAULT = new HeatPolyMapPlot();
   }
 
   public record LandscapePlot(
