@@ -19,8 +19,12 @@
  */
 package io.github.ericmedvet.jviz.core.geometry;
 
+import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.SequencedSet;
+import java.util.stream.Collectors;
 
 public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
 
@@ -108,6 +112,34 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
     return new Segment(topRight(), bottomRight);
   }
 
+  public SequencedSet<Rectangle> splitHorizontally(int n) {
+    double minY = min().y();
+    double maxY = max().y();
+    return new DoubleRange(min().x(), max().x()).split(n)
+        .stream()
+        .map(
+            r -> Rectangle.of(
+                new Point(r.min(), minY),
+                new Point(r.max(), maxY)
+            )
+        )
+        .collect(Collectors.toCollection(LinkedHashSet::new));
+  }
+
+  public SequencedSet<Rectangle> splitVertically(int n) {
+    double minX = min().x();
+    double maxX = max().x();
+    return new DoubleRange(min().y(), max().y()).split(n)
+        .stream()
+        .map(
+            r -> Rectangle.of(
+                new Point(minX, r.min()),
+                new Point(maxX, r.max())
+            )
+        )
+        .collect(Collectors.toCollection(LinkedHashSet::new));
+  }
+
   @Override
   public String toString() {
     return "r(%s->%s)".formatted(min(), max());
@@ -127,7 +159,7 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
         min(),
         new Point(min().x(), max().y()),
         max(),
-        new Point(max().x(), max().y())
+        new Point(max().x(), min().y())
     );
   }
 

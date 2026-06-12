@@ -48,8 +48,8 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
 
   private static DoubleRange computeValueRange(UnivariateGridPlot p) {
     DoubleRange valueRange;
-    Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
     if (p.valueRange().equals(DoubleRange.UNBOUNDED)) {
+      Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
       valueRange = DoubleRange.union(valueRanges.values().stream().toList());
     } else {
       valueRange = p.valueRange();

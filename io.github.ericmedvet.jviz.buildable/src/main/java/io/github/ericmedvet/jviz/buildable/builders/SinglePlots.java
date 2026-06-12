@@ -23,6 +23,8 @@ import io.github.ericmedvet.jnb.core.Discoverable;
 import io.github.ericmedvet.jnb.core.Param;
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
+import io.github.ericmedvet.jviz.core.geometry.Polygon;
+import io.github.ericmedvet.jviz.core.plot.accumulator.HeatPolyMapSEPAF;
 import io.github.ericmedvet.jviz.core.plot.accumulator.UnivariateGridSEPAF;
 import io.github.ericmedvet.jviz.core.plot.accumulator.VectorialFieldSEPAF;
 import io.github.ericmedvet.jviz.core.plot.accumulator.XYDataSeriesSEPAF;
@@ -38,7 +40,6 @@ public class SinglePlots {
   private SinglePlots() {
   }
 
-  @SuppressWarnings("unused")
   public static <E, K, X, F> VectorialFieldSEPAF<E, K, X, F> field(
       @Param("title") Function<? super K, String> titleFunction,
       @Param("fields") List<Function<? super E, F>> fieldFunctions,
@@ -57,7 +58,6 @@ public class SinglePlots {
     );
   }
 
-  @SuppressWarnings("unused")
   public static <E, K, X, G> UnivariateGridSEPAF<E, K, X, G> grid(
       @Param("title") Function<? super K, String> titleFunction,
       @Param("values") List<Function<? super G, ? extends Number>> valueFunctions,
@@ -73,6 +73,26 @@ public class SinglePlots {
         condition,
         unique,
         gridFunctions,
+        valueFunctions,
+        valueRange
+    );
+  }
+
+  public static <E, K, X, V> HeatPolyMapSEPAF<E, K, X, V> heat(
+      @Param("title") Function<? super K, String> titleFunction,
+      @Param("values") List<Function<? super V, ? extends Number>> valueFunctions,
+      @Param("maps") List<Function<? super E, Map<Polygon, V>>> mapFunctions,
+      @Param("predicateValue") Function<E, X> predicateValueFunction,
+      @Param(value = "condition", dNPM = "predicate.ltEq(t=1)") Predicate<X> condition,
+      @Param(value = "valueRange", dNPM = "m.range(min=-Infinity;max=Infinity)") DoubleRange valueRange,
+      @Param(value = "unique", dB = true) boolean unique
+  ) {
+    return new HeatPolyMapSEPAF<>(
+        titleFunction,
+        predicateValueFunction,
+        condition,
+        unique,
+        mapFunctions,
         valueFunctions,
         valueRange
     );
@@ -102,7 +122,6 @@ public class SinglePlots {
     );
   }
 
-  @SuppressWarnings("unused")
   public static <E, K> XYDataSeriesSRPAF<E, K> xyrs(
       @Param("title") Function<? super K, String> titleFunction,
       @Param("x") Function<? super E, ? extends Number> xFunction,

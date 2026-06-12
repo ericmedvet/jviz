@@ -25,8 +25,10 @@ import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jnb.datastructure.Pair;
 import io.github.ericmedvet.jviz.core.drawer.Drawer;
 import io.github.ericmedvet.jviz.core.drawer.Drawer.Arrangement;
+import io.github.ericmedvet.jviz.core.geometry.Rectangle;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot.Data;
+import io.github.ericmedvet.jviz.core.plot.HeatPolyMapPlot;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.TrajectoryPlot;
 import io.github.ericmedvet.jviz.core.plot.TrajectoryPlot.Data.ReductionType;
@@ -43,6 +45,7 @@ import io.github.ericmedvet.jviz.core.plot.csv.VectorialFieldPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.csv.XYDataSeriesPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.image.BoxPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration;
+import io.github.ericmedvet.jviz.core.plot.image.HeatPolyMapPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
@@ -53,6 +56,7 @@ import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +113,7 @@ public class Main {
   }
 
   public static void main(String[] args) throws IOException {
-    stacked();
+    polyPlot();
   }
 
   public static void stacked() {
@@ -121,6 +125,50 @@ public class Main {
         ),
         Arrangement.VERTICAL
     ).show("cane");
+  }
+
+  public static void polyPlot() {
+    int nOfIterations = 10;
+    int maxSplitSize = 5;
+    RandomGenerator rg = RandomGenerator.getDefault();
+    List<Rectangle> rectangles = new ArrayList<>();
+    rectangles.add(new Rectangle(io.github.ericmedvet.jviz.core.geometry.Point.ORIGIN, 2, 1));
+    for (int i = 0; i < nOfIterations; i++) {
+      Rectangle r = rectangles.get(rg.nextInt(rectangles.size()));
+      rectangles.remove(r);
+      if (rg.nextBoolean()) {
+        rectangles.addAll(r.splitHorizontally(Math.max(rg.nextInt(maxSplitSize + 1), 2)));
+      } else {
+        rectangles.addAll(r.splitVertically(Math.max(rg.nextInt(maxSplitSize + 1), 2)));
+      }
+    }
+    HeatPolyMapPlot p = new HeatPolyMapPlot(
+        "Heat",
+        "x title",
+        "y title",
+        "x name",
+        "y name",
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        DoubleRange.UNBOUNDED,
+        Grid.create(
+            3,
+            2,
+            (gX, gY) -> new TitledData<>(
+                "gx=%d".formatted(gX),
+                "gy=%d".formatted(gY),
+                rectangles.stream()
+                    .filter(r -> rg.nextBoolean())
+                    .collect(
+                        Collectors.toMap(
+                            r -> r,
+                            r -> r.width() * r.height()
+                        )
+                    )
+            )
+        )
+    );
+    new HeatPolyMapPlotDrawer().show(p);
   }
 
   public static void onePlot() throws IOException {

@@ -38,7 +38,6 @@ public class MultiPlots {
   private MultiPlots() {
   }
 
-  @SuppressWarnings("unused")
   public static <E, K, X> ScatterMKPAF<E, K, String, X> scatter(
       @Param("xSubplot") Function<? super K, String> xSubplotFunction,
       @Param("ySubplot") Function<? super K, String> ySubplotFunction,
@@ -69,7 +68,6 @@ public class MultiPlots {
     );
   }
 
-  @SuppressWarnings("unused")
   public static <E, R> AggregatedXYDataSeriesMKPAF<E, R, String> xy(
       @Param("xSubplot") Function<? super R, String> xSubplotFunction,
       @Param("ySubplot") Function<? super R, String> ySubplotFunction,
@@ -118,7 +116,6 @@ public class MultiPlots {
     );
   }
 
-  @SuppressWarnings("unused")
   public static <E, R, X> DistributionMKPAF<E, R, String, X> yBoxplot(
       @Param("xSubplot") Function<? super R, String> xSubplotFunction,
       @Param("ySubplot") Function<? super R, String> ySubplotFunction,

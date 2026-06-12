@@ -192,9 +192,25 @@ public record Configuration(
   }
 
   public record HeatPolyMapPlot(
-    // TODO fill
+      double erodeRate,
+      double strokeSizeRate,
+      int legendSteps,
+      double legendImageWRate,
+      double legendImageHRate,
+      boolean showRanges,
+      ColorRange colorRange,
+      Color polyBorderColor
   ) {
-    public static final HeatPolyMapPlot DEFAULT = new HeatPolyMapPlot();
+    public static final HeatPolyMapPlot DEFAULT = new HeatPolyMapPlot(
+        0.0025,
+        0.0015,
+        20,
+        0.2,
+        0.025,
+        true,
+        Colors.DEFAULT.continuousDataColorRanges().getFirst(),
+        Colors.DEFAULT.plotBorderColor()
+    );
   }
 
   public record LandscapePlot(

@@ -23,49 +23,62 @@ import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import io.github.ericmedvet.jnb.datastructure.Grid;
 import io.github.ericmedvet.jnb.datastructure.NamedFunction;
 import io.github.ericmedvet.jnb.datastructure.Table;
-import io.github.ericmedvet.jviz.core.plot.RangedGrid;
-import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
+import io.github.ericmedvet.jviz.core.geometry.Polygon;
+import io.github.ericmedvet.jviz.core.plot.HeatPolyMapPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-public class UnivariateGridSEPAF<E, K, X, G> extends AbstractSingleEPAF<E, UnivariateGridPlot, K, Grid<Double>, X> {
-  private final List<Function<? super E, Grid<G>>> gridFunctions;
-  private final List<Function<? super G, ? extends Number>> gridValueFunctions;
+public class HeatPolyMapSEPAF<E, K, X, V> extends AbstractSingleEPAF<E, HeatPolyMapPlot, K, Map<Polygon, Double>, X> {
+
+  private final List<Function<? super E, Map<Polygon, V>>> mapFunctions;
+  private final List<Function<? super V, ? extends Number>> mapValueFunctions;
   private final DoubleRange valueRange;
 
-  public UnivariateGridSEPAF(
+  public HeatPolyMapSEPAF(
       Function<? super K, String> titleFunction,
       Function<? super E, X> predicateValueFunction,
       Predicate<? super X> predicate,
       boolean unique,
-      List<Function<? super E, Grid<G>>> gridFunctions,
-      List<Function<? super G, ? extends Number>> gridValueFunctions,
+      List<Function<? super E, Map<Polygon, V>>> mapFunctions,
+      List<Function<? super V, ? extends Number>> mapValueFunctions,
       DoubleRange valueRange
   ) {
     super(titleFunction, predicateValueFunction, predicate, unique);
-    this.gridFunctions = gridFunctions;
-    this.gridValueFunctions = gridValueFunctions;
+    this.mapFunctions = mapFunctions;
+    this.mapValueFunctions = mapValueFunctions;
     this.valueRange = valueRange;
   }
 
   @Override
-  protected List<Map.Entry<String, Grid<Double>>> buildData(E e, K k) {
-    return gridFunctions.stream()
-        .flatMap(gf -> {
-          Grid<G> grid = gf.apply(e);
-          return gridValueFunctions.stream()
+  protected List<Entry<String, Map<Polygon, Double>>> buildData(E e, K k) {
+    return mapFunctions.stream()
+        .flatMap(mf -> {
+          Map<Polygon, V> vMap = mf.apply(e);
+          return mapValueFunctions.stream()
               .map(
-                  gvf -> Map.entry(
-                      gridFunctions.size() == 1 ? NamedFunction.name(gvf) : "%s on %s".formatted(
-                          NamedFunction.name(gvf),
-                          NamedFunction.name(gf)
+                  mvf -> Map.entry(
+                      mapFunctions.size() == 1 ? NamedFunction.name(mvf) : "%s on %s".formatted(
+                          NamedFunction.name(mvf),
+                          NamedFunction.name(mf)
                       ),
-                      grid.map(g -> Objects.isNull(g) ? null : gvf.apply(g).doubleValue())
+                      vMap.entrySet()
+                          .stream()
+                          .collect(
+                              Collectors.toMap(
+                                  Entry::getKey,
+                                  entry -> Optional
+                                      .ofNullable(entry.getValue())
+                                      .map(v -> mvf.apply(v).doubleValue())
+                                      .orElse(Double.NaN)
+                              )
+                          )
                   )
               );
         })
@@ -73,15 +86,15 @@ public class UnivariateGridSEPAF<E, K, X, G> extends AbstractSingleEPAF<E, Univa
   }
 
   @Override
-  protected UnivariateGridPlot buildPlot(Table<String, String, Grid<Double>> data, K k) {
+  protected HeatPolyMapPlot buildPlot(Table<String, String, Map<Polygon, Double>> data, K k) {
     List<String> colIndexes = new ArrayList<>(data.colIndexes());
     List<String> rowIndexes = new ArrayList<>(data.rowIndexes());
-    return new UnivariateGridPlot(
+    return new HeatPolyMapPlot(
         titleFunction.apply(k),
         NamedFunction.name(predicateValueFunction),
         "value",
-        data.get(0, 0) instanceof RangedGrid<?> rg ? rg.xName() : "x",
-        data.get(0, 0) instanceof RangedGrid<?> rg ? rg.yName() : "y",
+        "x",
+        "y",
         DoubleRange.UNBOUNDED,
         DoubleRange.UNBOUNDED,
         valueRange,
@@ -99,6 +112,6 @@ public class UnivariateGridSEPAF<E, K, X, G> extends AbstractSingleEPAF<E, Univa
 
   @Override
   public String toString() {
-    return "gridSEPAF(gridValueFunctions=" + gridValueFunctions + ')';
+    return "heatPolyMapSEPAF(mapValueFunctions=" + mapValueFunctions + ')';
   }
 }
