@@ -28,6 +28,7 @@ import io.github.ericmedvet.jviz.core.drawer.Drawer.ImageInfo;
 import io.github.ericmedvet.jviz.core.drawer.Video;
 import io.github.ericmedvet.jviz.core.drawer.VideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.DistributionPlot;
+import io.github.ericmedvet.jviz.core.plot.HeatPolyMapPlot;
 import io.github.ericmedvet.jviz.core.plot.LandscapePlot;
 import io.github.ericmedvet.jviz.core.plot.TrajectoryPlot;
 import io.github.ericmedvet.jviz.core.plot.UnivariateGridPlot;
@@ -41,13 +42,13 @@ import io.github.ericmedvet.jviz.core.plot.csv.VectorialFieldPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.csv.XYDataSeriesPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.image.BoxPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.Configuration;
+import io.github.ericmedvet.jviz.core.plot.image.HeatPolyMapPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.LandscapePlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.LinesPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.TrajectoryPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.video.AbstractXYDataSeriesPlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.BoxPlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.LandscapePlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.LinesPlotVideoBuilder;
@@ -56,8 +57,8 @@ import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.VectorialFieldVideoBuilder;
 import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 @Discoverable(prefixTemplate = "viz.function|f")
@@ -82,27 +83,33 @@ public class Functions {
         List.of(new io.github.ericmedvet.jviz.core.plot.csv.Configuration.Replacement("\\W+", ".")),
         missingDataString
     );
-    Function<P, String> f = p -> {
-      if (p instanceof DistributionPlot dp) {
-        return new DistributionPlotCsvBuilder(configuration, mode).apply(dp);
-      }
-      if (p instanceof LandscapePlot lsp) {
-        return new LandscapePlotCsvBuilder(configuration, mode).apply(lsp);
-      }
-      if (p instanceof XYDataSeriesPlot xyp) {
-        return new XYDataSeriesPlotCsvBuilder(configuration, mode).apply(xyp);
-      }
-      if (p instanceof UnivariateGridPlot ugp) {
-        return new UnivariateGridPlotCsvBuilder(configuration, mode).apply(ugp);
-      }
-      if (p instanceof VectorialFieldPlot vfp) {
-        return new VectorialFieldPlotCsvBuilder(configuration, mode).apply(vfp);
-      }
-      throw new IllegalArgumentException(
+    Function<P, String> f = p -> switch (p) {
+      case DistributionPlot dp -> new DistributionPlotCsvBuilder(configuration, mode).apply(dp);
+      case LandscapePlot lsp -> new LandscapePlotCsvBuilder(configuration, mode).apply(lsp);
+      case XYDataSeriesPlot xyp -> new XYDataSeriesPlotCsvBuilder(configuration, mode).apply(xyp);
+      case UnivariateGridPlot ugp -> new UnivariateGridPlotCsvBuilder(configuration, mode).apply(ugp);
+      case VectorialFieldPlot vfp -> new VectorialFieldPlotCsvBuilder(configuration, mode).apply(vfp);
+      // TODO add TrajectoryPlot and HeatPolyMapPlot plots
+      default -> throw new IllegalArgumentException(
           "Unsupported type of plot %s".formatted(p.getClass().getSimpleName())
       );
     };
     return NamedFunction.from(f, "csv.plotter").compose(beforeF);
+  }
+
+  private static <P> Object image(P plot, Supplier<? extends Drawer<? super P>> supplier, int w, int h, String type) {
+    UnaryOperator<ImageInfo> iiAdapter = ii -> new Drawer.ImageInfo(
+        w == -1 ? ii.w() : w,
+        h == -1 ? ii.h() : h
+    );
+    Drawer<? super P> drawer = supplier.get();
+    return switch (type.toLowerCase()) {
+      case "png" -> drawer.buildRaster(iiAdapter.apply(drawer.imageInfo(plot)), plot);
+      case "svg" -> drawer.buildVectorial(iiAdapter.apply(drawer.imageInfo(plot)), plot);
+      default -> throw new IllegalArgumentException(
+          "Invalid type '%s', which is not 'png' nor 'svg'".formatted(type)
+      );
+    };
   }
 
   @Cacheable
@@ -110,71 +117,20 @@ public class Functions {
       @Param(value = "of", dNPM = "f.identity()") Function<X, P> beforeF,
       @Param(value = "w", dI = -1) int w,
       @Param(value = "h", dI = -1) int h,
-      @Param(value = "configuration", dNPM = "viz.plot.configuration.image()") Configuration configuration,
+      @Param(value = "configuration", dNPM = "viz.plot.configuration.image()") Configuration c,
       @Param("secondary") boolean secondary,
       @Param(value = "type", dS = "png") String type
   ) {
-    UnaryOperator<ImageInfo> iiAdapter = ii -> new Drawer.ImageInfo(
-        w == -1 ? ii.w() : w,
-        h == -1 ? ii.h() : h
-    );
-    class ConditionedDrawer<Y> implements BiFunction<Drawer<Y>, Y, Object> {
-
-      @Override
-      public Object apply(Drawer<Y> drawer, Y y) {
-        return switch (type.toLowerCase()) {
-          case "png" -> drawer.buildRaster(iiAdapter.apply(drawer.imageInfo(y)), y);
-          case "svg" -> drawer.buildVectorial(iiAdapter.apply(drawer.imageInfo(y)), y);
-          default -> throw new IllegalArgumentException(
-              "Invalid type '%s', which is not 'png' nor 'svg'".formatted(type)
-          );
-        };
-      }
-    }
-    Function<P, Object> f = p -> {
-      if (p instanceof DistributionPlot dp) {
-        return new ConditionedDrawer<DistributionPlot>().apply(
-            new BoxPlotDrawer(configuration),
-            dp
-        );
-      }
-      if (p instanceof LandscapePlot lsp) {
-        return new ConditionedDrawer<LandscapePlot>().apply(
-            new LandscapePlotDrawer(configuration),
-            lsp
-        );
-      }
-      if (p instanceof XYDataSeriesPlot xyp) {
-        if (secondary) {
-          return new ConditionedDrawer<XYDataSeriesPlot>().apply(
-              new PointsPlotDrawer(configuration),
-              xyp
-          );
-        }
-        return new ConditionedDrawer<XYDataSeriesPlot>().apply(
-            new LinesPlotDrawer(configuration),
-            xyp
-        );
-      }
-      if (p instanceof UnivariateGridPlot ugp) {
-        return new ConditionedDrawer<UnivariateGridPlot>().apply(
-            new UnivariateGridPlotDrawer(configuration),
-            ugp
-        );
-      }
-      if (p instanceof VectorialFieldPlot vfp) {
-        return new ConditionedDrawer<VectorialFieldPlot>().apply(
-            new VectorialFieldPlotDrawer(configuration),
-            vfp
-        );
-      }
-      if (p instanceof TrajectoryPlot tp) {
-        return new ConditionedDrawer<TrajectoryPlot>().apply(
-            new TrajectoryPlotDrawer(configuration),
-            tp
-        );
-      }
-      throw new IllegalArgumentException(
+    Function<P, Object> f = p -> switch (p) {
+      case DistributionPlot dp -> image(dp, () -> new BoxPlotDrawer(c), w, h, type);
+      case LandscapePlot lsp -> image(lsp, () -> new LandscapePlotDrawer(c), w, h, type);
+      case XYDataSeriesPlot xyp when secondary -> image(xyp, () -> new PointsPlotDrawer(c), w, h, type);
+      case XYDataSeriesPlot xyp -> image(xyp, () -> new LinesPlotDrawer(c), w, h, type);
+      case UnivariateGridPlot ugp -> image(ugp, () -> new UnivariateGridPlotDrawer(c), w, h, type);
+      case VectorialFieldPlot vfp -> image(vfp, () -> new VectorialFieldPlotDrawer(c), w, h, type);
+      case TrajectoryPlot tp -> image(tp, () -> new TrajectoryPlotDrawer(c), w, h, type);
+      case HeatPolyMapPlot hpmp -> image(hpmp, () -> new HeatPolyMapPlotDrawer(c), w, h, type);
+      default -> throw new IllegalArgumentException(
           "Unsupported type of plot %s".formatted(p.getClass().getSimpleName())
       );
     };
@@ -278,65 +234,45 @@ public class Functions {
     return NamedFunction.from(f, "to.video[%s]".formatted(videoBuilder)).compose(beforeF);
   }
 
-  @Cacheable
-  public static <X, P extends XYPlot<D>, D> NamedFunction<X, Video> videoPlotter(
-      @Param(value = "of", dNPM = "f.identity()") Function<X, P> beforeF,
-      @Param(value = "w", dI = -1) int w,
-      @Param(value = "h", dI = -1) int h,
-      @Param(value = "encoder", dS = "default") VideoUtils.EncoderFacility encoder,
-      @Param(value = "frameRate", dD = 10) double frameRate,
-      @Param(value = "configuration", dNPM = "viz.plot.configuration.image()") Configuration iConfiguration,
-      @Param("secondary") boolean secondary
+  private static <P> Video video(
+      P plot,
+      Supplier<? extends VideoBuilder<? super P>> supplier,
+      int w,
+      int h,
+      VideoUtils.EncoderFacility encoder
   ) {
     UnaryOperator<VideoBuilder.VideoInfo> viAdapter = vi -> new VideoBuilder.VideoInfo(
         w == -1 ? vi.w() : w,
         h == -1 ? vi.h() : h,
         encoder
     );
-    io.github.ericmedvet.jviz.core.plot.video.Configuration vConfiguration = new io.github.ericmedvet.jviz.core.plot.video.Configuration(
+    VideoBuilder<? super P> vb = supplier.get();
+    return vb.build(viAdapter.apply(vb.videoInfo(plot)), plot);
+  }
+
+  @Cacheable
+  public static <X, P extends XYPlot<D>, D> NamedFunction<X, Video> videoPlotter(
+      @Param(value = "of", dNPM = "f.identity()") Function<X, P> beforeF,
+      @Param(value = "w", dI = -1) int w,
+      @Param(value = "h", dI = -1) int h,
+      @Param(value = "encoder", dS = "default") VideoUtils.EncoderFacility e,
+      @Param(value = "frameRate", dD = 10) double frameRate,
+      @Param(value = "configuration", dNPM = "viz.plot.configuration.image()") Configuration ic,
+      @Param("secondary") boolean secondary
+  ) {
+    io.github.ericmedvet.jviz.core.plot.video.Configuration vc = new io.github.ericmedvet.jviz.core.plot.video.Configuration(
         io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT.splitType(),
         frameRate
     );
-    Function<P, Video> f = p -> {
-      if (p instanceof DistributionPlot dp) {
-        BoxPlotVideoBuilder vb = new BoxPlotVideoBuilder(
-            vConfiguration,
-            iConfiguration
-        );
-        return vb.build(viAdapter.apply(vb.videoInfo(dp)), dp);
-      }
-      if (p instanceof LandscapePlot lsp) {
-        LandscapePlotVideoBuilder vb = new LandscapePlotVideoBuilder(
-            vConfiguration,
-            iConfiguration
-        );
-        return vb.build(viAdapter.apply(vb.videoInfo(lsp)), lsp);
-      }
-      if (p instanceof XYDataSeriesPlot xyp) {
-        AbstractXYDataSeriesPlotVideoBuilder vb = (!secondary) ? new LinesPlotVideoBuilder(
-            vConfiguration,
-            iConfiguration
-        ) : new PointsPlotVideoBuilder(
-            vConfiguration,
-            iConfiguration
-        );
-        return vb.build(viAdapter.apply(vb.videoInfo(xyp)), xyp);
-      }
-      if (p instanceof UnivariateGridPlot ugp) {
-        UnivariatePlotVideoBuilder vb = new UnivariatePlotVideoBuilder(
-            vConfiguration,
-            iConfiguration
-        );
-        return vb.build(viAdapter.apply(vb.videoInfo(ugp)), ugp);
-      }
-      if (p instanceof VectorialFieldPlot vfp) {
-        VectorialFieldVideoBuilder vb = new VectorialFieldVideoBuilder(
-            vConfiguration,
-            iConfiguration
-        );
-        return vb.build(viAdapter.apply(vb.videoInfo(vfp)), vfp);
-      }
-      throw new IllegalArgumentException(
+    Function<P, Video> f = p -> switch (p) {
+      case DistributionPlot dp -> video(dp, () -> new BoxPlotVideoBuilder(vc, ic), w, h, e);
+      case LandscapePlot lsp -> video(lsp, () -> new LandscapePlotVideoBuilder(vc, ic), w, h, e);
+      case XYDataSeriesPlot xyp when secondary -> video(xyp, () -> new PointsPlotVideoBuilder(vc, ic), w, h, e);
+      case XYDataSeriesPlot xyp -> video(xyp, () -> new LinesPlotVideoBuilder(vc, ic), w, h, e);
+      case UnivariateGridPlot ugp -> video(ugp, () -> new UnivariatePlotVideoBuilder(vc, ic), w, h, e);
+      case VectorialFieldPlot vfp -> video(vfp, () -> new VectorialFieldVideoBuilder(vc, ic), w, h, e);
+      // TODO add TrajectoryPlot and HeatPolyMapPlot plots
+      default -> throw new IllegalArgumentException(
           "Unsupported type of plot %s".formatted(p.getClass().getSimpleName())
       );
     };
