@@ -34,7 +34,6 @@ public record Circle(Point center, double radius) {
     return center.distance(point) <= radius;
   }
 
-  // TODO check
   // the list of intersection points returned sorted in ascending order based on the distance from segment.p1()
   public List<Point> intersection(Segment segment) {
     // translate the segment to the circle's coordinate system

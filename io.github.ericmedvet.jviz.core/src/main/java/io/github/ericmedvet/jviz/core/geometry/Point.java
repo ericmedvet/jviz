@@ -71,18 +71,16 @@ public record Point(double x, double y) {
     return new Point(-x, -y);
   }
 
-  // TODO check
   public double getRotationAngle(Point centerOfRotation) {
-    return this.diff(centerOfRotation).direction();
+    return diff(centerOfRotation).direction();
   }
 
   public double magnitude() {
     return Math.sqrt(x * x + y * y);
   }
 
-  // TODO check
   public Point rotate(Point centerOfRotation, double angle) {
-    return this.translate(centerOfRotation.getOpposite()).rotate(angle).translate(centerOfRotation);
+    return translate(centerOfRotation.getOpposite()).rotate(angle).translate(centerOfRotation);
   }
 
   public Point rotate(double angle) {
