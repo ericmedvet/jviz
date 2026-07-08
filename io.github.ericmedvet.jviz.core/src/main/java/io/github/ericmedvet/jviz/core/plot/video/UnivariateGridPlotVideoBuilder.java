@@ -25,9 +25,9 @@ import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.Configuration.SplitType;
 import java.util.List;
 
-public class UnivariatePlotVideoBuilder extends AbstractXYPlotVideoBuilder<UnivariateGridPlot, Grid<Double>> {
+public class UnivariateGridPlotVideoBuilder extends AbstractXYPlotVideoBuilder<UnivariateGridPlot, Grid<Double>> {
 
-  public UnivariatePlotVideoBuilder(
+  public UnivariateGridPlotVideoBuilder(
       Configuration c,
       io.github.ericmedvet.jviz.core.plot.image.Configuration iConfiguration
   ) {
