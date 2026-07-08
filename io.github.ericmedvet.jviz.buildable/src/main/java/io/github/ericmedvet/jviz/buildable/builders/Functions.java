@@ -51,6 +51,7 @@ import io.github.ericmedvet.jviz.core.plot.image.TrajectoryPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.video.BoxPlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.HeatPolyMapPlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.LandscapePlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.LinesPlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.PointsPlotVideoBuilder;
@@ -91,7 +92,7 @@ public class Functions {
       case UnivariateGridPlot ugp -> new UnivariateGridPlotCsvBuilder(c, m).apply(ugp);
       case VectorialFieldPlot vfp -> new VectorialFieldPlotCsvBuilder(c, m).apply(vfp);
       case TrajectoryPlot tp -> new TrajectoryPlotCsvBuilder(c, m).apply(tp);
-      // TODO add HeatPolyMapPlot plots
+      // TODO maybe add HeatPolyMapPlot plots
       default -> throw new IllegalArgumentException(
           "Unsupported type of plot %s".formatted(p.getClass().getSimpleName())
       );
@@ -273,7 +274,8 @@ public class Functions {
       case XYDataSeriesPlot xyp -> video(xyp, () -> new LinesPlotVideoBuilder(vc, ic), w, h, e);
       case UnivariateGridPlot ugp -> video(ugp, () -> new UnivariateGridPlotVideoBuilder(vc, ic), w, h, e);
       case VectorialFieldPlot vfp -> video(vfp, () -> new VectorialFieldVideoBuilder(vc, ic), w, h, e);
-      // TODO add TrajectoryPlot and HeatPolyMapPlot plots
+      case HeatPolyMapPlot hpmp -> video(hpmp, () -> new HeatPolyMapPlotVideoBuilder(vc, ic), w, h, e);
+      // TODO maybe add TrajectoryPlot?
       default -> throw new IllegalArgumentException(
           "Unsupported type of plot %s".formatted(p.getClass().getSimpleName())
       );
