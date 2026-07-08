@@ -37,6 +37,7 @@ import io.github.ericmedvet.jviz.core.plot.XYDataSeriesPlot;
 import io.github.ericmedvet.jviz.core.plot.XYPlot;
 import io.github.ericmedvet.jviz.core.plot.csv.DistributionPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.csv.LandscapePlotCsvBuilder;
+import io.github.ericmedvet.jviz.core.plot.csv.TrajectoryPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.csv.UnivariateGridPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.csv.VectorialFieldPlotCsvBuilder;
 import io.github.ericmedvet.jviz.core.plot.csv.XYDataSeriesPlotCsvBuilder;
@@ -53,7 +54,7 @@ import io.github.ericmedvet.jviz.core.plot.video.BoxPlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.LandscapePlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.LinesPlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.PointsPlotVideoBuilder;
-import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.UnivariateGridPlotVideoBuilder;
 import io.github.ericmedvet.jviz.core.plot.video.VectorialFieldVideoBuilder;
 import io.github.ericmedvet.jviz.core.util.VideoUtils;
 import java.util.List;
@@ -74,9 +75,9 @@ public class Functions {
       @Param(value = "doubleFormat", dS = "%.3e") String doubleFormat,
       @Param(value = "delimiter", dS = "\t") String delimiter,
       @Param(value = "missingDataString", dS = "nan") String missingDataString,
-      @Param(value = "mode", dS = "paper_friendly") io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode mode
+      @Param(value = "mode", dS = "paper_friendly") io.github.ericmedvet.jviz.core.plot.csv.Configuration.Mode m
   ) {
-    io.github.ericmedvet.jviz.core.plot.csv.Configuration configuration = new io.github.ericmedvet.jviz.core.plot.csv.Configuration(
+    io.github.ericmedvet.jviz.core.plot.csv.Configuration c = new io.github.ericmedvet.jviz.core.plot.csv.Configuration(
         columnNameJoiner,
         doubleFormat,
         delimiter,
@@ -84,12 +85,13 @@ public class Functions {
         missingDataString
     );
     Function<P, String> f = p -> switch (p) {
-      case DistributionPlot dp -> new DistributionPlotCsvBuilder(configuration, mode).apply(dp);
-      case LandscapePlot lsp -> new LandscapePlotCsvBuilder(configuration, mode).apply(lsp);
-      case XYDataSeriesPlot xyp -> new XYDataSeriesPlotCsvBuilder(configuration, mode).apply(xyp);
-      case UnivariateGridPlot ugp -> new UnivariateGridPlotCsvBuilder(configuration, mode).apply(ugp);
-      case VectorialFieldPlot vfp -> new VectorialFieldPlotCsvBuilder(configuration, mode).apply(vfp);
-      // TODO add TrajectoryPlot and HeatPolyMapPlot plots
+      case DistributionPlot dp -> new DistributionPlotCsvBuilder(c, m).apply(dp);
+      case LandscapePlot lsp -> new LandscapePlotCsvBuilder(c, m).apply(lsp);
+      case XYDataSeriesPlot xyp -> new XYDataSeriesPlotCsvBuilder(c, m).apply(xyp);
+      case UnivariateGridPlot ugp -> new UnivariateGridPlotCsvBuilder(c, m).apply(ugp);
+      case VectorialFieldPlot vfp -> new VectorialFieldPlotCsvBuilder(c, m).apply(vfp);
+      case TrajectoryPlot tp -> new TrajectoryPlotCsvBuilder(c, m).apply(tp);
+      // TODO add HeatPolyMapPlot plots
       default -> throw new IllegalArgumentException(
           "Unsupported type of plot %s".formatted(p.getClass().getSimpleName())
       );
@@ -269,7 +271,7 @@ public class Functions {
       case LandscapePlot lsp -> video(lsp, () -> new LandscapePlotVideoBuilder(vc, ic), w, h, e);
       case XYDataSeriesPlot xyp when secondary -> video(xyp, () -> new PointsPlotVideoBuilder(vc, ic), w, h, e);
       case XYDataSeriesPlot xyp -> video(xyp, () -> new LinesPlotVideoBuilder(vc, ic), w, h, e);
-      case UnivariateGridPlot ugp -> video(ugp, () -> new UnivariatePlotVideoBuilder(vc, ic), w, h, e);
+      case UnivariateGridPlot ugp -> video(ugp, () -> new UnivariateGridPlotVideoBuilder(vc, ic), w, h, e);
       case VectorialFieldPlot vfp -> video(vfp, () -> new VectorialFieldVideoBuilder(vc, ic), w, h, e);
       // TODO add TrajectoryPlot and HeatPolyMapPlot plots
       default -> throw new IllegalArgumentException(

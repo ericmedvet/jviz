@@ -52,7 +52,7 @@ import io.github.ericmedvet.jviz.core.plot.image.PointsPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.TrajectoryPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.UnivariateGridPlotDrawer;
 import io.github.ericmedvet.jviz.core.plot.image.VectorialFieldPlotDrawer;
-import io.github.ericmedvet.jviz.core.plot.video.UnivariatePlotVideoBuilder;
+import io.github.ericmedvet.jviz.core.plot.video.UnivariateGridPlotVideoBuilder;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -326,7 +326,7 @@ public class Main {
         )
     );
     new UnivariateGridPlotDrawer().show(ugp);
-    new UnivariatePlotVideoBuilder(
+    new UnivariateGridPlotVideoBuilder(
         io.github.ericmedvet.jviz.core.plot.video.Configuration.DEFAULT,
         Configuration.DEFAULT
     )
