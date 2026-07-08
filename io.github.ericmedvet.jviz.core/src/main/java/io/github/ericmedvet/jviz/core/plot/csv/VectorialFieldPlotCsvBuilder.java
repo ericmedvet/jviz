@@ -63,16 +63,14 @@ public class VectorialFieldPlotCsvBuilder extends AbstractCsvBuilder<VectorialFi
             for (Map.Entry<Point, Point> pp : ds.pointPairs().entrySet()) {
               csvPrinter.printRecord(
                   processRecord(
-                      processRecord(
-                          List.of(
-                              td.xTitle(),
-                              td.yTitle(),
-                              ds.name(),
-                              pp.getKey().x(),
-                              pp.getKey().y(),
-                              pp.getValue().x(),
-                              pp.getValue().y()
-                          )
+                      List.of(
+                          td.xTitle(),
+                          td.yTitle(),
+                          ds.name(),
+                          pp.getKey().x(),
+                          pp.getKey().y(),
+                          pp.getValue().x(),
+                          pp.getValue().y()
                       )
                   )
               );
@@ -96,8 +94,10 @@ public class VectorialFieldPlotCsvBuilder extends AbstractCsvBuilder<VectorialFi
             processRecord(
                 Stream.of(
                     List.of(
-                        Stream.of("src", p.xName()).collect(Collectors.joining(c.columnNameJoiner())),
-                        Stream.of("src", p.yName()).collect(Collectors.joining(c.columnNameJoiner()))
+                        Stream.of("src", p.xName())
+                            .collect(Collectors.joining(c.columnNameJoiner())),
+                        Stream.of("src", p.yName())
+                            .collect(Collectors.joining(c.columnNameJoiner()))
                     ),
                     t.colIndexes()
                         .stream()
