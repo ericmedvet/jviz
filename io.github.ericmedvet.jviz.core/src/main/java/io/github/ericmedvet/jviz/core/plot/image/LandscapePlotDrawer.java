@@ -191,15 +191,15 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
     if (!c.showRanges()) {
       return;
     }
-    DoubleRange valueRange = computeValueRange(p, gm);
-    Grid<DoubleRange> valueRanges = computeValueRanges(p, gm);
+    DoubleRange globalValueRange = computeValueRange(p, gm);
+    DoubleRange localValueRange = computeValueRanges(p, gm).get(k).intersectionWith(globalValueRange);
     PlotUtils.drawColorBar(
         g,
         configuration(),
         gm,
         new Rectangle2D.Double(r.getX(), r.getY(), r.getWidth(), r.getHeight()),
-        valueRange,
-        valueRanges.get(k),
+        globalValueRange,
+        localValueRange,
         c.colorRange(),
         c.colorBarLegendImageHRate() * gm.h(),
         c.legendSteps(),

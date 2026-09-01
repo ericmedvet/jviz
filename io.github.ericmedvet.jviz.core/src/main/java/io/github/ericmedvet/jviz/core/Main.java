@@ -128,7 +128,7 @@ public class Main {
   }
 
   public static void polyPlot() {
-    int nOfIterations = 10;
+    int nOfIterations = 5;
     int maxSplitSize = 5;
     RandomGenerator rg = RandomGenerator.getDefault();
     List<Rectangle> rectangles = new ArrayList<>();
@@ -150,7 +150,7 @@ public class Main {
         "y name",
         DoubleRange.UNBOUNDED,
         DoubleRange.UNBOUNDED,
-        DoubleRange.UNBOUNDED,
+        new DoubleRange(1, 3.4),
         Grid.create(
             3,
             2,
@@ -158,11 +158,11 @@ public class Main {
                 "gx=%d".formatted(gX),
                 "gy=%d".formatted(gY),
                 rectangles.stream()
-                    .filter(r -> rg.nextBoolean())
+                    //.filter(r -> rg.nextBoolean())
                     .collect(
                         Collectors.toMap(
                             r -> r,
-                            r -> r.width() * r.height()
+                            r -> rg.nextDouble(2, 5)
                         )
                     )
             )

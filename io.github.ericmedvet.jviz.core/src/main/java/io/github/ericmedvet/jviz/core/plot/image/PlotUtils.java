@@ -38,6 +38,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -365,11 +367,24 @@ public class PlotUtils {
           List.of(outerRange.min(), innerRange.min(), innerRange.max(), outerRange.max())
       );
     }
+    NumberFormat numberFormat = NumberFormat.getInstance();
+    double minLabelValue = innerRange.min();
+    try {
+      minLabelValue = numberFormat.parse(rangeLabelFormat.formatted(minLabelValue)).doubleValue();
+    } catch (ParseException e) {
+      // ignore
+    }
+    double maxLabelValue = innerRange.max();
+    try {
+      maxLabelValue = numberFormat.parse(rangeLabelFormat.formatted(maxLabelValue)).doubleValue();
+    } catch (ParseException e) {
+      // ignore
+    }
     drawString(
         g,
         c,
-        new Point2D.Double(rRange.denormalize(outerRange.normalize(innerRange.min())), labelsY),
-        rangeLabelFormat.formatted(innerRange.min()),
+        new Point2D.Double(rRange.denormalize(outerRange.normalize(minLabelValue)), labelsY),
+        rangeLabelFormat.formatted(minLabelValue),
         AnchorH.C,
         AnchorV.B,
         use,
@@ -379,8 +394,8 @@ public class PlotUtils {
     drawString(
         g,
         c,
-        new Point2D.Double(rRange.denormalize(outerRange.normalize(innerRange.max())), labelsY),
-        rangeLabelFormat.formatted(innerRange.max()),
+        new Point2D.Double(rRange.denormalize(outerRange.normalize(maxLabelValue)), labelsY),
+        rangeLabelFormat.formatted(maxLabelValue),
         AnchorH.C,
         AnchorV.B,
         use,

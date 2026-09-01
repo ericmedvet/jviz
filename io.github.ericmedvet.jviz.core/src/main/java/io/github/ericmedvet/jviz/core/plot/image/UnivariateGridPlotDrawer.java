@@ -29,7 +29,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.DoubleFunction;
 
@@ -170,30 +169,22 @@ public class UnivariateGridPlotDrawer extends AbstractXYPlotDrawer<UnivariateGri
     if (!c.showRanges()) {
       return;
     }
-    DoubleRange valueRange = computeValueRange(p);
-    Grid<DoubleRange> valueRanges = p.dataGrid().map(td -> computeValueRange(td.data()));
-    List<Double> allLabels = p.dataGrid()
-        .values()
-        .stream()
-        .map(td -> computeValueRange(td.data()))
-        .map(dr -> List.of(dr.min(), dr.max()))
-        .flatMap(List::stream)
-        .toList();
-    String rangeLabelFormat = PlotUtils.computeTicksFormat(configuration(), allLabels);
+    DoubleRange globalValueRange = computeValueRange(p);
+    DoubleRange localValueRange = computeValueRange(p.dataGrid().get(k).data()).intersectionWith(globalValueRange);
     PlotUtils.drawColorBar(
         g,
         configuration(),
         gm,
         new Rectangle2D.Double(r.getX(), r.getY(), r.getWidth(), r.getHeight()),
-        valueRange,
-        valueRanges.get(k),
+        globalValueRange,
+        localValueRange,
         c.colorRange(),
         c.legendImageHRate() * gm.h(),
         c.legendSteps(),
         Configuration.Text.Use.TICK_LABEL,
         configuration().colors().tickLabelColor(),
         AnchorV.T,
-        rangeLabelFormat
+        null
     );
   }
 }
