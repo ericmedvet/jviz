@@ -22,12 +22,17 @@ package io.github.ericmedvet.jviz.core.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Circle(Point center, double radius) implements Entity {
+public record Circle(Point center, double radius) implements BoundedEntity {
 
   public Circle {
     if (radius <= 0) {
       throw new IllegalArgumentException("Radius must be positive.");
     }
+  }
+
+  @Override
+  public Rectangle boundingBox() {
+    return new Rectangle(center, 2 * radius, 2 * radius);
   }
 
   public boolean contains(Point point) {

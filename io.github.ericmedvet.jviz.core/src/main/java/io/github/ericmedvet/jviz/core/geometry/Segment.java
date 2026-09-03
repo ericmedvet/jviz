@@ -23,24 +23,26 @@ package io.github.ericmedvet.jviz.core.geometry;
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import java.util.Optional;
 
-public record Segment(Point p1, Point p2) implements Entity {
+public record Segment(Point p1, Point p2) implements BoundedEntity {
+
+  @Override
+  public Rectangle boundingBox() {
+    return new Rectangle(center(), Math.abs(p1.x() - p2.x()), Math.abs(p1.y() - p2.y()));
+  }
 
   public Point center() {
     return new Point(p1.x() / 2d + p2.x() / 2d, p1.y() / 2d + p2.y() / 2d);
   }
 
-  public double direction() {
-    return p2.diff(p1).direction();
+  public Line perpendicularBisector() {
+    double a = p2.x() - p1.x();
+    double b = p2.y() - p1.y();
+    double c = (Math.pow(p2.x(), 2) - Math.pow(p1.x(), 2) + Math.pow(p2.y(), 2) - Math.pow(p1.y(), 2)) / 2d;
+    return new Line(a, b, c);
   }
 
-  public boolean isPointInBoundingBox(Point point, double precision) {
-    return point.x() >= Math.min(this.p1.x(), this.p2.x()) - precision / 2 && point.x() <= Math.max(
-        this.p1.x(),
-        this.p2.x()
-    ) + precision / 2 && point.y() >= Math.min(this.p1.y(), this.p2.y()) - precision / 2 && point.y() <= Math.max(
-        this.p1.y(),
-        this.p2.y()
-    ) + precision / 2;
+  public double direction() {
+    return p2.diff(p1).direction();
   }
 
   public boolean intersect(Segment other) {
@@ -90,6 +92,16 @@ public record Segment(Point p1, Point p2) implements Entity {
       return Optional.of(intersection);
     }
     return Optional.empty();
+  }
+
+  public boolean isPointInBoundingBox(Point point, double precision) {
+    return point.x() >= Math.min(this.p1.x(), this.p2.x()) - precision / 2 && point.x() <= Math.max(
+        this.p1.x(),
+        this.p2.x()
+    ) + precision / 2 && point.y() >= Math.min(this.p1.y(), this.p2.y()) - precision / 2 && point.y() <= Math.max(
+        this.p1.y(),
+        this.p2.y()
+    ) + precision / 2;
   }
 
   public double length() {

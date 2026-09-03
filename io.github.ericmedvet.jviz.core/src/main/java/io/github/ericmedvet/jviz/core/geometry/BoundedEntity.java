@@ -19,6 +19,8 @@
  */
 package io.github.ericmedvet.jviz.core.geometry;
 
-public interface Entity {
+public interface BoundedEntity extends Entity {
+
+  Rectangle boundingBox();
 
 }

@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
 
   public Rectangle {
-    if (topLeft.x() >= bottomRight.x() || bottomRight.y() >= topLeft.y()) {
+    if (topLeft.x() > bottomRight.x() || bottomRight.y() > topLeft.y()) {
       throw new IllegalArgumentException(
           "Invalid rectangle: Ensure bottomLeft is below and to the left of topRight."
       );
@@ -177,5 +177,13 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
 
   public double width() {
     return bottomRight.x() - topLeft.x();
+  }
+
+  public DoubleRange xRange() {
+    return new DoubleRange(min().x(), max().x());
+  }
+
+  public DoubleRange yRange() {
+    return new DoubleRange(min().y(), max().y());
   }
 }

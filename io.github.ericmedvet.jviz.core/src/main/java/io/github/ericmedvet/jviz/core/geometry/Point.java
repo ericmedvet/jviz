@@ -22,7 +22,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 
 import java.util.stream.DoubleStream;
 
-public record Point(double x, double y) implements Entity {
+public record Point(double x, double y) implements BoundedEntity {
 
   public static Point ORIGIN = new Point(0, 0);
 
@@ -36,6 +36,11 @@ public record Point(double x, double y) implements Entity {
 
   public static Point ofY(double y) {
     return new Point(0, y);
+  }
+
+  @Override
+  public Rectangle boundingBox() {
+    return Rectangle.of(this, this);
   }
 
   public Point diff(Point p) {

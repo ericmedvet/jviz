@@ -23,7 +23,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public interface Polygon extends Entity {
+public interface Polygon extends BoundedEntity {
 
   static Polygon of(List<Point> vertexes) {
     record HardPolygon(List<Point> vertexes) implements Polygon {
@@ -50,6 +50,7 @@ public interface Polygon extends Entity {
         .toList();
   }
 
+  @Override
   default Rectangle boundingBox() {
     return Rectangle.of(
         new Point(
