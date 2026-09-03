@@ -23,7 +23,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import java.util.Optional;
 
-public record Segment(Point p1, Point p2) {
+public record Segment(Point p1, Point p2) implements Entity {
 
   public Point center() {
     return new Point(p1.x() / 2d + p2.x() / 2d, p1.y() / 2d + p2.y() / 2d);

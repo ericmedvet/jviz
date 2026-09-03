@@ -21,7 +21,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 
 import java.util.Optional;
 
-public record Line(double a, double b, double c) {
+public record Line(double a, double b, double c) implements Entity {
 
   public static Line from(Point p1, Point p2) {
     if (p1.x() == p2.x()) {

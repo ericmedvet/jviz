@@ -21,7 +21,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 
 import java.util.Optional;
 
-public record Semiline(Point p, double a) {
+public record Semiline(Point p, double a) implements Entity {
   public Optional<Point> intersection(Segment s) {
     Line l = Line.from(p, a);
     Optional<Point> oIP = l.intersection(s);

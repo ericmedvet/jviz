@@ -23,7 +23,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public interface Polygon {
+public interface Polygon extends Entity {
 
   static Polygon of(List<Point> vertexes) {
     record HardPolygon(List<Point> vertexes) implements Polygon {

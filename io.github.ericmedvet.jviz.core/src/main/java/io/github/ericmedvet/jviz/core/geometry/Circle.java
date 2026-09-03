@@ -22,7 +22,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Circle(Point center, double radius) {
+public record Circle(Point center, double radius) implements Entity {
 
   public Circle {
     if (radius <= 0) {

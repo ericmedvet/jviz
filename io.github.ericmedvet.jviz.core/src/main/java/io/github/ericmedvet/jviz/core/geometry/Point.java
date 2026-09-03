@@ -22,7 +22,7 @@ package io.github.ericmedvet.jviz.core.geometry;
 
 import java.util.stream.DoubleStream;
 
-public record Point(double x, double y) {
+public record Point(double x, double y) implements Entity {
 
   public static Point ORIGIN = new Point(0, 0);
 
