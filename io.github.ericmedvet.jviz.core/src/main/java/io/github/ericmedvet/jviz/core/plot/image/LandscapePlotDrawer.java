@@ -192,7 +192,7 @@ public class LandscapePlotDrawer extends AbstractXYPlotDrawer<LandscapePlot, Lan
       return;
     }
     DoubleRange globalValueRange = computeValueRange(p, gm);
-    DoubleRange localValueRange = computeValueRanges(p, gm).get(k).intersectionWith(globalValueRange);
+    DoubleRange localValueRange = computeValueRanges(p, gm).get(k);
     PlotUtils.drawColorBar(
         g,
         configuration(),

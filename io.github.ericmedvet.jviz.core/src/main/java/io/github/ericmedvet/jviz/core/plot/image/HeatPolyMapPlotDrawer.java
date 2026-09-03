@@ -185,7 +185,7 @@ public class HeatPolyMapPlotDrawer extends AbstractXYPlotDrawer<HeatPolyMapPlot,
       return;
     }
     DoubleRange globalValueRange = computeValueRange(p);
-    DoubleRange localValueRange = computeValueRange(p.dataGrid().get(k).data()).intersectionWith(globalValueRange);
+    DoubleRange localValueRange = computeValueRange(p.dataGrid().get(k).data());
     PlotUtils.drawColorBar(
         g,
         configuration(),

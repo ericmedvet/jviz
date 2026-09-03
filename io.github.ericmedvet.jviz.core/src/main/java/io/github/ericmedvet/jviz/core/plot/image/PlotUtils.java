@@ -246,7 +246,8 @@ public class PlotUtils {
     int nOfDigits = 0;
     while (nOfDigits < c.general().maxNOfDecimalDigits()) {
       final int d = nOfDigits;
-      long nOfDistinct = ticks.stream().map(("%." + d + "f")::formatted).distinct().count();
+      double factor = Math.pow(10, nOfDigits);
+      long nOfDistinct = ticks.stream().map(v -> Math.floor(v * factor)).distinct().count();
       if (nOfDistinct == ticks.size()) {
         break;
       }
@@ -334,6 +335,16 @@ public class PlotUtils {
       AnchorV labelsAnchor,
       String rangeLabelFormat
   ) {
+    // fix ranges, if needed
+    if (innerRange.overlaps(outerRange)) {
+      innerRange = innerRange.intersectionWith(outerRange);
+    } else if (innerRange.min() > outerRange.max()) {
+      innerRange = new DoubleRange(outerRange.max(), outerRange.max());
+    } else {
+      innerRange = new DoubleRange(outerRange.min(), outerRange.min());
+    }
+    DoubleRange finalInnerRange = innerRange;
+    // marks
     Shape clip = g.getClip();
     markRectangle(g, c, r);
     // background
@@ -347,12 +358,12 @@ public class PlotUtils {
     DoubleRange rRange = new DoubleRange(r.getX(), r.getMaxX());
     double step = outerRange.extent() / (double) steps;
     DoubleStream.iterate(outerRange.min(), v -> v < outerRange.max(), v -> v + step)
-        .filter(v -> v + step > innerRange.min())
-        .filter(v -> v < innerRange.max())
+        .filter(v -> v + step > finalInnerRange.min())
+        .filter(v -> v < finalInnerRange.max())
         .forEach(v -> {
           g.setColor(colorRange.interpolate(outerRange.normalize(v)));
-          double rMin = rRange.denormalize(outerRange.normalize(innerRange.clip(v)));
-          double rMax = rRange.denormalize(outerRange.normalize(innerRange.clip(v + step)));
+          double rMin = rRange.denormalize(outerRange.normalize(finalInnerRange.clip(v)));
+          double rMax = rRange.denormalize(outerRange.normalize(finalInnerRange.clip(v + step)));
           g.fill(new Rectangle2D.Double(rMin, barY, rMax - rMin, h));
         });
     // border

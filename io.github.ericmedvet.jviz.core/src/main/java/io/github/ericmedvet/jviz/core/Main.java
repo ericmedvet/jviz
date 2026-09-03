@@ -150,7 +150,7 @@ public class Main {
         "y name",
         DoubleRange.UNBOUNDED,
         DoubleRange.UNBOUNDED,
-        new DoubleRange(1, 3.4),
+        new DoubleRange(0.1, 0.5),
         Grid.create(
             3,
             2,
