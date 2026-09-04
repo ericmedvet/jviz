@@ -112,4 +112,9 @@ public record Line(double a, double b, double c) implements Entity {
   public double interecept() {
     return -c / b;
   }
+
+  @Override
+  public String toString() {
+    return "l(%.3fx+%.3fy+%.3f=0)".formatted(a, b, c);
+  }
 }

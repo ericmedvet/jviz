@@ -79,10 +79,6 @@ public class GeometryUtils {
         clipped.add(p2);
       } else if (p1Inside) {
         clipped.add(getIntersection(p1, p2, l.a(), l.b(), l.c()));
-        //clipped.add(l.intersection(side).orElseThrow());
-        System.out.println(getIntersection(p1, p2, l.a(), l.b(), -l.c()));
-        System.out.println("\t" + Line.from(p1, p2) + " " + l.intersectionWith(Line.from(p1, p2)));
-        System.out.println("\t" + side + " " + l.intersectionWith(side));
       } else if (p2Inside) {
         clipped.add(getIntersection(p1, p2, l.a(), l.b(), l.c()));
         clipped.add(p2);
@@ -91,36 +87,22 @@ public class GeometryUtils {
     return Polygon.of(clipped);
   }
 
-  private static Point getIntersection(Point p1, Point p2, double A, double B, double C) {
+  private static Point getIntersection(Point p1, Point p2, double a, double b, double c) {
+    // TODO ideally, this should be replaced with intersectionWith of Line
     double dx = p2.x() - p1.x();
     double dy = p2.y() - p1.y();
-    double t = (C - A * p1.x() - B * p1.y()) / (A * dx + B * dy);
+    double t = (c - a * p1.x() - b * p1.y()) / (a * dx + b * dy);
     return new Point(p1.x() + t * dx, p1.y() + t * dy);
-  }
-
-  public static void main2() {
-    Point p1 = new Point(1, 2);
-    Point p2 = new Point(2, 1);
-    System.out.println(Line.from(p1, p2));
-    System.out.println(Line.from(p2, p1));
-    Segment s12 = new Segment(p1, p2);
-    Segment s21 = new Segment(p2, p1);
-    System.out.println(s12.perpendicularBisector());
-    System.out.println(s21.perpendicularBisector());
-    System.out.println(s12.perpendicularBisector().intersectionWith(s12));
-    System.out.println(s21.perpendicularBisector().intersectionWith(s12));
-    System.out.println(s12.perpendicularBisector().intersectionWith(s21));
-    System.out.println(s21.perpendicularBisector().intersectionWith(s21));
   }
 
   public static void main(String[] args) {
     DoubleRange xR = new DoubleRange(-0.4, 0.4);
     DoubleRange yR = new DoubleRange(-0.3, 0.35);
-    RandomGenerator rg = new Random(2);
+    RandomGenerator rg = new Random(3);
     List<Entity> entities = new ArrayList<>();
     entities.add(new Rectangle(Point.ORIGIN, 2, 1));
     entities.add(new Rectangle(Point.ORIGIN, 1, 0.75));
-    Set<Point> points = IntStream.range(0, 10)
+    Set<Point> points = IntStream.range(0, 20)
         .mapToObj(
             _ -> new Point(
                 xR.extend(1).denormalize(rg.nextDouble()),
