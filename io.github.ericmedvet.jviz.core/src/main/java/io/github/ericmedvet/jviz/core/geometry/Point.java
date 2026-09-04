@@ -51,41 +51,37 @@ public record Point(double x, double y) implements BoundedEntity {
     return Math.atan2(y, x);
   }
 
-  public double distance(Point p) {
+  public double distanceTo(Point p) {
     return diff(p).magnitude();
   }
 
-  public double distance(Segment s) {
+  public double distanceTo(Segment s) {
     return DoubleStream.of(
         Line.from(this, s.direction() + Math.PI / 2d)
-            .intersection(s)
-            .map(p -> p.distance(this))
+            .intersectionWith(s)
+            .map(p -> p.distanceTo(this))
             .orElse(Double.POSITIVE_INFINITY),
-        distance(s.p1()),
-        distance(s.p2())
+        distanceTo(s.p1()),
+        distanceTo(s.p2())
     )
         .min()
         .orElseThrow();
   }
 
-  public double distance(Line l) {
+  public double distanceTo(Line l) {
     return Math.abs(l.a() * x + l.b() * y + l.c()) / Math.sqrt(l.a() * l.a() + l.b() * l.b());
   }
 
-  public Point getOpposite() {
+  public Point opposite() {
     return new Point(-x, -y);
-  }
-
-  public double getRotationAngle(Point centerOfRotation) {
-    return diff(centerOfRotation).direction();
   }
 
   public double magnitude() {
     return Math.sqrt(x * x + y * y);
   }
 
-  public Point rotate(Point centerOfRotation, double angle) {
-    return translate(centerOfRotation.getOpposite()).rotate(angle).translate(centerOfRotation);
+  public Point rotate(Point center, double angle) {
+    return sum(center.opposite()).rotate(angle).sum(center);
   }
 
   public Point rotate(double angle) {
@@ -105,7 +101,4 @@ public record Point(double x, double y) implements BoundedEntity {
     return String.format("(%.3f;%.3f)", x, y);
   }
 
-  public Point translate(Point translation) {
-    return new Point(x + translation.x(), y + translation.y());
-  }
 }

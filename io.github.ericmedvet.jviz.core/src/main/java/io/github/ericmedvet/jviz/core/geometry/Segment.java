@@ -20,7 +20,6 @@
 
 package io.github.ericmedvet.jviz.core.geometry;
 
-import io.github.ericmedvet.jnb.datastructure.DoubleRange;
 import java.util.Optional;
 
 public record Segment(Point p1, Point p2) implements BoundedEntity {
@@ -38,31 +37,23 @@ public record Segment(Point p1, Point p2) implements BoundedEntity {
     return p2.diff(p1).direction();
   }
 
-  public boolean intersect(Segment other) {
-    Point v1 = p2().diff(p1());
-    Point v2 = other.p2().diff(other.p1());
-    if (v1.magnitude() == 0 || v2.magnitude() == 0) {
-      return false;
+  public Optional<Point> intersectionWith(Segment other) {
+    Optional<Point> oP = Line.from(this).intersectionWith(other);
+    if (oP.isEmpty()) {
+      return oP;
     }
-    double cramerDet = v1.y() * v2.x() - v1.x() * v2.y();
-    if (cramerDet == 0) {
-      if (Math.abs(other.p2().diff(p1()).direction()) != Math.abs(p2().diff(p1()).direction())) {
-        return false;
-      }
-      if (v1.x() > 0 == other.p2().x() > p2().x()) {
-        return DoubleRange.UNIT.contains((other.p2().x() - p1().x()) / v1.x());
-      }
-      return DoubleRange.UNIT.contains((p2().x() - other.p1().x()) / v2.x());
+    Point p = oP.orElseThrow();
+    if (!boundingBox().contains(p)) {
+      return Optional.empty();
     }
-    Point pointDiff = other.p1().diff(p1());
-    return DoubleRange.UNIT.contains((pointDiff.y() * v2.x() - pointDiff.x() * v2.y()) / cramerDet) && DoubleRange.UNIT
-        .contains(
-            (pointDiff.y() * v1.x() - pointDiff
-                .x() * v1.y()) / cramerDet
-        );
+    return oP;
   }
 
-  public Optional<Point> intersection(Segment other, double precision) {
+  public boolean intersects(Segment other) {
+    return intersectionWith(other).isEmpty();
+  }
+
+  public Optional<Point> intersectionWith(Segment other, double precision) {
     final double thisDeltaX = this.p1.x() - this.p2.x();
     final double otherDeltaX = other.p1.x() - other.p2.x();
     final double thisDeltaY = this.p1.y() - this.p2.y();
@@ -98,7 +89,7 @@ public record Segment(Point p1, Point p2) implements BoundedEntity {
   }
 
   public double length() {
-    return p1.distance(p2);
+    return p1.distanceTo(p2);
   }
 
   public Line perpendicularBisector() {

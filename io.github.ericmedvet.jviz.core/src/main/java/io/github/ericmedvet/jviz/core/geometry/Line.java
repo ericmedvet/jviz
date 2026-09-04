@@ -35,12 +35,20 @@ public record Line(double a, double b, double c) implements Entity {
     return new Line(1d / dX, -1d / dY, -p1.x() / dX + p1.y() / dY);
   }
 
-  public static Line from(Point p, double a) {
-    return from(p, p.sum(new Point(a)));
+  public static Line from(Point point, double direction) {
+    return from(point, point.sum(new Point(direction)));
   }
 
-  public static Line from(Segment s) {
-    return from(s.p1(), s.p2());
+  public static Line from(Segment segment) {
+    return from(segment.p1(), segment.p2());
+  }
+
+  public static Line from(double slope, double intercept) {
+    return new Line(slope, -1, intercept);
+  }
+
+  public static Line from(Semiline semiline) {
+    return from(semiline.point(), semiline.direction());
   }
 
   public boolean contains(Point p) {
@@ -51,25 +59,57 @@ public record Line(double a, double b, double c) implements Entity {
     return contains(s.p1()) && contains(s.p2());
   }
 
-  public Optional<Point> intersection(Line other) {
+  public Optional<Point> intersectionWith(Line other) {
     double determinant = a * other.b - other.a * b;
     if (Math.abs(determinant) < 1e-9) {
       return Optional.empty();
     }
-    double x = (- c * other.b + other.c * b) / determinant;
-    double y = (- a * other.c + other.a * c) / determinant;
+    double x = (-c * other.b + other.c * b) / determinant;
+    double y = (-a * other.c + other.a * c) / determinant;
     return Optional.of(new Point(x, y));
   }
 
-  public Optional<Point> intersection(Segment s) {
-    Optional<Point> oP = intersection(from(s));
+  public Optional<Point> intersectionWith(Segment segment) {
+    Optional<Point> oP = intersectionWith(from(segment));
     if (oP.isEmpty()) {
       return oP;
     }
     Point p = oP.orElseThrow();
-    if (!s.boundingBox().contains(p)) {
+    if (!segment.boundingBox().contains(p)) {
       return Optional.empty();
     }
     return oP;
+  }
+
+  public Optional<Point> intersectionWith(Semiline semiline) {
+    Optional<Point> oP = intersectionWith(from(semiline));
+    if (oP.isEmpty()) {
+      return oP;
+    }
+    Point iP = oP.orElseThrow();
+    if (Math.abs((iP.diff(semiline.point()).direction() - semiline.direction()) % (2 * Math.PI)) > Math.PI / 2d) {
+      return Optional.empty();
+    }
+    return oP;
+  }
+
+  public boolean isParallelWith(Line other) {
+    return intersectionWith(other).isEmpty();
+  }
+
+  public boolean isParallelWith(Semiline semiline) {
+    return intersectionWith(from(semiline)).isEmpty();
+  }
+
+  public boolean isParallelWith(Segment segment) {
+    return intersectionWith(from(segment)).isEmpty();
+  }
+
+  public double slope() {
+    return -a / b;
+  }
+
+  public double interecept() {
+    return -c / b;
   }
 }

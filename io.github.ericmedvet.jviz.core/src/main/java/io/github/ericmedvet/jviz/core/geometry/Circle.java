@@ -36,7 +36,7 @@ public record Circle(Point center, double radius) implements BoundedEntity {
   }
 
   public boolean contains(Point point) {
-    return center.distance(point) <= radius;
+    return center.distanceTo(point) <= radius;
   }
 
   // the list of intersection points returned sorted in ascending order based on the distance from segment.p1()

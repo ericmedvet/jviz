@@ -59,7 +59,7 @@ public class GeometryUtils {
         if (p == q) {
           continue;
         }
-        cell = clipPolygon(cell, new Segment(p,q).perpendicularBisector());
+        cell = clipPolygon(cell, new Segment(p, q).perpendicularBisector());
       }
       if (!cell.vertexes().isEmpty()) {
         cells.add(cell);
@@ -79,10 +79,10 @@ public class GeometryUtils {
         clipped.add(p2);
       } else if (p1Inside) {
         clipped.add(getIntersection(p1, p2, l.a(), l.b(), l.c()));
-        clipped.add(l.intersection(side).orElseThrow());
-        System.out.println(getIntersection(p1, p2, l.a(), l.b(), l.c()));
-        System.out.println(l.intersection(Line.from(p1, p2)));
-        System.out.println();
+        //clipped.add(l.intersection(side).orElseThrow());
+        System.out.println(getIntersection(p1, p2, l.a(), l.b(), -l.c()));
+        System.out.println("\t" + Line.from(p1, p2) + " " + l.intersectionWith(Line.from(p1, p2)));
+        System.out.println("\t" + side + " " + l.intersectionWith(side));
       } else if (p2Inside) {
         clipped.add(getIntersection(p1, p2, l.a(), l.b(), l.c()));
         clipped.add(p2);
@@ -103,14 +103,14 @@ public class GeometryUtils {
     Point p2 = new Point(2, 1);
     System.out.println(Line.from(p1, p2));
     System.out.println(Line.from(p2, p1));
-    Segment s12 = new Segment(p1,p2);
-    Segment s21 = new Segment(p2,p1);
+    Segment s12 = new Segment(p1, p2);
+    Segment s21 = new Segment(p2, p1);
     System.out.println(s12.perpendicularBisector());
     System.out.println(s21.perpendicularBisector());
-    System.out.println(s12.perpendicularBisector().intersection(s12));
-    System.out.println(s21.perpendicularBisector().intersection(s12));
-    System.out.println(s12.perpendicularBisector().intersection(s21));
-    System.out.println(s21.perpendicularBisector().intersection(s21));
+    System.out.println(s12.perpendicularBisector().intersectionWith(s12));
+    System.out.println(s21.perpendicularBisector().intersectionWith(s12));
+    System.out.println(s12.perpendicularBisector().intersectionWith(s21));
+    System.out.println(s21.perpendicularBisector().intersectionWith(s21));
   }
 
   public static void main(String[] args) {

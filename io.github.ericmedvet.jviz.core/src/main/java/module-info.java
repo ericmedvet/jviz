@@ -39,4 +39,6 @@ module io.github.ericmedvet.jviz.core {
   requires smile.base;
   requires org.jspecify;
   requires commons.math3;
+
+  opens io.github.ericmedvet.jviz.core.geometry to org.junit.platform.commons;
 }

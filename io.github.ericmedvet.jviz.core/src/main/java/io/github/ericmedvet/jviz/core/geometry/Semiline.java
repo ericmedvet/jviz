@@ -21,17 +21,16 @@ package io.github.ericmedvet.jviz.core.geometry;
 
 import java.util.Optional;
 
-public record Semiline(Point p, double a) implements Entity {
-  public Optional<Point> intersection(Segment s) {
-    Line l = Line.from(p, a);
-    Optional<Point> oIP = l.intersection(s);
-    if (oIP.isEmpty()) {
-      return oIP;
+public record Semiline(Point point, double direction) implements Entity {
+  public Optional<Point> intersectionWith(Segment s) {
+    Optional<Point> oP = Line.from(this).intersectionWith(s);
+    if (oP.isEmpty()) {
+      return oP;
     }
-    Point iP = oIP.orElseThrow();
-    if (Math.abs((iP.diff(p).direction() - a) % (2 * Math.PI)) > Math.PI / 2d) {
+    Point p = oP.orElseThrow();
+    if (Math.abs((p.diff(point).direction() - direction) % (2 * Math.PI)) > Math.PI / 2d) {
       return Optional.empty();
     }
-    return oIP;
+    return oP;
   }
 }
