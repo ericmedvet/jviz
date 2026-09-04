@@ -24,6 +24,7 @@ import io.github.ericmedvet.jviz.core.geometry.EntitiesDrawer.Configuration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
@@ -58,9 +59,11 @@ public class GeometryUtils {
         if (p == q) {
           continue;
         }
-        cell = clipPolygon(cell, new Segment(p, q).perpendicularBisector());
+        cell = clipPolygon(cell, new Segment(p,q).perpendicularBisector());
       }
-      cells.add(cell);
+      if (!cell.vertexes().isEmpty()) {
+        cells.add(cell);
+      }
     }
     return cells;
   }
@@ -76,6 +79,10 @@ public class GeometryUtils {
         clipped.add(p2);
       } else if (p1Inside) {
         clipped.add(getIntersection(p1, p2, l.a(), l.b(), l.c()));
+        clipped.add(l.intersection(side).orElseThrow());
+        System.out.println(getIntersection(p1, p2, l.a(), l.b(), l.c()));
+        System.out.println(l.intersection(Line.from(p1, p2)));
+        System.out.println();
       } else if (p2Inside) {
         clipped.add(getIntersection(p1, p2, l.a(), l.b(), l.c()));
         clipped.add(p2);
@@ -91,14 +98,29 @@ public class GeometryUtils {
     return new Point(p1.x() + t * dx, p1.y() + t * dy);
   }
 
+  public static void main2() {
+    Point p1 = new Point(1, 2);
+    Point p2 = new Point(2, 1);
+    System.out.println(Line.from(p1, p2));
+    System.out.println(Line.from(p2, p1));
+    Segment s12 = new Segment(p1,p2);
+    Segment s21 = new Segment(p2,p1);
+    System.out.println(s12.perpendicularBisector());
+    System.out.println(s21.perpendicularBisector());
+    System.out.println(s12.perpendicularBisector().intersection(s12));
+    System.out.println(s21.perpendicularBisector().intersection(s12));
+    System.out.println(s12.perpendicularBisector().intersection(s21));
+    System.out.println(s21.perpendicularBisector().intersection(s21));
+  }
+
   public static void main(String[] args) {
     DoubleRange xR = new DoubleRange(-0.4, 0.4);
     DoubleRange yR = new DoubleRange(-0.3, 0.35);
-    RandomGenerator rg = RandomGenerator.getDefault();
+    RandomGenerator rg = new Random(2);
     List<Entity> entities = new ArrayList<>();
     entities.add(new Rectangle(Point.ORIGIN, 2, 1));
     entities.add(new Rectangle(Point.ORIGIN, 1, 0.75));
-    Set<Point> points = IntStream.range(0, 100)
+    Set<Point> points = IntStream.range(0, 10)
         .mapToObj(
             _ -> new Point(
                 xR.extend(1).denormalize(rg.nextDouble()),

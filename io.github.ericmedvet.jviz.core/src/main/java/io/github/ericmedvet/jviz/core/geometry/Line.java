@@ -51,16 +51,13 @@ public record Line(double a, double b, double c) implements Entity {
     return contains(s.p1()) && contains(s.p2());
   }
 
-  public Optional<Point> intersection(Line l) {
-    if (l.equals(this)) {
+  public Optional<Point> intersection(Line other) {
+    double determinant = a * other.b - other.a * b;
+    if (Math.abs(determinant) < 1e-9) {
       return Optional.empty();
     }
-    if (a / l.a == b / l.b) {
-      return Optional.empty();
-    }
-    double d = a * l.b - l.a * b;
-    double x = (b * l.c - l.b * c) / d;
-    double y = (c * l.a - l.c * a) / d;
+    double x = (- c * other.b + other.c * b) / determinant;
+    double y = (- a * other.c + other.a * c) / determinant;
     return Optional.of(new Point(x, y));
   }
 
@@ -70,16 +67,7 @@ public record Line(double a, double b, double c) implements Entity {
       return oP;
     }
     Point p = oP.orElseThrow();
-    if (p.x() < Math.min(s.p1().x(), s.p2().x())) {
-      return Optional.empty();
-    }
-    if (p.x() > Math.max(s.p1().x(), s.p2().x())) {
-      return Optional.empty();
-    }
-    if (p.y() < Math.min(s.p1().y(), s.p2().y())) {
-      return Optional.empty();
-    }
-    if (p.y() > Math.max(s.p1().y(), s.p2().y())) {
+    if (!s.boundingBox().contains(p)) {
       return Optional.empty();
     }
     return oP;

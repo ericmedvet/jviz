@@ -34,13 +34,6 @@ public record Segment(Point p1, Point p2) implements BoundedEntity {
     return new Point(p1.x() / 2d + p2.x() / 2d, p1.y() / 2d + p2.y() / 2d);
   }
 
-  public Line perpendicularBisector() {
-    double a = p2.x() - p1.x();
-    double b = p2.y() - p1.y();
-    double c = (Math.pow(p2.x(), 2) - Math.pow(p1.x(), 2) + Math.pow(p2.y(), 2) - Math.pow(p1.y(), 2)) / 2d;
-    return new Line(a, b, c);
-  }
-
   public double direction() {
     return p2.diff(p1).direction();
   }
@@ -106,6 +99,13 @@ public record Segment(Point p1, Point p2) implements BoundedEntity {
 
   public double length() {
     return p1.distance(p2);
+  }
+
+  public Line perpendicularBisector() {
+    double a = p2.x() - p1.x();
+    double b = p2.y() - p1.y();
+    double c = (Math.pow(p2.x(), 2) - Math.pow(p1.x(), 2) + Math.pow(p2.y(), 2) - Math.pow(p1.y(), 2)) / 2d;
+    return new Line(a, b, c);
   }
 
   @Override

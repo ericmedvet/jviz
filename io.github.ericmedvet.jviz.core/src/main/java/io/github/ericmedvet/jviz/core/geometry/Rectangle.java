@@ -65,6 +65,10 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
     );
   }
 
+  public boolean contains(Point p) {
+    return xRange().contains(p.x()) && yRange().contains(p.y());
+  }
+
   public double height() {
     return topLeft.y() - bottomRight.y();
   }
