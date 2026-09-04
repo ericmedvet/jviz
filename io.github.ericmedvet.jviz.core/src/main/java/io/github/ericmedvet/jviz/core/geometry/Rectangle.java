@@ -73,10 +73,10 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
     return topLeft.y() - bottomRight.y();
   }
 
-  public List<Point> horizontalEdgesIntersections(Segment segment, double precision) {
+  public List<Point> horizontalEdgesIntersectionsWith(Segment segment) {
     List<Point> horizontalEdgesIntersections = new ArrayList<>();
-    segment.intersectionWith(topEdge(), precision).ifPresent(horizontalEdgesIntersections::add);
-    segment.intersectionWith(bottomEdge(), precision).ifPresent(horizontalEdgesIntersections::add);
+    segment.intersectionWith(topEdge()).ifPresent(horizontalEdgesIntersections::add);
+    segment.intersectionWith(bottomEdge()).ifPresent(horizontalEdgesIntersections::add);
     horizontalEdgesIntersections.sort((intersection1, intersection2) -> {
       double distance1 = segment.p1().distanceTo(intersection1);
       double distance2 = segment.p1().distanceTo(intersection2);
@@ -86,11 +86,11 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
   }
 
   // the list of intersection points returned sorted in ascending order based on the distance from segment.p1()
-  public List<Point> intersection(Segment segment, double precision) {
+  public List<Point> intersectionsWith(Segment segment) {
     List<Point> intersections = new ArrayList<>();
     // check intersection with each edge
     for (Segment edge : List.of(topEdge(), bottomEdge(), leftEdge(), rightEdge())) {
-      segment.intersectionWith(edge, precision).ifPresent(intersections::add);
+      segment.intersectionWith(edge).ifPresent(intersections::add);
     }
     intersections.sort((intersection1, intersection2) -> {
       double distance1 = segment.p1().distanceTo(intersection1);
@@ -167,10 +167,10 @@ public record Rectangle(Point topLeft, Point bottomRight) implements Polygon {
     );
   }
 
-  public List<Point> verticalEdgesIntersections(Segment segment, double precision) {
+  public List<Point> verticalEdgesIntersectionsWith(Segment segment) {
     List<Point> verticalEdgesIntersections = new ArrayList<>();
-    segment.intersectionWith(leftEdge(), precision).ifPresent(verticalEdgesIntersections::add);
-    segment.intersectionWith(rightEdge(), precision).ifPresent(verticalEdgesIntersections::add);
+    segment.intersectionWith(leftEdge()).ifPresent(verticalEdgesIntersections::add);
+    segment.intersectionWith(rightEdge()).ifPresent(verticalEdgesIntersections::add);
     verticalEdgesIntersections.sort((intersection1, intersection2) -> {
       double distance1 = segment.p1().distanceTo(intersection1);
       double distance2 = segment.p1().distanceTo(intersection2);
